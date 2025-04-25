@@ -11,6 +11,7 @@ class Game {
   gameObjects: GameObject[] = [];
   turnIndex = 0;
   camera: GameObject | undefined;
+  lastTime: number = 0;
 
   constructor(width: number, height: number) {
     if (Game.instance) {
@@ -30,9 +31,6 @@ class Game {
     this.gameObjects.push(camera);
     this.camera = camera;
 
-    (this.camera.behaviors.Transform as Transform).position.x = -100;
-    (this.camera.behaviors.Transform as Transform).position.y = -100;
-
     Input.getInstance();
 
     Game.instance = this;
@@ -45,11 +43,16 @@ class Game {
     this.gameObjects.forEach((gameObject) => {
       gameObject.start();
     });
+    this.lastTime = performance.now();
     this.tick();
   }
 
   tick() {
-    this.update();
+    const currentTime = performance.now();
+    const deltaTime = (currentTime - this.lastTime) / 1000; // Convert to seconds
+    this.lastTime = currentTime;
+
+    this.update(deltaTime);
     this.draw();
     requestAnimationFrame(() => this.tick());
   }
@@ -64,9 +67,9 @@ class Game {
     this.gameObjects.push(gameObject);
   }
 
-  update() {
+  update(deltaTime: number) {
     this.gameObjects.forEach((gameObject) => {
-      gameObject.update();
+      gameObject.update(deltaTime);
     });
   }
 
@@ -84,8 +87,8 @@ class Game {
     const cameraTransform = Game.Camera.behaviors.Transform as Transform;
     // console.log(cameraTransform);
     this.ctx.translate(
-      -cameraTransform.position.x + this.canvas.width / 2,
-      -cameraTransform.position.y + this.canvas.height / 2
+      Math.floor(-cameraTransform.position.x + this.canvas.width / 2),
+      Math.floor(-cameraTransform.position.y + this.canvas.height / 2)
     );
     this.gameObjects.forEach((gameObject) => {
       gameObject.draw();

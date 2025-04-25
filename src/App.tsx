@@ -2,8 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import "./App.css";
 import Game from "./engine/Game";
 import PlayerCamera from "./example/objects/PlayerCamera";
-import RedRectangle from "./example/behaviors/RedRectangle";
-import WorldGrid from "./example/objects/WorldGrid";
+import RedRectangle from "./example/objects/RedRectangle";
 
 function App() {
   const canvasContainer = useRef<HTMLDivElement>(null);

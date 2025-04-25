@@ -47,12 +47,12 @@ export class GameObject {
     });
   }
 
-  update() {
+  update(deltaTime: number) {
     Object.values(this.behaviors).forEach((behavior) => {
-      behavior.update();
+      behavior.update(deltaTime);
     });
     this.children.forEach((child) => {
-      child.update();
+      child.update(deltaTime);
     });
   }
 
@@ -60,14 +60,24 @@ export class GameObject {
     const ctx = Game.instance?.ctx;
     if (!ctx) return;
 
+    const time = performance.now() / 1000;
+
+    const transform = this.behaviors.Transform as Transform;
     ctx.save();
     ctx.translate(
-      (this.behaviors.Transform as Transform).position.x,
-      (this.behaviors.Transform as Transform).position.y
+      Math.floor(transform.position.x),
+      Math.floor(transform.position.y)
+    );
+    ctx.rotate(transform.rotation);
+    ctx.save();
+    ctx.translate(
+      Math.floor(-transform.origin.x),
+      Math.floor(-transform.origin.y)
     );
     Object.values(this.behaviors).forEach((behavior) => {
       behavior.draw();
     });
+    ctx.restore();
     this.children.forEach((child) => {
       child.draw();
     });

@@ -7,7 +7,8 @@ class Behavior {
   ctx: CanvasRenderingContext2D | undefined;
 
   start() {}
-  update() {}
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  update(deltaTime: number) {}
   draw() {}
 }
 
