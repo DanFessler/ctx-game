@@ -5,19 +5,29 @@ import Game from "../../engine/Game";
 
 class WorldGridBehavior extends Behavior {
   spacing: number;
+
   constructor(spacing: number) {
     super();
     this.spacing = spacing;
   }
+
   draw() {
     const ctx = Game.instance?.ctx;
     if (!ctx) return;
 
     const transform = this.gameObject!.behaviors.Transform as Transform;
+    const halfPixelOffset = 1 / Game.instance!.PPU / 2;
     const position = {
-      x: Math.floor(transform.position.x),
-      y: Math.floor(transform.position.y),
+      x:
+        Math.round(transform.position.x * Game.instance!.PPU) /
+          Game.instance!.PPU +
+        halfPixelOffset,
+      y:
+        Math.round(transform.position.y * Game.instance!.PPU) /
+          Game.instance!.PPU +
+        halfPixelOffset,
     };
+
     ctx.save();
     ctx.translate(-position.x, -position.y);
 
@@ -30,7 +40,7 @@ class WorldGridBehavior extends Behavior {
     let lines = Math.ceil(screenWidth / 2 / spacing) * 2;
     for (let x = -lines / 2; x < lines; x += 1) {
       ctx.beginPath();
-      const xPos = x * spacing + position.x + 0.5;
+      const xPos = x * spacing + position.x;
       const modXPos = position.x % spacing;
       ctx.moveTo(xPos - modXPos, position.y - screenHeight / 2);
       ctx.lineTo(xPos - modXPos, screenHeight + position.y - screenHeight / 2);
@@ -40,7 +50,7 @@ class WorldGridBehavior extends Behavior {
     lines = Math.ceil(screenHeight / 2 / spacing) * 2;
     for (let y = -lines / 2; y < lines; y += 1) {
       ctx.beginPath();
-      const yPos = y * spacing + position.y + 0.5;
+      const yPos = y * spacing + position.y;
       const modYPos = position.y % spacing;
       ctx.moveTo(position.x - screenWidth / 2, yPos - modYPos);
       ctx.lineTo(screenWidth + position.x - screenWidth / 2, yPos - modYPos);
@@ -51,16 +61,16 @@ class WorldGridBehavior extends Behavior {
     ctx.strokeStyle = "rgba(0, 0, 0, 0.5)";
     ctx.beginPath();
 
-    ctx.moveTo(position.x - position.x + 0.5, position.y - screenHeight / 2);
+    ctx.moveTo(position.x - position.x, position.y - screenHeight / 2);
     ctx.lineTo(
-      position.x - position.x + 0.5,
+      position.x - position.x,
       screenHeight + position.y - screenHeight / 2
     );
 
-    ctx.moveTo(position.x - screenWidth / 2, position.y - position.y + 0.5);
+    ctx.moveTo(position.x - screenWidth / 2, position.y - position.y);
     ctx.lineTo(
       screenWidth + position.x - screenWidth / 2,
-      position.y - position.y + 0.5
+      position.y - position.y
     );
 
     ctx.stroke();

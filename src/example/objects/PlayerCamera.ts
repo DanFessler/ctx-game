@@ -8,9 +8,9 @@ import Game from "../../engine/Game";
 import WorldGrid from "../behaviors/WorldGrid";
 
 class CameraController extends Behavior {
-  acceleration: number = 100;
+  acceleration: number = 2;
   velocity: Vector2 = new Vector2(0, 0);
-  maxSpeed: number = 50;
+  maxSpeed: number = 5;
   friction: number = 0.9;
 
   constructor() {
@@ -58,10 +58,10 @@ class CameraController extends Behavior {
 
     ctx.strokeStyle = "black";
     ctx.beginPath();
-    ctx.moveTo(0, -5);
-    ctx.lineTo(0, 5);
-    ctx.moveTo(-5, 0);
-    ctx.lineTo(5, 0);
+    ctx.moveTo(0, -0.5);
+    ctx.lineTo(0, 0.5);
+    ctx.moveTo(-0.5, 0);
+    ctx.lineTo(0.5, 0);
     ctx.stroke();
   }
 }
@@ -69,7 +69,7 @@ class CameraController extends Behavior {
 class PlayerCamera extends GameObject {
   constructor() {
     super({
-      behaviors: [new Camera(), new CameraController(), new WorldGrid(100)],
+      behaviors: [new Camera(), new CameraController(), new WorldGrid(1)],
     });
   }
 }

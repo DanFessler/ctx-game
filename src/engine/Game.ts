@@ -12,17 +12,34 @@ class Game {
   turnIndex = 0;
   camera: GameObject | undefined;
   lastTime: number = 0;
+  PPU: number = 1;
+  scale: number = 4;
 
-  constructor(width: number, height: number) {
+  constructor(
+    width: number,
+    height: number,
+    PPU: number = 64,
+    scale: number = 1
+  ) {
     if (Game.instance) {
       throw new Error("Game already exists");
     }
 
+    this.scale = scale;
     this.canvas = document.createElement("canvas");
     this.canvas.width = width;
     this.canvas.height = height;
     this.canvas.style.backgroundColor = "white";
+    this.canvas.style.imageRendering = "pixelated";
+    this.canvas.style.width = `${width * this.scale}px`;
+    this.canvas.style.height = `${height * this.scale}px`;
+
+    this.PPU = PPU;
     this.ctx = this.canvas.getContext("2d")!;
+    this.ctx.scale(this.PPU, this.PPU);
+    this.ctx.lineWidth = 1 / this.PPU;
+    this.ctx.font = `${12 / this.PPU}px Arial`;
+    this.ctx.imageSmoothingEnabled = false;
 
     // Create a default camera game object
     const camera = new GameObject({
@@ -74,7 +91,12 @@ class Game {
   }
 
   draw() {
-    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    this.ctx.clearRect(
+      0,
+      0,
+      this.canvas.width / this.PPU,
+      this.canvas.height / this.PPU
+    );
 
     if (!this.camera) {
       this.ctx.fillStyle = "black";
@@ -86,10 +108,23 @@ class Game {
     this.ctx.save();
     const cameraTransform = Game.Camera.behaviors.Transform as Transform;
     // console.log(cameraTransform);
-    this.ctx.translate(
-      Math.floor(-cameraTransform.position.x + this.canvas.width / 2),
-      Math.floor(-cameraTransform.position.y + this.canvas.height / 2)
-    );
+
+    const snapToPixel = true;
+    if (snapToPixel) {
+      this.ctx.translate(
+        Math.round(
+          -cameraTransform.position.x * this.PPU + this.canvas.width / 2
+        ) / this.PPU,
+        Math.round(
+          -cameraTransform.position.y * this.PPU + this.canvas.height / 2
+        ) / this.PPU
+      );
+    } else {
+      this.ctx.translate(
+        -cameraTransform.position.x + this.canvas.width / this.PPU / 2,
+        -cameraTransform.position.y + this.canvas.height / this.PPU / 2
+      );
+    }
     this.gameObjects.forEach((gameObject) => {
       gameObject.draw();
     });

@@ -30,14 +30,14 @@ class RedRectangle extends GameObject {
   constructor() {
     super({
       behaviors: [
-        new Transform(0, 0, 96, 96, 48, 48),
+        new Transform(0, 0, 3, 3, 1.5, 1.5),
         new Rectangle("red"),
         new RedRectangleBehavior(),
       ],
       children: [
         new GameObject({
           behaviors: [
-            new Transform(0, 0, 32, 32, 16, 16),
+            new Transform(0, 0, 1, 1, 0.5, 0.5),
             new Rectangle("blue"),
           ],
         }),

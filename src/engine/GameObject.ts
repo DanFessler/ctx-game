@@ -60,20 +60,22 @@ export class GameObject {
     const ctx = Game.instance?.ctx;
     if (!ctx) return;
 
-    const time = performance.now() / 1000;
-
     const transform = this.behaviors.Transform as Transform;
+    const snapToPixel = true;
     ctx.save();
-    ctx.translate(
-      Math.floor(transform.position.x),
-      Math.floor(transform.position.y)
-    );
+    if (snapToPixel) {
+      ctx.translate(
+        Math.round(transform.position.x * Game.instance!.PPU) /
+          Game.instance!.PPU,
+        Math.round(transform.position.y * Game.instance!.PPU) /
+          Game.instance!.PPU
+      );
+    } else {
+      ctx.translate(transform.position.x, transform.position.y);
+    }
     ctx.rotate(transform.rotation);
     ctx.save();
-    ctx.translate(
-      Math.floor(-transform.origin.x),
-      Math.floor(-transform.origin.y)
-    );
+    ctx.translate(-transform.origin.x, -transform.origin.y);
     Object.values(this.behaviors).forEach((behavior) => {
       behavior.draw();
     });
