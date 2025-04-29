@@ -5,6 +5,7 @@ import { Transform } from "./behaviors/Transform";
 type GameObjectProps = {
   behaviors?: Behavior[];
   children?: GameObject[];
+  name?: string;
 };
 
 export class GameObject {
@@ -12,8 +13,19 @@ export class GameObject {
   behaviors: Record<string, Behavior> = {};
   children: GameObject[] = [];
   parent: GameObject | undefined;
+  name: string;
 
-  constructor({ behaviors, children }: GameObjectProps) {
+  private subscribers = new Set<() => void>();
+
+  subscribe(callback: () => void): () => void {
+    this.subscribers.add(callback);
+    console.log("subscribed to", this.name, callback);
+    return () => this.subscribers.delete(callback);
+  }
+
+  constructor({ behaviors, children, name }: GameObjectProps) {
+    this.name = name || this.constructor.name;
+
     if (behaviors) {
       // Map behaviors to their constructor name
       this.behaviors = behaviors.reduce((acc, behavior) => {
@@ -54,6 +66,7 @@ export class GameObject {
     this.children.forEach((child) => {
       child.update(deltaTime);
     });
+    this.subscribers.forEach((callback) => callback());
   }
 
   draw() {
