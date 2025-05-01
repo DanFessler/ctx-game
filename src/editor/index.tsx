@@ -1,6 +1,6 @@
 import { useState } from "react";
 import GameObject from "../engine/GameObject";
-import game from "./game";
+import game from "../game";
 
 import HierarchyList from "./components/HierarchyList";
 import TabView from "./components/TabView";

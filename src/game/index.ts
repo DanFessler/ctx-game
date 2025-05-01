@@ -1,7 +1,7 @@
 import Game from "../engine/Game";
-import PlayerCamera from "../example/objects/PlayerCamera";
-import RedRectangle from "../example/objects/RedRectangle";
-import TileMap from "../example/objects/TileMap";
+import PlayerCamera from "./objects/PlayerCamera";
+import RedRectangle from "./objects/RedRectangle";
+import TileMap from "./objects/TileMap";
 
 let game: Game;
 if (!Game.instance) {

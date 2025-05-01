@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 
-import game from "../game";
+import game from "../../game";
 import colors from "../colors";
 import styles from "./SceneCanvas.module.css";
 function SceneCanvas() {
