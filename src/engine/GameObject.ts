@@ -14,14 +14,18 @@ export class GameObject {
   children: GameObject[] = [];
   parent: GameObject | undefined;
   name: string;
+  isActive: boolean = true;
 
   private subscribers = new Set<() => void>();
 
-  subscribe(callback: () => void): () => void {
+  subscribe = (callback: () => void): (() => void) => {
     this.subscribers.add(callback);
     console.log("subscribed to", this.name, callback);
-    return () => this.subscribers.delete(callback);
-  }
+    return () => {
+      this.subscribers.delete(callback);
+      console.log("unsubscribed from", this.name, callback);
+    };
+  };
 
   constructor({ behaviors, children, name }: GameObjectProps) {
     this.name = name || this.constructor.name;
@@ -34,8 +38,12 @@ export class GameObject {
       }, {} as Record<string, Behavior>);
 
       // add default transform if not present
+      // make sure it's the first behavior
       if (!this.behaviors.Transform) {
-        this.behaviors.Transform = new Transform(0, 0, 0, 0);
+        this.behaviors = {
+          Transform: new Transform(0, 0, 0, 0),
+          ...this.behaviors,
+        };
       }
 
       // Set the gameObject and game properties for each behavior
@@ -55,21 +63,27 @@ export class GameObject {
   start() {
     Object.values(this.behaviors).forEach((behavior) => {
       behavior.ctx = Game.instance?.ctx;
-      behavior.start();
+      behavior.start?.();
     });
   }
 
   update(deltaTime: number) {
     Object.values(this.behaviors).forEach((behavior) => {
-      behavior.update(deltaTime);
+      if (behavior.active) {
+        behavior.update?.(deltaTime);
+      }
     });
     this.children.forEach((child) => {
       child.update(deltaTime);
     });
+    this.updateSubscribers();
+  }
+
+  updateSubscribers() {
     this.subscribers.forEach((callback) => callback());
   }
 
-  draw() {
+  draw(renderPass?: string) {
     const ctx = Game.instance?.ctx;
     if (!ctx) return;
 
@@ -90,11 +104,13 @@ export class GameObject {
     ctx.save();
     ctx.translate(-transform.origin.x, -transform.origin.y);
     Object.values(this.behaviors).forEach((behavior) => {
-      behavior.draw();
+      if (behavior.active) {
+        behavior.draw?.(ctx, renderPass);
+      }
     });
     ctx.restore();
     this.children.forEach((child) => {
-      child.draw();
+      child.draw(renderPass);
     });
     ctx.restore();
   }

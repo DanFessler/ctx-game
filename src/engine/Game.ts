@@ -1,5 +1,4 @@
 import GameObject from "./GameObject";
-import Camera from "./behaviors/Camera";
 import { Transform } from "./behaviors/Transform";
 import Input from "./Input";
 
@@ -14,6 +13,7 @@ class Game {
   lastTime: number = 0;
   PPU: number = 1;
   scale: number = 4;
+  isPlaying = false;
 
   constructor(
     width: number,
@@ -29,7 +29,7 @@ class Game {
     this.canvas = document.createElement("canvas");
     this.canvas.width = width;
     this.canvas.height = height;
-    this.canvas.style.backgroundColor = "white";
+    this.canvas.style.backgroundColor = "black";
     this.canvas.style.imageRendering = "pixelated";
     this.canvas.style.width = `${width * this.scale}px`;
     this.canvas.style.height = `${height * this.scale}px`;
@@ -41,21 +41,14 @@ class Game {
     this.ctx.font = `${12 / this.PPU}px Arial`;
     this.ctx.imageSmoothingEnabled = false;
 
-    // Create a default camera game object
-    const camera = new GameObject({
-      behaviors: [new Transform(0, 0, 200, 200), new Camera()],
-    });
-    this.gameObjects.push(camera);
-    this.camera = camera;
-
     Input.getInstance();
-
     Game.instance = this;
   }
 
   init() {}
 
   start() {
+    // this.isPlaying = true;
     this.init();
     this.gameObjects.forEach((gameObject) => {
       gameObject.start();
@@ -64,15 +57,26 @@ class Game {
     this.tick();
   }
 
-  tick() {
+  play() {
+    this.isPlaying = true;
+  }
+
+  stop() {
+    this.isPlaying = false;
+  }
+
+  tick = () => {
     const currentTime = performance.now();
     const deltaTime = (currentTime - this.lastTime) / 1000; // Convert to seconds
     this.lastTime = currentTime;
 
-    this.update(deltaTime);
+    if (this.isPlaying) {
+      this.update(deltaTime);
+    }
+
     this.draw();
     requestAnimationFrame(() => this.tick());
-  }
+  };
 
   addGameObject(gameObject: GameObject) {
     console.log("Adding game object", gameObject);
@@ -86,11 +90,15 @@ class Game {
 
   update(deltaTime: number) {
     this.gameObjects.forEach((gameObject) => {
-      gameObject.update(deltaTime);
+      if (gameObject.isActive) {
+        gameObject.update(deltaTime);
+      }
     });
   }
 
   draw() {
+    // console.log("Drawing");
+
     this.ctx.clearRect(
       0,
       0,
@@ -126,7 +134,14 @@ class Game {
       );
     }
     this.gameObjects.forEach((gameObject) => {
-      gameObject.draw();
+      if (gameObject.isActive) {
+        gameObject.draw("default");
+      }
+    });
+    this.gameObjects.forEach((gameObject) => {
+      if (gameObject.isActive) {
+        gameObject.draw("Editor");
+      }
     });
     this.ctx.restore();
   }

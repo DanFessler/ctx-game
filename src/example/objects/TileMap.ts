@@ -2,6 +2,7 @@ import GameObject from "../../engine/GameObject";
 import Behavior from "../../engine/Behavior";
 import Game from "../../engine/Game";
 import tile from "../images/seashell.png";
+import WorldGridBehavior from "../behaviors/WorldGrid";
 
 class TileMapBehavior extends Behavior {
   mapData: number[][] = [
@@ -20,37 +21,52 @@ class TileMapBehavior extends Behavior {
   ];
   tileSize: number = 1;
   tileImage: HTMLImageElement;
+  buffer: HTMLCanvasElement;
+  bufferCtx: CanvasRenderingContext2D;
 
   constructor() {
     super();
     this.tileImage = new Image();
     this.tileImage.src = tile;
+    this.buffer = document.createElement("canvas");
+    this.buffer.width =
+      this.tileSize * this.mapData[0].length * Game.instance!.PPU;
+    this.buffer.height =
+      this.tileSize * this.mapData.length * Game.instance!.PPU;
+    this.bufferCtx = this.buffer.getContext("2d")!;
+    this.bufferCtx.imageSmoothingEnabled = false;
   }
 
-  draw() {
-    const ctx = Game.instance?.ctx;
-    if (!ctx) return;
-
-    this.mapData.forEach((row, y) => {
-      row.forEach((tile, x) => {
-        if (tile === 1) {
-          ctx.drawImage(
+  draw(ctx: CanvasRenderingContext2D) {
+    this.bufferCtx.clearRect(0, 0, this.buffer.width, this.buffer.height);
+    // this.bufferCtx.drawImage(this.tileImage, 0, 0);
+    for (let y = 0; y < this.mapData.length; y++) {
+      for (let x = 0; x < this.mapData[y].length; x++) {
+        if (this.mapData[y][x] === 1) {
+          this.bufferCtx.drawImage(
             this.tileImage,
-            x * this.tileSize,
-            y * this.tileSize,
-            this.tileSize,
-            this.tileSize
+            x * this.tileSize * Game.instance!.PPU,
+            y * this.tileSize * Game.instance!.PPU,
+            this.tileSize * Game.instance!.PPU,
+            this.tileSize * Game.instance!.PPU
           );
         }
-      });
-    });
+      }
+    }
+    ctx.drawImage(
+      this.buffer,
+      0,
+      0,
+      this.buffer.width / Game.instance!.PPU,
+      this.buffer.height / Game.instance!.PPU
+    );
   }
 }
 
 class TileMap extends GameObject {
   constructor() {
     super({
-      behaviors: [new TileMapBehavior()],
+      behaviors: [new TileMapBehavior(), new WorldGridBehavior(1)],
     });
   }
 }

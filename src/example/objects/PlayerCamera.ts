@@ -5,7 +5,6 @@ import Behavior from "../../engine/Behavior";
 import Input from "../../engine/Input";
 import Vector2 from "../../engine/Vector2";
 import Game from "../../engine/Game";
-import WorldGrid from "../behaviors/WorldGrid";
 
 class CameraController extends Behavior {
   acceleration: number = 2;
@@ -69,7 +68,7 @@ class CameraController extends Behavior {
 class PlayerCamera extends GameObject {
   constructor() {
     super({
-      behaviors: [new Camera(), new CameraController(), new WorldGrid(1)],
+      behaviors: [new Camera(), new CameraController()],
     });
   }
 }

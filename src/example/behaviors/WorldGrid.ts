@@ -32,7 +32,7 @@ class WorldGridBehavior extends Behavior {
     ctx.translate(-position.x, -position.y);
 
     // draw gridlines
-    ctx.strokeStyle = "rgba(0, 0, 0, 0.125)";
+    ctx.strokeStyle = "rgba(128, 128, 128, 0.125)";
     const screenWidth = ctx.canvas.width;
     const screenHeight = ctx.canvas.height;
     const spacing = this.spacing;
@@ -58,7 +58,7 @@ class WorldGridBehavior extends Behavior {
     }
 
     // draw major axis
-    ctx.strokeStyle = "rgba(0, 0, 0, 0.5)";
+    ctx.strokeStyle = "rgba(128, 128, 128, 0.25)";
     ctx.beginPath();
 
     ctx.moveTo(position.x - position.x, position.y - screenHeight / 2);
