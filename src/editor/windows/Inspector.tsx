@@ -28,7 +28,7 @@ function Inspector({ gameObject }: { gameObject: GameObject }) {
       <div
         className={styles.header}
         style={{
-          borderBottom: `1px solid ${colors.border}`,
+          // borderBottom: `1px solid ${colors.border}`,
           background: colors.headers,
         }}
       >
@@ -52,9 +52,16 @@ function Inspector({ gameObject }: { gameObject: GameObject }) {
           className={styles.nameInput}
         />
       </div>
-      {Object.entries(behaviors).map(([key, behavior]) => {
-        return <InspectorBehavior behavior={behavior} key={key} name={key} />;
-      })}
+      <div
+        style={{
+          background: colors.content,
+          flex: 1,
+        }}
+      >
+        {Object.entries(behaviors).map(([key, behavior]) => {
+          return <InspectorBehavior behavior={behavior} key={key} name={key} />;
+        })}
+      </div>
     </div>
   );
 }
@@ -96,7 +103,7 @@ function InspectorBehavior({
     <div
       className={styles.behaviorContainer}
       style={{
-        borderBottom: `1px solid ${colors.border}`,
+        borderTop: `1px solid ${colors.border}`,
       }}
     >
       <div
@@ -116,7 +123,10 @@ function InspectorBehavior({
         <TiThMenu style={{ width: 14, height: 14 }} />
       </div>
       {behavior.inspector && isOpen ? (
-        <div className={styles.behaviorContent}>
+        <div
+          className={styles.behaviorContent}
+          style={{ background: colors.content }}
+        >
           <behavior.inspector
             refresh={() => {
               behavior.gameObject!.updateSubscribers();

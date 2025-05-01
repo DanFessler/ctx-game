@@ -15,7 +15,7 @@ function TabView({ tabs }: TabViewProps) {
     <div
       className={styles.container}
       style={{
-        background: colors.content,
+        background: colors.headers,
       }}
     >
       <div className={styles.tabBar} style={{ background: colors.background }}>

@@ -1,6 +1,9 @@
 .inspector {
   box-sizing: border-box;
   border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
 }
 
 .header {

@@ -30,6 +30,8 @@ function SceneCanvas() {
       style={{
         background: colors.document,
         border: `3px solid ${colors.headers}`,
+        borderRadius: 4,
+        overflow: "hidden",
       }}
     />
   );

@@ -10,6 +10,7 @@ import Inspector from "./windows/Inspector";
 
 import "./App.css";
 import { FaPlay, FaStop } from "react-icons/fa";
+import colors from "./colors";
 
 function App() {
   const [selectedGameObject, setSelectedGameObject] =
@@ -77,7 +78,15 @@ function App() {
             },
             {
               name: "Game",
-              content: <div></div>,
+              content: (
+                <div
+                  style={{
+                    background: colors.content,
+                    flex: 1,
+                    marginTop: 4,
+                  }}
+                ></div>
+              ),
             },
           ]}
         />

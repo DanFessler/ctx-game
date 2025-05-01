@@ -21,7 +21,9 @@ function SceneHierarchy({ children }: { children: React.ReactNode }) {
           />
         </div>
       </div>
-      <div className={styles.content}>{children}</div>
+      <div className={styles.content} style={{ background: colors.content }}>
+        {children}
+      </div>
     </div>
   );
 }
