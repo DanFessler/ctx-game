@@ -1,37 +1,27 @@
+import styles from "./Hierarchy.module.css";
 import colors from "../colors";
 import { FaSearch } from "react-icons/fa";
 
 function SceneHierarchy({ children }: { children: React.ReactNode }) {
   return (
-    <div>
+    <div className={styles.container}>
       <div
+        className={styles.header}
         style={{
-          background: colors.headers,
-          padding: "6px",
           borderBottom: `1px solid ${colors.border}`,
+          background: colors.headers,
         }}
       >
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-            gap: "6px",
-          }}
-        >
-          <FaSearch style={{ width: "14px", height: "14px" }} />
+        <div className={styles.searchContainer}>
+          <FaSearch className={styles.searchIcon} />
           <input
             type="text"
             placeholder="Search..."
-            style={{
-              flex: 1,
-              padding: "4px 6px",
-              fontSize: "12px",
-            }}
+            className={styles.searchInput}
           />
         </div>
       </div>
-      <div style={{ padding: "0px" }}>{children}</div>
+      <div className={styles.content}>{children}</div>
     </div>
   );
 }

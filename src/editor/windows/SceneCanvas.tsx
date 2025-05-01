@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 
 import game from "../game";
 import colors from "../colors";
-
+import styles from "./SceneCanvas.module.css";
 function SceneCanvas() {
   const canvasContainer = useRef<HTMLDivElement>(null);
 
@@ -26,16 +26,10 @@ function SceneCanvas() {
   return (
     <div
       ref={canvasContainer}
+      className={styles.container}
       style={{
-        flex: 1,
         background: colors.document,
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        overflow: "hidden",
         border: `3px solid ${colors.headers}`,
-        borderRadius: "4px",
       }}
     />
   );

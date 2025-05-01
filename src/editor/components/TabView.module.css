@@ -1,0 +1,21 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  background: var(--content-color);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.tabBar {
+  background: var(--background-color);
+}
+
+.tab {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 8px 16px;
+  line-height: 12px;
+  border-radius: 4px 4px 0 0;
+  box-sizing: border-box;
+}

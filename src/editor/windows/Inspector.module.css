@@ -1,0 +1,44 @@
+.inspector {
+  box-sizing: border-box;
+  border-radius: 4px;
+}
+
+.header {
+  font-weight: bold;
+  padding: 8px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
+.nameInput {
+  flex: 1;
+  padding: 4px 6px;
+}
+
+.behaviorContainer {
+  display: flex;
+  flex-direction: column;
+}
+
+.behaviorHeader {
+  display: flex;
+  flex-direction: row;
+  font-weight: bold;
+  align-items: center;
+  gap: 6px;
+  padding: 4px;
+}
+
+.arrowContainer {
+  width: 16px;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.behaviorContent {
+  padding: 8px;
+}

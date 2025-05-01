@@ -1,0 +1,25 @@
+.list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.item {
+  position: relative;
+  padding: 4px 0 4px 24px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.arrow {
+  width: 16px;
+  position: absolute;
+  left: 8px;
+}
+
+.children {
+  margin-left: 16px;
+}

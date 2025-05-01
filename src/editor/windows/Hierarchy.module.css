@@ -1,0 +1,31 @@
+.container {
+  /* Root container */
+}
+
+.header {
+  background: var(--headers);
+  padding: 6px;
+  border-bottom: 1px solid var(--border);
+}
+
+.searchContainer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+}
+
+.searchIcon {
+  width: 14px;
+  height: 14px;
+}
+
+.searchInput {
+  flex: 1;
+  padding: 4px 6px;
+  font-size: 12px;
+}
+
+.content {
+  padding: 0px;
+}

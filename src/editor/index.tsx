@@ -1,16 +1,14 @@
 import { useState } from "react";
 import GameObject from "../engine/GameObject";
+import game from "./game";
+
 import HierarchyList from "./components/HierarchyList";
 import TabView from "./components/TabView";
-
 import SceneHierarchy from "./windows/Hierarchy";
 import SceneCanvas from "./windows/SceneCanvas";
 import Inspector from "./windows/Inspector";
 
 import "./App.css";
-import game from "./game";
-
-// play stop icons
 import { FaPlay, FaStop } from "react-icons/fa";
 
 function App() {
