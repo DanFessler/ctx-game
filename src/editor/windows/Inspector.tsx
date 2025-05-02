@@ -5,7 +5,9 @@ import Behavior from "../../engine/Behavior";
 import colors from "../colors";
 import { PiBoundingBoxFill } from "react-icons/pi";
 import { FaCode } from "react-icons/fa";
-import { TiThMenu } from "react-icons/ti";
+// import { TiThMenu } from "react-icons/ti";
+import { HiDotsVertical as TiThMenu } from "react-icons/hi";
+
 import styles from "./Inspector.module.css";
 
 function useGameObjejct(gameObject: GameObject) {

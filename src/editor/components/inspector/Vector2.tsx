@@ -9,6 +9,25 @@ type Vector2InputProps = {
   onChange: (value: Vector2) => void;
 };
 
+const styles: Record<string, React.CSSProperties> = {
+  label: {
+    position: "absolute",
+    left: 4,
+    color: "rgba(255,255,255,0.25)",
+    fontSize: 10,
+  },
+  inputContainer: {
+    display: "flex",
+    gap: "4px",
+    alignItems: "center",
+    position: "relative",
+  },
+  input: {
+    width: "100%",
+    paddingLeft: 16,
+  },
+};
+
 function Vector2Input({ label, value, onChange }: Vector2InputProps) {
   function handleChange(
     e: React.ChangeEvent<HTMLInputElement>,
@@ -20,55 +39,26 @@ function Vector2Input({ label, value, onChange }: Vector2InputProps) {
       onChange({ x: (value as Vector2).x, y: Number(e.target.value) });
     }
   }
+
   return (
     <>
       <label>{label}</label>
-      <div
-        style={{
-          display: "flex",
-          gap: "4px",
-          alignItems: "center",
-          position: "relative",
-        }}
-      >
-        <label
-          style={{
-            position: "absolute",
-            left: 4,
-            color: "rgba(255,255,255,0.25)",
-          }}
-        >
-          X
-        </label>
+      <div style={styles.inputContainer}>
+        <label style={styles.label}>X</label>
         <input
           type="number"
-          value={(value as Vector2).x}
+          value={(value as Vector2).x.toString()}
           onChange={(e) => handleChange(e, "x")}
-          style={{ width: "100%", paddingLeft: 18 }}
+          style={styles.input}
         />
       </div>
-      <div
-        style={{
-          display: "flex",
-          gap: "4px",
-          alignItems: "center",
-          position: "relative",
-        }}
-      >
-        <label
-          style={{
-            position: "absolute",
-            left: 4,
-            color: "rgba(255,255,255,0.25)",
-          }}
-        >
-          Y
-        </label>
+      <div style={styles.inputContainer}>
+        <label style={styles.label}>Y</label>
         <input
           type="number"
-          value={(value as Vector2).y}
+          value={(value as Vector2).y.toString()}
           onChange={(e) => handleChange(e, "y")}
-          style={{ width: "100%", paddingLeft: 18 }}
+          style={styles.input}
         />
       </div>
     </>
