@@ -26,6 +26,7 @@ class RedRectangleBehavior extends Behavior {
     }
   }
 }
+
 class RedRectangle extends GameObject {
   constructor() {
     super({

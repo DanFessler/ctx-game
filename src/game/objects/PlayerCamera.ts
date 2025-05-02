@@ -5,12 +5,19 @@ import Behavior from "../../engine/Behavior";
 import Input from "../../engine/Input";
 import Vector2 from "../../engine/Vector2";
 import Game from "../../engine/Game";
+import { inspect } from "../../engine/serializable";
 
 class CameraController extends Behavior {
+  @inspect()
   acceleration: number = 2;
-  velocity: Vector2 = new Vector2(0, 0);
+
+  @inspect()
   maxSpeed: number = 5;
+
+  @inspect()
   friction: number = 0.9;
+
+  velocity: Vector2 = new Vector2(0, 0);
 
   constructor() {
     super();

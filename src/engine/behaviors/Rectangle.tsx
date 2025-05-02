@@ -1,8 +1,11 @@
 import { Transform } from "./Transform";
 import Behavior from "../Behavior";
+import { inspect } from "../serializable";
 
 export class Rectangle extends Behavior {
   transform: Transform | undefined;
+
+  @inspect({ type: "color" })
   color: string = "black";
 
   constructor(color: string = "black") {
@@ -16,29 +19,14 @@ export class Rectangle extends Behavior {
     switch (renderPass) {
       case "Editor":
         ctx.strokeStyle = "rgb(0,255,0)";
-        ctx.strokeRect(0, 0, transform.size.x, transform.size.y);
+        ctx.strokeRect(0, 0, transform.scale.x, transform.scale.y);
         break;
       default:
         ctx.fillStyle = this.color;
-        ctx.fillRect(0, 0, transform.size.x, transform.size.y);
+        ctx.fillRect(0, 0, transform.scale.x, transform.scale.y);
         break;
     }
   }
-
-  inspector = () => {
-    return (
-      <div style={{ display: "flex", flexDirection: "row", gap: "10px" }}>
-        <div>color:</div>
-        <input
-          type="color"
-          value={this.color}
-          onChange={(e) => {
-            this.color = e.target.value;
-          }}
-        />
-      </div>
-    );
-  };
 
   update() {
     // super.update();

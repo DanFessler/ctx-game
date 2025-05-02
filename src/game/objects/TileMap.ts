@@ -3,6 +3,7 @@ import Behavior from "../../engine/Behavior";
 import Game from "../../engine/Game";
 import tile from "../images/seashell.png";
 import WorldGridBehavior from "../behaviors/WorldGrid";
+import { inspect } from "../../engine/serializable";
 
 class TileMapBehavior extends Behavior {
   mapData: number[][] = [
@@ -19,7 +20,10 @@ class TileMapBehavior extends Behavior {
     [1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1],
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
   ];
+
+  @inspect({ type: "number" })
   tileSize: number = 1;
+
   tileImage: HTMLImageElement;
   buffer: HTMLCanvasElement;
   bufferCtx: CanvasRenderingContext2D;

@@ -120,7 +120,7 @@ function InspectorBehavior({
         <div>{name}</div>
         <div className={styles.spacer} />
         {renderArrow()}
-        <TiThMenu style={{ width: 14, height: 14 }} />
+        <TiThMenu style={{ minWidth: 14, minHeight: 14 }} />
       </div>
       {behavior.inspector && isOpen ? (
         <div
