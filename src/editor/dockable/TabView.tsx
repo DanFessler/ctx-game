@@ -3,11 +3,12 @@ import colors from "../colors";
 import styles from "./TabView.module.css";
 
 export type tabObject = {
+  id: string;
   name: string;
   content: React.ReactNode;
 };
 
-export type tabGroupObject = { [key: string]: tabObject };
+export type tabGroupObject = tabObject[];
 
 function TabView({ tabs }: { tabs: tabGroupObject }) {
   const [selectedTab, setSelectedTab] = useState(0);
@@ -20,7 +21,7 @@ function TabView({ tabs }: { tabs: tabGroupObject }) {
       }}
     >
       <div className={styles.tabBar} style={{ background: colors.background }}>
-        {Object.keys(tabs).map((tabId, index) => (
+        {tabs.map((tab, index) => (
           <span
             className={styles.tab}
             style={{
@@ -31,11 +32,11 @@ function TabView({ tabs }: { tabs: tabGroupObject }) {
               setSelectedTab(index);
             }}
           >
-            {tabs[tabId].name}
+            {tab.name}
           </span>
         ))}
       </div>
-      {tabs[Object.keys(tabs)[selectedTab]].content}
+      {tabs[selectedTab].content}
     </div>
   );
 }
