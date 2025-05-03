@@ -14,7 +14,7 @@ import colors from "./colors";
 
 function App() {
   const [selectedGameObject, setSelectedGameObject] =
-    useState<GameObject | null>(null);
+    useState<GameObject | null>(game.gameObjects[0]);
 
   const panels: panelObject[] = [
     {
