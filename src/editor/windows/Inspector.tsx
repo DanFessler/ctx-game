@@ -56,7 +56,7 @@ function Inspector({ gameObject }: { gameObject: GameObject }) {
       </div>
       <div
         style={{
-          background: colors.content,
+          // background: colors.content,
           flex: 1,
         }}
       >
@@ -76,13 +76,6 @@ function InspectorBehavior({
   name: string;
 }) {
   const [isOpen, setIsOpen] = useState(true);
-
-  function renderArrow() {
-    if (behavior.inspector) {
-      return <div className={styles.arrowContainer}>{isOpen ? "▼" : "▶"}</div>;
-    }
-    return null;
-  }
 
   function renderCheckbox() {
     return (
@@ -121,13 +114,13 @@ function InspectorBehavior({
         <FaCode />
         <div>{name}</div>
         <div className={styles.spacer} />
-        {renderArrow()}
+        <div className={styles.arrowContainer}>{isOpen ? "▼" : "▶"}</div>
         <TiThMenu style={{ minWidth: 14, minHeight: 14 }} />
       </div>
-      {behavior.inspector && isOpen ? (
+      {isOpen ? (
         <div
           className={styles.behaviorContent}
-          style={{ background: colors.content }}
+          // style={{ background: colors.content }}
         >
           <behavior.inspector
             refresh={() => {

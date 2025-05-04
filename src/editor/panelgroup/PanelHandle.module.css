@@ -1,0 +1,12 @@
+.handle {
+  position: absolute;
+  z-index: 1000;
+  background-color: transparent;
+  transition: background-color 0.1s ease-in-out;
+  border-radius: 2px;
+}
+
+.handle:hover,
+.handle:active {
+  background-color: rgb(0, 140, 255, 0.75);
+}

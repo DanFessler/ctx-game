@@ -1,8 +1,20 @@
 import styles from "./Hierarchy.module.css";
 import colors from "../colors";
 import { FaSearch } from "react-icons/fa";
+import HierarchyList from "../components/HierarchyList";
+import GameObject from "../../engine/GameObject";
 
-function SceneHierarchy({ children }: { children: React.ReactNode }) {
+type SceneHierarchyProps = {
+  gameObjects: GameObject[];
+  setSelectedGameObject: (gameObject: GameObject) => void;
+  selectedGameObject: GameObject | null;
+};
+
+function SceneHierarchy({
+  gameObjects,
+  setSelectedGameObject,
+  selectedGameObject,
+}: SceneHierarchyProps) {
   return (
     <div className={styles.container}>
       <div
@@ -22,7 +34,11 @@ function SceneHierarchy({ children }: { children: React.ReactNode }) {
         </div>
       </div>
       <div className={styles.content} style={{ background: colors.content }}>
-        {children}
+        <HierarchyList
+          gameObjects={gameObjects}
+          setSelectedGameObject={setSelectedGameObject}
+          selectedGameObject={selectedGameObject}
+        />
       </div>
     </div>
   );

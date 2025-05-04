@@ -2,37 +2,36 @@ import { useState } from "react";
 import GameObject from "../engine/GameObject";
 import game from "../game";
 
-import HierarchyList from "./components/HierarchyList";
 import SceneHierarchy from "./windows/Hierarchy";
 import SceneCanvas from "./windows/SceneCanvas";
 import Inspector from "./windows/Inspector";
-import PanelView, { panelObject } from "./dockable/PanelView";
+import PanelView, { panelObject, Window } from "./dockable/PanelView";
 
 import "./App.css";
 import { FaPlay, FaStop } from "react-icons/fa";
-import colors from "./colors";
 
 const panels: panelObject[] = [
   {
-    size: 1,
-    tabs: ["hierarchy"],
-  },
-  {
-    size: 4,
     panels: [
       {
-        size: 1,
-        tabs: ["scene"],
+        size: 2,
+        panels: [
+          {
+            panels: [{ tabs: ["hierarchy"] }, { tabs: ["hierarchy"] }],
+          },
+          {
+            size: 2,
+            panels: [{ tabs: ["scene"] }],
+          },
+          {
+            panels: [{ tabs: ["inspector"] }, { tabs: ["inspector"] }],
+          },
+        ],
       },
       {
-        size: 1,
         tabs: ["game"],
       },
     ],
-  },
-  {
-    size: 1,
-    tabs: ["inspector"],
   },
 ];
 
@@ -70,42 +69,22 @@ function App() {
         </button>
       </div>
       <PanelView orientation="row" panels={panels}>
-        {[
-          {
-            id: "inspector",
-            name: "Inspector",
-            content: selectedGameObject ? (
-              <Inspector gameObject={selectedGameObject} />
-            ) : null,
-          },
-          {
-            id: "scene",
-            name: "Scene",
-            content: <SceneCanvas />,
-          },
-          {
-            id: "game",
-            name: "Game",
-            content: (
-              <div
-                style={{ background: colors.content, flex: 1, marginTop: 4 }}
-              ></div>
-            ),
-          },
-          {
-            id: "hierarchy",
-            name: "Hierarchy",
-            content: (
-              <SceneHierarchy>
-                <HierarchyList
-                  gameObjects={game.gameObjects}
-                  setSelectedGameObject={setSelectedGameObject}
-                  selectedGameObject={selectedGameObject}
-                />
-              </SceneHierarchy>
-            ),
-          },
-        ]}
+        <Window id="inspector" name="Inspector">
+          <Inspector gameObject={selectedGameObject!} />
+        </Window>
+        <Window id="scene" name="Scene">
+          <SceneCanvas />
+        </Window>
+        <Window id="game" name="Game">
+          <div></div>
+        </Window>
+        <Window id="hierarchy" name="Hierarchy">
+          <SceneHierarchy
+            gameObjects={game.gameObjects}
+            setSelectedGameObject={setSelectedGameObject}
+            selectedGameObject={selectedGameObject}
+          />
+        </Window>
       </PanelView>
     </div>
   );

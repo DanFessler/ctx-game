@@ -1,9 +1,13 @@
-import TabView, { tabGroupObject } from "./TabView";
+import TabView from "./TabView";
+import PanelGroup from "../panelgroup/PanelGroup";
+import React from "react";
 
 type PanelViewProps = {
   orientation: "row" | "column";
   panels: panelObject[];
-  children: tabGroupObject;
+  children:
+    | React.ReactElement<React.ComponentProps<typeof Window>>
+    | React.ReactElement<React.ComponentProps<typeof Window>>[];
 };
 
 export type panelObject =
@@ -12,31 +16,28 @@ export type panelObject =
 
 // a list of TabViews with horizontal or vertical orientation
 function PanelView({ orientation = "row", panels, children }: PanelViewProps) {
-  const sizes = panels.map((panel) => panel.size || 1).join("fr ") + "fr";
+  const sizes = panels.map((panel) => panel.size || 1);
   console.log(sizes);
+
+  // Normalize children to an array
+  const childArray = React.Children.toArray(children) as React.ReactElement<
+    React.ComponentProps<typeof Window>
+  >[];
+
   return (
-    <div
-      style={{
-        // display: "flex",
-        flexDirection: orientation,
-        flex: 1,
-        width: "100%",
-        justifyContent: "stretch",
-        gap: "3px",
-        display: "grid",
-        ...(orientation === "row"
-          ? { gridTemplateColumns: sizes }
-          : { gridTemplateRows: sizes }),
-      }}
-    >
+    <PanelGroup direction={orientation} gap={4} initialSizes={sizes}>
       {panels.map((panel, index) => {
         if ("tabs" in panel) {
           const panelTabs = panel.tabs.map((tabId) => {
-            const tab = children.find((child) => child.id === tabId);
+            const tab = childArray.find(({ props }) => props.id === tabId);
             if (!tab) {
               throw new Error(`Tab ${tabId} not found`);
             }
-            return tab;
+            return {
+              id: tab.props.id,
+              name: tab.props.name,
+              content: tab,
+            };
           });
           return <TabView tabs={panelTabs} />;
         } else {
@@ -50,8 +51,16 @@ function PanelView({ orientation = "row", panels, children }: PanelViewProps) {
           );
         }
       })}
-    </div>
+    </PanelGroup>
   );
 }
+
+type WindowProps = {
+  id: string;
+  name: string;
+  children: React.ReactNode;
+};
+
+export const Window: React.FC<WindowProps> = ({ children }) => <>{children}</>;
 
 export default PanelView;
