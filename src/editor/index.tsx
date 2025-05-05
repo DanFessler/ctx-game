@@ -8,7 +8,6 @@ import Inspector from "./windows/Inspector";
 import PanelView, { panelObject, Window } from "./dockable/PanelView";
 
 import "./App.css";
-import { FaPlay, FaStop } from "react-icons/fa";
 
 const panels: panelObject[] = [
   {
@@ -24,7 +23,11 @@ const panels: panelObject[] = [
             panels: [{ tabs: ["scene"] }],
           },
           {
-            panels: [{ tabs: ["inspector"] }, { tabs: ["inspector"] }],
+            panels: [
+              { tabs: ["inspector", "inspector", "inspector"] },
+              { tabs: ["inspector"] },
+              { tabs: ["inspector"] },
+            ],
           },
         ],
       },
@@ -49,25 +52,9 @@ function App() {
         boxSizing: "border-box",
         overflow: "hidden",
         gap: 1,
+        padding: 3,
       }}
     >
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: "4px",
-          padding: "4px",
-        }}
-      >
-        <button onClick={() => game.play()}>
-          <FaPlay />
-        </button>
-        <button onClick={() => game.stop()}>
-          <FaStop />
-        </button>
-      </div>
       <PanelView orientation="row" panels={panels}>
         <Window id="inspector" name="Inspector">
           <Inspector gameObject={selectedGameObject!} />

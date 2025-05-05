@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { FaPlay, FaStop } from "react-icons/fa";
 
 import game from "../../game";
 import colors from "../colors";
@@ -24,16 +25,21 @@ function SceneCanvas() {
   }, []);
 
   return (
-    <div
-      ref={canvasContainer}
-      className={styles.container}
-      style={{
-        background: colors.document,
-        border: `3px solid ${colors.headers}`,
-        borderRadius: 4,
-        overflow: "hidden",
-      }}
-    />
+    <div className={styles.container}>
+      <div className={styles.header}>
+        <button onClick={() => game.play()}>
+          <FaPlay />
+        </button>
+        <button onClick={() => game.stop()}>
+          <FaStop />
+        </button>
+      </div>
+      <div
+        ref={canvasContainer}
+        className={styles.canvasContainer}
+        style={{ background: colors.document }}
+      />
+    </div>
   );
 }
 

@@ -8,6 +8,7 @@
 
 .tabBar {
   background: var(--background-color);
+  display: flex;
 }
 
 .tab {

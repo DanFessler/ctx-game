@@ -33,6 +33,10 @@ body {
   min-height: 100vh;
 }
 
+div {
+  box-sizing: border-box;
+}
+
 h1 {
   font-size: 3.2em;
   line-height: 1.1;
