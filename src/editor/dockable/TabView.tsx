@@ -36,7 +36,9 @@ function TabView({ tabs }: { tabs: tabGroupObject }) {
           </span>
         ))}
       </div>
-      <div style={{ overflow: "auto" }}>{tabs[selectedTab].content}</div>
+      <div style={{ overflow: "auto", display: "flex", flex: 1 }}>
+        {tabs[selectedTab].content}
+      </div>
     </div>
   );
 }

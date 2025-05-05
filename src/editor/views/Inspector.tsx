@@ -60,9 +60,13 @@ function Inspector({ gameObject }: { gameObject: GameObject }) {
           flex: 1,
         }}
       >
-        {Object.entries(behaviors).map(([key, behavior]) => {
-          return <InspectorBehavior behavior={behavior} key={key} name={key} />;
-        })}
+        <div style={{ overflow: "auto" }}>
+          {Object.entries(behaviors).map(([key, behavior]) => {
+            return (
+              <InspectorBehavior behavior={behavior} key={key} name={key} />
+            );
+          })}
+        </div>
       </div>
     </div>
   );

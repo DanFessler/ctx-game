@@ -2,10 +2,11 @@ import { useState } from "react";
 import GameObject from "../engine/GameObject";
 import game from "../game";
 
-import SceneHierarchy from "./windows/Hierarchy";
-import SceneCanvas from "./windows/SceneCanvas";
-import Inspector from "./windows/Inspector";
-import PanelView, { panelObject, Window } from "./dockable/PanelView";
+import SceneHierarchy from "./views/Hierarchy";
+import SceneCanvas from "./views/SceneCanvas";
+import Inspector from "./views/Inspector";
+import Panel, { panelObject, View } from "./dockable/PanelView";
+import Dockable from "./dockable/dockable";
 
 import "./App.css";
 
@@ -16,18 +17,14 @@ const panels: panelObject[] = [
         size: 2,
         panels: [
           {
-            panels: [{ tabs: ["hierarchy"] }, { tabs: ["hierarchy"] }],
+            panels: [{ tabs: ["hierarchy"] }],
           },
           {
             size: 2,
             panels: [{ tabs: ["scene"] }],
           },
           {
-            panels: [
-              { tabs: ["inspector", "inspector", "inspector"] },
-              { tabs: ["inspector"] },
-              { tabs: ["inspector"] },
-            ],
+            panels: [{ tabs: ["inspector", "inspector"] }],
           },
         ],
       },
@@ -55,24 +52,24 @@ function App() {
         padding: 3,
       }}
     >
-      <PanelView orientation="row" panels={panels}>
-        <Window id="inspector" name="Inspector">
+      <Dockable orientation="row" panels={panels}>
+        <View id="inspector" name="Inspector">
           <Inspector gameObject={selectedGameObject!} />
-        </Window>
-        <Window id="scene" name="Scene">
+        </View>
+        <View id="scene" name="Scene">
           <SceneCanvas />
-        </Window>
-        <Window id="game" name="Game">
+        </View>
+        <View id="game" name="Game">
           <div></div>
-        </Window>
-        <Window id="hierarchy" name="Hierarchy">
+        </View>
+        <View id="hierarchy" name="Hierarchy">
           <SceneHierarchy
             gameObjects={game.gameObjects}
             setSelectedGameObject={setSelectedGameObject}
             selectedGameObject={selectedGameObject}
           />
-        </Window>
-      </PanelView>
+        </View>
+      </Dockable>
     </div>
   );
 }

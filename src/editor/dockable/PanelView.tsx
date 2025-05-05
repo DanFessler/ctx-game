@@ -2,12 +2,12 @@ import TabView from "./TabView";
 import PanelGroup from "../panelgroup/PanelGroup";
 import React from "react";
 
-type PanelViewProps = {
+type PanelProps = {
   orientation: "row" | "column";
   panels: panelObject[];
   children:
-    | React.ReactElement<React.ComponentProps<typeof Window>>
-    | React.ReactElement<React.ComponentProps<typeof Window>>[];
+    | React.ReactElement<React.ComponentProps<typeof View>>
+    | React.ReactElement<React.ComponentProps<typeof View>>[];
 };
 
 export type panelObject =
@@ -15,13 +15,13 @@ export type panelObject =
   | { size?: number; panels: panelObject[] };
 
 // a list of TabViews with horizontal or vertical orientation
-function PanelView({ orientation = "row", panels, children }: PanelViewProps) {
+function Panel({ orientation = "row", panels, children }: PanelProps) {
   const sizes = panels.map((panel) => panel.size || 1);
   console.log(sizes);
 
   // Normalize children to an array
   const childArray = React.Children.toArray(children) as React.ReactElement<
-    React.ComponentProps<typeof Window>
+    React.ComponentProps<typeof View>
   >[];
 
   return (
@@ -42,7 +42,7 @@ function PanelView({ orientation = "row", panels, children }: PanelViewProps) {
           return <TabView tabs={panelTabs} />;
         } else {
           return (
-            <PanelView
+            <Panel
               key={index}
               orientation={orientation === "row" ? "column" : "row"}
               panels={panel.panels}
@@ -61,6 +61,6 @@ type WindowProps = {
   children: React.ReactNode;
 };
 
-export const Window: React.FC<WindowProps> = ({ children }) => <>{children}</>;
+export const View: React.FC<WindowProps> = ({ children }) => <>{children}</>;
 
-export default PanelView;
+export default Panel;
