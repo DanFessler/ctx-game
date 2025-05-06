@@ -1,87 +1,88 @@
-import Panel from "./PanelView";
+import React, { useReducer, useEffect } from "react";
+import PanelView from "./PanelView";
+import appReducer from "./reducer";
+import serializeLayout, { ParsedNode } from "./serializeLayout";
 
 type DockableProps = {
-  orientation: "row" | "column";
-  panels: panelObject[];
+  orientation?: "row" | "column";
+  panels?: ParsedNode[];
   children: React.ReactNode;
+  onChange?: (panels: ParsedNode[]) => void;
 };
 
-export type panelObject =
-  | { size?: number; tabs: string[] }
-  | { size?: number; panels: panelObject[] };
+function Dockable({
+  orientation = "row",
+  children,
+  panels: controledPanels,
+  onChange,
+}: DockableProps) {
+  const views: React.ReactElement<ViewProps>[] = [];
 
-function Dockable({ orientation = "row", panels, children }: DockableProps) {
-  const views = [];
-  const panels = [];
+  const childrenArray = React.Children.toArray(
+    children
+  ) as React.ReactElement[];
 
-  let parentType = "Panel";
-  function parseNodeTree(element: React.ReactElement) {
-    if (typeof element !== "object" || element === null) return null;
+  const declarativePanels = childrenArray.map((child) =>
+    serializeLayout(child, views)
+  );
 
-    const { type } = element;
+  const [state, dispatch] = useReducer(appReducer, {
+    panels: controledPanels || declarativePanels,
+  });
 
-    let node;
-    switch (parentType) {
-      case "Panel":
-        {
-          if (type !== "Panel" && type !== "Window") {
-            throw new Error("Invalid element type");
-          }
-          const { props } = element;
-
-          if (type === "Panel") {
-            const panelProps = element.props as PanelProps;
-            node = {
-              size: panelProps.size || 1,
-            };
-          }
-        }
-        break;
-      case "Window":
-        break;
-      case "View":
-        break;
+  useEffect(() => {
+    console.log("state changed", state);
+    if (onChange) {
+      onChange(state.panels);
     }
-
-    const node = {
-      type: typeof type === "string" ? type : type.name || "Unknown",
-      id: props.id,
-      direction: props.direction,
-      title: props.title,
-      children: [],
-    };
-
-    const children = React.Children.toArray(props.children);
-    for (const child of children) {
-      const parsed = parseNodeTree(child);
-      if (parsed) node.children.push(parsed);
-    }
-
-    return node;
-  }
+  }, [state, onChange]);
 
   return (
-    <Panel orientation={orientation} panels={panels}>
-      {children}
-    </Panel>
+    <PanelView
+      orientation={orientation}
+      panels={state.panels}
+      dispatch={dispatch}
+      address={[]}
+    >
+      {views}
+    </PanelView>
   );
 }
 
-type PanelProps = {
-  orientation: "row" | "column";
+export type WindowProps = {
+  children: React.ReactNode;
   size?: number;
-  panels: panelObject[];
-  children: React.ReactNode;
 };
+export function Window(props: WindowProps) {
+  return props.children;
+}
 
-type WindowProps = {
-  children: React.ReactNode;
-};
-
-type ViewProps = {
+export type ViewProps = {
   id: string;
   name: string;
   children: React.ReactNode;
+};
+export function View(props: ViewProps) {
+  return props.children;
+}
+
+export type PanelProps = {
+  orientation?: "row" | "column";
+  size?: number;
+  children: React.ReactNode;
+};
+
+function _Panel(props: PanelProps) {
+  return props.children;
+}
+
+export const Panel = {
+  row(props: PanelProps) {
+    return <_Panel orientation="row" {...props} />;
+  },
+  column(props: PanelProps) {
+    return <_Panel orientation="column" {...props} />;
+  },
 };
 
 export default Dockable;

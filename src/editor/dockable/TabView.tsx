@@ -6,20 +6,22 @@ export type tabObject = {
   id: string;
   name: string;
   content: React.ReactNode;
+  renderTabs?: boolean;
 };
 
 export type tabGroupObject = tabObject[];
 
-function TabView({ tabs }: { tabs: tabGroupObject }) {
+function TabView({
+  tabs,
+  hideTabs = false,
+}: {
+  tabs: tabGroupObject;
+  hideTabs?: boolean;
+}) {
   const [selectedTab, setSelectedTab] = useState(0);
-  return (
-    <div
-      className={styles.container}
-      style={{
-        background: colors.headers,
-        flex: 1,
-      }}
-    >
+
+  function renderTabs() {
+    return (
       <div className={styles.tabBar} style={{ background: colors.background }}>
         {tabs.map((tab, index) => (
           <span
@@ -36,6 +38,18 @@ function TabView({ tabs }: { tabs: tabGroupObject }) {
           </span>
         ))}
       </div>
+    );
+  }
+
+  return (
+    <div
+      className={styles.container}
+      style={{
+        background: colors.headers,
+        flex: 1,
+      }}
+    >
+      {!hideTabs && renderTabs()}
       <div style={{ overflow: "auto", display: "flex", flex: 1 }}>
         {tabs[selectedTab].content}
       </div>

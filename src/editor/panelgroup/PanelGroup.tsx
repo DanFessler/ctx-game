@@ -6,12 +6,14 @@ type PanelGroupProps = {
   direction: "row" | "column";
   initialSizes?: number[];
   gap?: number;
+  onResizeEnd?: (sizes: number[]) => void;
 };
 
 function PanelGroup({
   children,
   direction,
   initialSizes,
+  onResizeEnd,
   gap = 3,
 }: PanelGroupProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -28,8 +30,6 @@ function PanelGroup({
     y: number;
   } | null>(null);
 
-  console.log(sizes);
-
   const handleDrag = (delta: { x: number; y: number }) => {
     setDraggingDelta(delta);
   };
@@ -42,7 +42,9 @@ function PanelGroup({
   const handleDragEnd = () => {
     setDraggingIndex(null);
     setDraggingDelta(null);
-    setSizes(calcNewSizes());
+    const newSizes = calcNewSizes();
+    setSizes(newSizes);
+    onResizeEnd?.(newSizes);
   };
 
   function getPanelPixelSizes() {
@@ -59,7 +61,6 @@ function PanelGroup({
     const panelPixelSizes = getPanelPixelSizes();
     const totalSize = panelPixelSizes.reduce((acc, size) => acc + size, 0);
     const newSizes = panelPixelSizes.map((size) => size / totalSize);
-    console.log(newSizes);
     return newSizes;
   }
 

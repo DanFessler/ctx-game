@@ -1,43 +1,31 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import GameObject from "../engine/GameObject";
 import game from "../game";
 
 import SceneHierarchy from "./views/Hierarchy";
 import SceneCanvas from "./views/SceneCanvas";
 import Inspector from "./views/Inspector";
-import Panel, { panelObject, View } from "./dockable/PanelView";
-import Dockable from "./dockable/dockable";
+import Dockable, { Panel, Window, View } from "./dockable/dockable";
+import { ParsedNode } from "./dockable/serializeLayout";
 
 import "./App.css";
-
-const panels: panelObject[] = [
-  {
-    panels: [
-      {
-        size: 2,
-        panels: [
-          {
-            panels: [{ tabs: ["hierarchy"] }],
-          },
-          {
-            size: 2,
-            panels: [{ tabs: ["scene"] }],
-          },
-          {
-            panels: [{ tabs: ["inspector", "inspector"] }],
-          },
-        ],
-      },
-      {
-        tabs: ["game"],
-      },
-    ],
-  },
-];
 
 function App() {
   const [selectedGameObject, setSelectedGameObject] =
     useState<GameObject | null>(game.gameObjects[0]);
+
+  // const savedLayout = localStorage.getItem("layout");
+  // const [layout, setLayout] = useState<ParsedNode[]>(
+  //   savedLayout ? JSON.parse(savedLayout) : undefined
+  // );
+
+  const [layout, setLayout] = useState<ParsedNode[]>();
+
+  // save layout to local storage
+  useEffect(() => {
+    console.log("saving layout", layout);
+    localStorage.setItem("layout", JSON.stringify(layout));
+  }, [layout]);
 
   return (
     <div
@@ -52,23 +40,40 @@ function App() {
         padding: 3,
       }}
     >
-      <Dockable orientation="row" panels={panels}>
-        <View id="inspector" name="Inspector">
-          <Inspector gameObject={selectedGameObject!} />
-        </View>
-        <View id="scene" name="Scene">
-          <SceneCanvas />
-        </View>
-        <View id="game" name="Game">
-          <div></div>
-        </View>
-        <View id="hierarchy" name="Hierarchy">
-          <SceneHierarchy
-            gameObjects={game.gameObjects}
-            setSelectedGameObject={setSelectedGameObject}
-            selectedGameObject={selectedGameObject}
-          />
-        </View>
+      <Dockable panels={layout} onChange={setLayout}>
+        <Panel.column>
+          <Window>
+            <View id="hierarchy" name="Hierarchy">
+              <SceneHierarchy
+                gameObjects={game.gameObjects}
+                setSelectedGameObject={setSelectedGameObject}
+                selectedGameObject={selectedGameObject}
+              />
+            </View>
+            <View id="inspector" name="Inspector">
+              <Inspector gameObject={selectedGameObject!} />
+            </View>
+          </Window>
+        </Panel.column>
+        <Panel.row size={3}>
+          <Window size={3}>
+            <View id="scene" name="Scene">
+              <SceneCanvas />
+            </View>
+          </Window>
+          <Window>
+            <View id="game" name="Game">
+              <div></div>
+            </View>
+          </Window>
+        </Panel.row>
+        <Panel.row>
+          <Window>
+            <View id="inspector" name="Inspector">
+              <Inspector gameObject={selectedGameObject!} />
+            </View>
+          </Window>
+        </Panel.row>
       </Dockable>
     </div>
   );
