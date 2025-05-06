@@ -37,7 +37,6 @@ function App() {
         boxSizing: "border-box",
         overflow: "hidden",
         gap: 1,
-        padding: 3,
       }}
     >
       <Dockable panels={layout} onChange={setLayout}>

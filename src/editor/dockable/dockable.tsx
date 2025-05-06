@@ -2,12 +2,14 @@ import React, { useReducer, useEffect } from "react";
 import PanelView from "./PanelView";
 import appReducer from "./reducer";
 import serializeLayout, { ParsedNode } from "./serializeLayout";
+import colors from "../colors";
 
 type DockableProps = {
   orientation?: "row" | "column";
   panels?: ParsedNode[];
   children: React.ReactNode;
   onChange?: (panels: ParsedNode[]) => void;
+  gap?: number;
 };
 
 function Dockable({
@@ -15,6 +17,7 @@ function Dockable({
   children,
   panels: controledPanels,
   onChange,
+  gap = 4,
 }: DockableProps) {
   const views: React.ReactElement<ViewProps>[] = [];
 
@@ -38,14 +41,25 @@ function Dockable({
   }, [state, onChange]);
 
   return (
-    <PanelView
-      orientation={orientation}
-      panels={state.panels}
-      dispatch={dispatch}
-      address={[]}
+    <div
+      style={{
+        width: "100%",
+        height: "100%",
+        padding: gap,
+        color: colors.text,
+        background: colors.gap,
+      }}
     >
-      {views}
-    </PanelView>
+      <PanelView
+        orientation={orientation}
+        panels={state.panels}
+        dispatch={dispatch}
+        address={[]}
+        gap={gap}
+      >
+        {views}
+      </PanelView>
+    </div>
   );
 }
 

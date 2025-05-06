@@ -15,6 +15,7 @@ type PanelProps = {
     address: number[];
   }) => void;
   address: number[];
+  gap?: number;
 };
 
 export type panelObject =
@@ -28,6 +29,7 @@ function PanelView({
   children,
   dispatch,
   address,
+  gap,
 }: PanelProps) {
   const sizes = panels.map((panel) => panel.size || 1);
 
@@ -44,7 +46,7 @@ function PanelView({
   return (
     <PanelGroup
       direction={orientation}
-      gap={4}
+      gap={gap}
       initialSizes={sizes}
       onResizeEnd={handleResizeEnd}
     >
@@ -78,6 +80,7 @@ function PanelView({
               children={children}
               dispatch={dispatch}
               address={address.concat(index)}
+              gap={gap}
             />
           );
         }
