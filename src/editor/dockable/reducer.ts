@@ -22,15 +22,16 @@ const appReducer = createReducer<State, Action>({
   resize: (state, { sizes, address }: ResizeAction) => {
     console.log("RESIZE!!!", sizes, address);
 
-    function getPanels(panels: ParsedNode[], address: number[]) {
+    function getPanels(panels: ParsedNode[], address: number[]): ParsedNode[] {
       if (address.length === 0) return panels;
 
-      let panel = panels[address[0]] as PanelNode;
+      let panel: ParsedNode | ParsedNode[] = panels[address[0]];
       if (address.length > 1) {
-        panel = getPanels(panel.panels, address.slice(1));
+        const innerPanels = (panel as PanelNode).panels;
+        panel = getPanels(innerPanels, address.slice(1));
       }
 
-      return panel.panels;
+      return (panel as PanelNode).panels;
     }
 
     // get the panels at the address
@@ -41,6 +42,7 @@ const appReducer = createReducer<State, Action>({
       p.size = sizes[i];
     });
   },
+
   addPanel: (state, { panel }: AddPanelAction) => {
     state.panels.push(panel);
   },

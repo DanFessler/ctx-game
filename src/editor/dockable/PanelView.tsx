@@ -63,11 +63,16 @@ function PanelView({
           });
           return <TabView tabs={panelTabs} />;
         } else {
+          console.log(panel.orientation, orientation);
           return (
             <PanelView
               key={index}
               orientation={
-                panel.orientation || orientation === "row" ? "column" : "row"
+                panel.orientation !== undefined
+                  ? panel.orientation
+                  : orientation === "row"
+                  ? "column"
+                  : "row"
               }
               panels={panel.panels}
               children={children}

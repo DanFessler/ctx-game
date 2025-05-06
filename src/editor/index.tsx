@@ -41,7 +41,7 @@ function App() {
       }}
     >
       <Dockable panels={layout} onChange={setLayout}>
-        <Panel.column>
+        <Panel>
           <Window>
             <View id="hierarchy" name="Hierarchy">
               <SceneHierarchy
@@ -54,8 +54,8 @@ function App() {
               <Inspector gameObject={selectedGameObject!} />
             </View>
           </Window>
-        </Panel.column>
-        <Panel.row size={3}>
+        </Panel>
+        <Panel size={3}>
           <Window size={3}>
             <View id="scene" name="Scene">
               <SceneCanvas />
@@ -66,14 +66,14 @@ function App() {
               <div></div>
             </View>
           </Window>
-        </Panel.row>
-        <Panel.row>
+        </Panel>
+        <Panel>
           <Window>
             <View id="inspector" name="Inspector">
               <Inspector gameObject={selectedGameObject!} />
             </View>
           </Window>
-        </Panel.row>
+        </Panel>
       </Dockable>
     </div>
   );

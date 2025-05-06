@@ -13,12 +13,12 @@ export type WindowNode = {
 
 export type PanelNode = {
   type: "Panel";
-  orientation: "row" | "column";
+  orientation?: "row" | "column";
   panels: LayoutNode[];
   size?: number;
 };
 
-type LayoutNode = PanelNode | WindowNode;
+export type LayoutNode = PanelNode | WindowNode;
 
 import type { PanelProps, WindowProps, ViewProps } from "./dockable";
 
@@ -32,9 +32,9 @@ function serializeLayout(
   }
 
   // Handle <Panel>
-  if (element.type === Panel.row || element.type === Panel.column) {
+  if (element.type === Panel) {
     const props = element.props as PanelProps;
-    const orientation = props.orientation || "row";
+    const orientation = props.orientation;
     // if (orientation !== "row" && orientation !== "column") {
     //   throw new Error(`Panel must have orientation 'row' or 'column'`);
     // }

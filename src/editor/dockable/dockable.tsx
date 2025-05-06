@@ -72,17 +72,8 @@ export type PanelProps = {
   children: React.ReactNode;
 };
 
-function _Panel(props: PanelProps) {
+export function Panel(props: PanelProps) {
   return props.children;
 }
-
-export const Panel = {
-  row(props: PanelProps) {
-    return <_Panel orientation="row" {...props} />;
-  },
-  column(props: PanelProps) {
-    return <_Panel orientation="column" {...props} />;
-  },
-};
 
 export default Dockable;
