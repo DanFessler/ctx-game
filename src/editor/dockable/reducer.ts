@@ -20,8 +20,6 @@ type Action = ResizeAction | AddPanelAction;
 
 const appReducer = createReducer<State, Action>({
   resize: (state, { sizes, address }: ResizeAction) => {
-    console.log("RESIZE!!!", sizes, address);
-
     function getPanels(panels: ParsedNode[], address: number[]): ParsedNode[] {
       if (address.length === 0) return panels;
 

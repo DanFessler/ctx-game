@@ -23,7 +23,6 @@ function App() {
 
   // save layout to local storage
   useEffect(() => {
-    console.log("saving layout", layout);
     localStorage.setItem("layout", JSON.stringify(layout));
   }, [layout]);
 

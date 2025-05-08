@@ -47,7 +47,6 @@ function Dockable({
   });
 
   useEffect(() => {
-    console.log("state changed", state);
     if (onChange) {
       onChange(state.panels);
     }
@@ -71,11 +70,11 @@ function Dockable({
   }
 
   function handleDragCancel() {
-    console.log("drag cancel");
+    // console.log("drag cancel");
   }
 
   function handleDragOver({ active, over }) {
-    console.log("drag over", active, over);
+    // console.log("drag over", active, over);
   }
 
   return (

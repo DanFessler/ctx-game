@@ -97,8 +97,6 @@ class Game {
   }
 
   draw() {
-    // console.log("Drawing");
-
     this.ctx.clearRect(
       0,
       0,

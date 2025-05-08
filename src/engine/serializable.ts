@@ -20,14 +20,7 @@ export function inspect(meta: FieldMeta = {}): PropertyDecorator {
     // Try to infer type if none provided
     if (!meta.type) {
       const reflected = Reflect.getMetadata("design:type", target, propertyKey);
-      console.log(
-        "reflected",
-        reflected,
-        meta,
-        reflected.name,
-        target,
-        propertyKey
-      );
+
       if (reflected) {
         meta.type = reflected.name.toLowerCase(); // e.g. "number", "string"
       }
