@@ -10,7 +10,7 @@ if (!Game.instance) {
   game.addGameObject(new RedRectangle());
   game.addGameObject(new PlayerCamera());
   game.start();
-  game.play();
+  // game.play();
 } else {
   game = Game.instance;
 }

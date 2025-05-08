@@ -2,12 +2,20 @@ import React, { useReducer, useEffect } from "react";
 import PanelView from "./PanelView";
 import appReducer from "./reducer";
 import serializeLayout, { ParsedNode } from "./serializeLayout";
+import colors from "../colors";
+import {
+  DndContext,
+  useSensor,
+  useSensors,
+  PointerSensor,
+} from "@dnd-kit/core";
 
 type DockableProps = {
   orientation?: "row" | "column";
   panels?: ParsedNode[];
   children: React.ReactNode;
   onChange?: (panels: ParsedNode[]) => void;
+  gap?: number;
 };
 
 function Dockable({
@@ -15,6 +23,7 @@ function Dockable({
   children,
   panels: controledPanels,
   onChange,
+  gap = 4,
 }: DockableProps) {
   const views: React.ReactElement<ViewProps>[] = [];
 
@@ -38,14 +47,27 @@ function Dockable({
   }, [state, onChange]);
 
   return (
-    <PanelView
-      orientation={orientation}
-      panels={state.panels}
-      dispatch={dispatch}
-      address={[]}
+    <div
+      style={{
+        width: "100%",
+        height: "100%",
+        padding: gap,
+        color: colors.text,
+        background: colors.gap,
+      }}
     >
-      {views}
-    </PanelView>
+      <DndContext sensors={sensors}>
+        <PanelView
+          orientation={orientation}
+          panels={state.panels}
+          dispatch={dispatch}
+          address={[]}
+          gap={gap}
+        >
+          {views}
+        </PanelView>
+      </DndContext>
+    </div>
   );
 }
 
@@ -72,17 +94,8 @@ export type PanelProps = {
   children: React.ReactNode;
 };
 
-function _Panel(props: PanelProps) {
+export function Panel(props: PanelProps) {
   return props.children;
 }
-
-export const Panel = {
-  row(props: PanelProps) {
-    return <_Panel orientation="row" {...props} />;
-  },
-  column(props: PanelProps) {
-    return <_Panel orientation="column" {...props} />;
-  },
-};
 
 export default Dockable;

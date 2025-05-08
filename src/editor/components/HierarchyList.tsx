@@ -56,7 +56,7 @@ function HierarchyItem({
   }
 
   return (
-    <li>
+    <li draggable={true}>
       <div
         className={styles.item}
         style={{

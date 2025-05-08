@@ -50,9 +50,6 @@ function App() {
                 selectedGameObject={selectedGameObject}
               />
             </View>
-            <View id="inspector" name="Inspector">
-              <Inspector gameObject={selectedGameObject!} />
-            </View>
           </Window>
         </Panel.column>
         <Panel.row size={3}>
@@ -62,7 +59,7 @@ function App() {
             </View>
           </Window>
           <Window>
-            <View id="game" name="Game">
+            <View id="assets" name="Assets">
               <div></div>
             </View>
           </Window>

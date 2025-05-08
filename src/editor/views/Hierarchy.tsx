@@ -33,7 +33,7 @@ function SceneHierarchy({
           />
         </div>
       </div>
-      <div className={styles.content} style={{ background: colors.content }}>
+      <div className={styles.content}>
         <HierarchyList
           gameObjects={gameObjects}
           setSelectedGameObject={setSelectedGameObject}
