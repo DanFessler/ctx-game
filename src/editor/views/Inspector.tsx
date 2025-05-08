@@ -41,7 +41,7 @@ function useGameObjejct(gameObject: GameObject) {
 }
 
 function Inspector({ gameObject }: { gameObject: GameObject }) {
-  const count = useGameObjejct(gameObject);
+  useGameObjejct(gameObject);
 
   const behaviors = gameObject.behaviors;
 
