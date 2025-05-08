@@ -46,6 +46,13 @@ function Dockable({
     }
   }, [state, onChange]);
 
+  const pointerSensor = useSensor(PointerSensor, {
+    activationConstraint: {
+      distance: 10,
+    },
+  });
+  const sensors = useSensors(pointerSensor);
+
   return (
     <div
       style={{
