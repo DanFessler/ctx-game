@@ -65,7 +65,6 @@ function PanelView({
           });
           return <TabView tabs={panelTabs} />;
         } else {
-          console.log(panel.orientation, orientation);
           return (
             <PanelView
               key={index}

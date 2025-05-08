@@ -1,4 +1,4 @@
-import React, { useReducer, useEffect } from "react";
+import React, { useReducer, useEffect, useState } from "react";
 import PanelView from "./PanelView";
 import appReducer from "./reducer";
 import serializeLayout, { ParsedNode } from "./serializeLayout";
@@ -8,6 +8,8 @@ import {
   useSensor,
   useSensors,
   PointerSensor,
+  closestCorners,
+  DragOverlay,
 } from "@dnd-kit/core";
 
 type DockableProps = {
@@ -26,6 +28,11 @@ function Dockable({
   gap = 4,
 }: DockableProps) {
   const views: React.ReactElement<ViewProps>[] = [];
+  const [active, setActive] = useState<{
+    id: string;
+    type: string;
+    children: React.ReactNode;
+  } | null>(null);
 
   const childrenArray = React.Children.toArray(
     children
@@ -53,6 +60,24 @@ function Dockable({
   });
   const sensors = useSensors(pointerSensor);
 
+  function handleDragStart({ active }) {
+    const type = active.data?.current?.type;
+    const children = active.data?.current?.children;
+    setActive({ id: active.id, type, children });
+  }
+
+  function handleDragEnd({ active, over }) {
+    setActive(null);
+  }
+
+  function handleDragCancel() {
+    console.log("drag cancel");
+  }
+
+  function handleDragOver({ active, over }) {
+    console.log("drag over", active, over);
+  }
+
   return (
     <div
       style={{
@@ -63,7 +88,19 @@ function Dockable({
         background: colors.gap,
       }}
     >
-      <DndContext sensors={sensors}>
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCorners}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
+        onDragCancel={handleDragCancel}
+        onDragOver={handleDragOver}
+        modifiers={
+          [
+            // restrictToVerticalAxis
+          ]
+        }
+      >
         <PanelView
           orientation={orientation}
           panels={state.panels}
@@ -73,6 +110,7 @@ function Dockable({
         >
           {views}
         </PanelView>
+        <DragOverlay>{active ? active.children : null}</DragOverlay>
       </DndContext>
     </div>
   );

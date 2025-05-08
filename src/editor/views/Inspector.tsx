@@ -1,13 +1,21 @@
 import { useState, useEffect } from "react";
+// import { useDraggable, DragOverlay, useDndContext } from "@dnd-kit/core";
 import {
-  useDraggable,
-  DragOverlay,
-  useDndContext,
   DndContext,
+  // closestCenter,
+  closestCorners,
+  KeyboardSensor,
+  PointerSensor,
   useSensor,
   useSensors,
-  PointerSensor,
+  DragOverlay,
 } from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 
 import GameObject from "../../engine/GameObject";
@@ -17,7 +25,7 @@ import { PiBoundingBoxFill } from "react-icons/pi";
 import { FaCode } from "react-icons/fa";
 // import { TiThMenu } from "react-icons/ti";
 import { HiDotsVertical as TiThMenu } from "react-icons/hi";
-
+import SortableItem from "../components/SortableItem";
 import styles from "./Inspector.module.css";
 
 function useGameObjejct(gameObject: GameObject) {
@@ -32,19 +40,8 @@ function useGameObjejct(gameObject: GameObject) {
 
 function Inspector({ gameObject }: { gameObject: GameObject }) {
   useGameObjejct(gameObject);
-  const [draggingBehavior, setDraggingBehavior] = useState<string | null>(null);
-  const { active } = useDndContext();
 
   const behaviors = gameObject.behaviors;
-
-  // Update draggingBehavior based on the active drag
-  useEffect(() => {
-    if (active) {
-      setDraggingBehavior(active.id as string);
-    } else {
-      setDraggingBehavior(null);
-    }
-  }, [active]);
 
   return (
     <div className={styles.inspector}>
@@ -77,42 +74,8 @@ function Inspector({ gameObject }: { gameObject: GameObject }) {
       </div>
       {/* <DndContext sensors={sensors}> */}
       <div style={{ overflow: "auto", flex: 1 }}>
-        {Object.entries(behaviors).map(([key, behavior]) => {
-          return (
-            <InspectorBehavior
-              behavior={behavior}
-              key={key}
-              name={key}
-              id={key}
-            />
-          );
-        })}
+        <SortableBehaviors behaviors={behaviors} />
       </div>
-      <DragOverlay
-        modifiers={
-          [
-            // restrictToVerticalAxis
-          ]
-        }
-      >
-        {draggingBehavior ? (
-          <div
-            style={{
-              overflow: "auto",
-              flex: 1,
-              borderRadius: 4,
-              boxShadow: "0 2px 10px 0 rgba(0, 0, 0, 0.25)",
-            }}
-          >
-            <InspectorBehavior
-              behavior={behaviors[draggingBehavior]}
-              key={draggingBehavior}
-              name={draggingBehavior}
-              id={draggingBehavior}
-            />
-          </div>
-        ) : null}
-      </DragOverlay>
       {/* </DndContext> */}
     </div>
   );
@@ -121,32 +84,26 @@ function Inspector({ gameObject }: { gameObject: GameObject }) {
 function InspectorBehavior({
   behavior,
   name,
-  id,
 }: {
   behavior: Behavior;
   name: string;
-  id: string;
 }) {
   const [isOpen, setIsOpen] = useState(true);
-  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
-    id: id,
-  });
 
   return (
     <div
       className={styles.behaviorContainer}
       style={{
         borderTop: `1px solid ${colors.border}`,
-        background: !isDragging ? colors.headers : colors.content,
+        // background: !isDragging ? colors.headers : colors.content,
       }}
-      ref={setNodeRef}
-      {...listeners}
-      {...attributes}
     >
       <div
-        style={{
-          opacity: isDragging ? 0 : 1, // Optional: add visual feedback for dragging
-        }}
+        style={
+          {
+            // opacity: isDragging ? 0 : 1,
+          }
+        }
       >
         <div
           className={styles.behaviorHeader}
@@ -187,6 +144,78 @@ function InspectorBehavior({
       </div>
     </div>
   );
+}
+
+function SortableBehaviors({
+  behaviors,
+}: {
+  behaviors: Record<string, Behavior>;
+}) {
+  const [items, setItems] = useState(Object.keys(behaviors));
+  const [activeId, setActiveId] = useState<string | null>(null);
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 10,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  return (
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCorners}
+      onDragStart={({ active }) => setActiveId(active.id)}
+      onDragEnd={handleDragEnd}
+      onDragCancel={() => setActiveId(null)}
+      modifiers={[restrictToVerticalAxis]}
+    >
+      <SortableContext items={items} strategy={verticalListSortingStrategy}>
+        {items.map((id) => (
+          <SortableItem key={id} id={id} type="behavior">
+            <InspectorBehavior
+              behavior={behaviors[id]}
+              key={id}
+              name={id.toString()}
+            />
+          </SortableItem>
+        ))}
+      </SortableContext>
+      <DragOverlay>
+        {activeId ? (
+          <div
+            style={{
+              borderRadius: 4,
+              overflow: "hidden",
+              boxShadow: "0 2px 10px 0 rgba(0, 0, 0, 0.25)",
+            }}
+          >
+            <InspectorBehavior
+              behavior={behaviors[activeId]}
+              name={activeId.toString()}
+            />
+          </div>
+        ) : null}
+      </DragOverlay>
+    </DndContext>
+  );
+
+  function handleDragEnd(event) {
+    const { active, over } = event;
+
+    if (active.id !== over.id) {
+      setItems((items) => {
+        const oldIndex = items.indexOf(active.id);
+        const newIndex = items.indexOf(over.id);
+
+        return arrayMove(items, oldIndex, newIndex);
+      });
+    }
+    setActiveId(null);
+  }
 }
 
 export default Inspector;

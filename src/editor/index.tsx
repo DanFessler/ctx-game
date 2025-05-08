@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import GameObject from "../engine/GameObject";
 import game from "../game";
 
@@ -39,7 +39,7 @@ function App() {
         gap: 1,
       }}
     >
-      <Dockable panels={layout} onChange={setLayout}>
+      <Dockable panels={layout} onChange={setLayout} gap={3}>
         <Panel>
           <Window>
             <View id="hierarchy" name="Hierarchy">
@@ -51,9 +51,16 @@ function App() {
             </View>
           </Window>
         </Panel>
+
         <Panel size={3}>
           <Window size={3}>
-            <View id="scene" name="Scene">
+            <View id="scene1" name="Scene">
+              <SceneCanvas />
+            </View>
+            <View id="scene2" name="Scene1">
+              <SceneCanvas />
+            </View>
+            <View id="scene3" name="Scene2">
               <SceneCanvas />
             </View>
           </Window>
@@ -63,9 +70,18 @@ function App() {
             </View>
           </Window>
         </Panel>
+
         <Panel>
           <Window>
             <View id="inspector" name="Inspector">
+              <Inspector gameObject={selectedGameObject!} />
+            </View>
+            <View id="inspector2" name="Inspector">
+              <Inspector gameObject={selectedGameObject!} />
+            </View>
+          </Window>
+          <Window>
+            <View id="inspector3" name="Inspector">
               <Inspector gameObject={selectedGameObject!} />
             </View>
           </Window>

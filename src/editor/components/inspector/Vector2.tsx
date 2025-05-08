@@ -13,7 +13,8 @@ const styles: Record<string, React.CSSProperties> = {
   label: {
     position: "absolute",
     left: 4,
-    color: "rgba(255,255,255,0.25)",
+    // color: "rgba(255,255,255,0.25)",
+    color: "rgba(128,128,128,0.75)",
     fontSize: 10,
   },
   inputContainer: {

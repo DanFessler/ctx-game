@@ -1,7 +1,7 @@
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
-  font-weight: 300;
+  font-weight: 400;
 
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
@@ -83,11 +83,18 @@ input {
   width: 0;
   min-width: 16px;
   border: none;
-  background: RGBA(0, 0, 0, 0.2);
+  background: var(--input);
+  box-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.2) inset;
+  color: var(--inputText);
   padding: 4px;
   border-radius: 4px;
   box-sizing: border-box;
   text-overflow: ellipsis;
+}
+
+textarea:focus,
+input:focus {
+  outline: 2px solid var(--selected);
 }
 
 input[type="checkbox"] {
