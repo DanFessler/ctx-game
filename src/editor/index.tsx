@@ -40,7 +40,7 @@ function App() {
         gap: 1,
       }}
     >
-      <Dockable panels={layout} onChange={setLayout} gap={3}>
+      <Dockable panels={layout} onChange={setLayout} gap={4} radius={6}>
         <Panel>
           <Window>
             <View id="hierarchy" name="Hierarchy">

@@ -3,7 +3,7 @@ const colors = {
     headers: "rgb(236, 239, 242)",
     selected: "rgb(66,137,204)",
     background: "rgb(197, 204, 212)",
-    document: "rgb(136, 142, 152)",
+    document: "rgb(92, 95, 99)",
     border: "rgba(0,0,0,0.1)",
     text: "rgb(63, 63, 63)",
     gap: "rgb(133, 140, 151)",

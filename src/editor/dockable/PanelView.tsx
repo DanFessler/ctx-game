@@ -86,7 +86,6 @@ function PanelView({
               }
               panels={panel.panels}
               children={children}
-              dispatch={dispatch}
               address={address.concat(index)}
               gap={gap}
             />

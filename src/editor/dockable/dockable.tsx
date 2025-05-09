@@ -20,6 +20,7 @@ type DockableProps = {
   children: React.ReactNode;
   onChange?: (panels: ParsedNode[]) => void;
   gap?: number;
+  radius?: number;
 };
 
 function Dockable({
@@ -28,6 +29,7 @@ function Dockable({
   panels: controledPanels,
   onChange,
   gap = 4,
+  radius = 4,
 }: DockableProps) {
   const views: React.ReactElement<ViewProps>[] = [];
   const [active, setActive] = useState<{
@@ -98,6 +100,7 @@ function Dockable({
           padding: gap,
           color: colors.text,
           background: colors.gap,
+          "--radius": radius + "px",
         }}
       >
         <DndContext
@@ -125,7 +128,7 @@ function Dockable({
             {active ? (
               <div
                 style={{
-                  borderRadius: 4,
+                  borderRadius: radius,
                   overflow: "hidden",
                   boxShadow: "0 1px 5px 1px rgba(0, 0, 0, 0.25)",
                 }}
