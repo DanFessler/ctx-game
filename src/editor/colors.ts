@@ -25,6 +25,7 @@ const colors = {
     headers: "rgb(57, 60, 65)",
     selected: "rgb(46,104,162)",
     background: "rgb(40, 43, 47)",
+    content: "rgb(46, 49, 54)",
     document: "rgb(13, 13, 14)",
     border: "rgba(0, 0, 0, 0.15)",
     text: "rgb(213, 218, 221)",
@@ -40,8 +41,8 @@ const userPreferredTheme = window.matchMedia("(prefers-color-scheme: dark)")
   ? "medium"
   : "light";
 
-const currentTheme = colors[userPreferredTheme];
-// const currentTheme = colors.dark;
+// const currentTheme = colors[userPreferredTheme];
+const currentTheme = colors.dark;
 
 // Set CSS variables on body for current theme
 Object.entries(currentTheme).forEach(([key, value]) => {

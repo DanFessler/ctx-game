@@ -7,12 +7,15 @@ type ViewId = string;
 
 export type WindowNode = {
   type: "Window";
+  id: string;
   tabs: ViewId[];
   size?: number;
+  selected: ViewId;
 };
 
 export type PanelNode = {
   type: "Panel";
+  id: string;
   orientation?: "row" | "column";
   panels: LayoutNode[];
   size?: number;
@@ -21,6 +24,8 @@ export type PanelNode = {
 export type LayoutNode = PanelNode | WindowNode;
 
 import type { PanelProps, WindowProps, ViewProps } from "./dockable";
+
+const idNonce = 0;
 
 function serializeLayout(
   element: React.ReactElement,
@@ -54,6 +59,7 @@ function serializeLayout(
 
     return {
       type: "Panel",
+      id: `panel-${idNonce}`,
       orientation,
       panels: parsedChildren,
       size: props.size || 1,
@@ -71,8 +77,10 @@ function serializeLayout(
 
     return {
       type: "Window",
+      id: `window-${idNonce}`,
       tabs: tabIds,
       size: props.size || 1,
+      selected: tabIds[props.selected || 0],
     };
   }
 
@@ -80,8 +88,10 @@ function serializeLayout(
   if (element.type === View) {
     return {
       type: "Window",
+      id: `window-${idNonce}`,
       tabs: [parseView(element)],
       size: 1,
+      selected: parseView(element),
     };
   }
 

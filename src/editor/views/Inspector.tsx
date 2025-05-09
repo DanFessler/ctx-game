@@ -272,7 +272,7 @@ function InspectorBehavior({
         <div>{name}</div>
         <div className={styles.spacer} />
         <div className={styles.arrowContainer}>{isCollapsed ? "▶" : "▼"}</div>
-        <TiThMenu style={{ minWidth: 14, minHeight: 14 }} />
+        {/* <TiThMenu style={{ minWidth: 14, minHeight: 14 }} /> */}
       </div>
       {!isCollapsed ? (
         <div

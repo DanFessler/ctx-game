@@ -32,14 +32,14 @@ class RedRectangle extends GameObject {
     super({
       behaviors: [
         new Transform(0, 0, 3, 3, 1.5, 1.5),
-        new Rectangle("red"),
+        new Rectangle("#ff0000"),
         new RedRectangleBehavior(),
       ],
       children: [
         new GameObject({
           behaviors: [
             new Transform(0, 0, 1, 1, 0.5, 0.5),
-            new Rectangle("blue"),
+            new Rectangle("#0000ff"),
           ],
           name: "Blue Rectangle",
         }),

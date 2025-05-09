@@ -9,8 +9,10 @@ import {
   useSensors,
   PointerSensor,
   closestCorners,
+  closestCenter,
   DragOverlay,
 } from "@dnd-kit/core";
+import { DockableContext } from "./DockableContext";
 
 type DockableProps = {
   orientation?: "row" | "column";
@@ -66,6 +68,12 @@ function Dockable({
   }
 
   function handleDragEnd({ active, over }) {
+    console.log("drag end", active, over);
+    dispatch({
+      type: "reorderTabs",
+      activeId: active.id,
+      overId: over.id,
+    });
     setActive(null);
   }
 
@@ -74,50 +82,68 @@ function Dockable({
   }
 
   function handleDragOver({ active, over }) {
+    console.log("drag over", active, over);
+    dispatch({ type: "moveTab", activeId: active.id, overId: over.id });
     // console.log("drag over", active, over);
   }
 
+  console.log(active);
+
   return (
-    <div
-      style={{
-        width: "100%",
-        height: "100%",
-        padding: gap,
-        color: colors.text,
-        background: colors.gap,
-      }}
-    >
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCorners}
-        onDragStart={handleDragStart}
-        onDragEnd={handleDragEnd}
-        onDragCancel={handleDragCancel}
-        onDragOver={handleDragOver}
-        modifiers={
-          [
-            // restrictToVerticalAxis
-          ]
-        }
+    <DockableContext.Provider value={{ state, dispatch }}>
+      <div
+        style={{
+          width: "100%",
+          height: "100%",
+          padding: gap,
+          color: colors.text,
+          background: colors.gap,
+        }}
       >
-        <PanelView
-          orientation={orientation}
-          panels={state.panels}
-          dispatch={dispatch}
-          address={[]}
-          gap={gap}
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragStart={handleDragStart}
+          onDragEnd={handleDragEnd}
+          onDragCancel={handleDragCancel}
+          onDragOver={handleDragOver}
+          modifiers={
+            [
+              // restrictToVerticalAxis
+            ]
+          }
         >
-          {views}
-        </PanelView>
-        <DragOverlay>{active ? active.children : null}</DragOverlay>
-      </DndContext>
-    </div>
+          <PanelView
+            orientation={orientation}
+            panels={state.panels}
+            address={[]}
+            gap={gap}
+          >
+            {views}
+          </PanelView>
+          <DragOverlay>
+            {active ? (
+              <div
+                style={{
+                  borderRadius: 4,
+                  overflow: "hidden",
+                  boxShadow: "0 1px 5px 1px rgba(0, 0, 0, 0.25)",
+                }}
+              >
+                {active.children}
+              </div>
+            ) : null}
+          </DragOverlay>
+        </DndContext>
+      </div>
+    </DockableContext.Provider>
   );
 }
 
 export type WindowProps = {
   children: React.ReactNode;
   size?: number;
+  selected?: number;
 };
 export function Window(props: WindowProps) {
   return props.children;

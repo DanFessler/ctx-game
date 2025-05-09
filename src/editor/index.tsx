@@ -21,6 +21,8 @@ function App() {
 
   const [layout, setLayout] = useState<ParsedNode[]>();
 
+  console.log("layout", JSON.stringify(layout, null, 2));
+
   // save layout to local storage
   useEffect(() => {
     localStorage.setItem("layout", JSON.stringify(layout));

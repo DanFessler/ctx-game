@@ -1,36 +1,38 @@
 import TabView from "./TabView";
 import PanelGroup from "../panelgroup/PanelGroup";
 import React from "react";
+import { WindowNode } from "./serializeLayout";
+import { useDockable } from "./DockableContext";
 
 type PanelProps = {
   orientation: "row" | "column";
-  panels: panelObject[];
   children:
     | React.ReactElement<React.ComponentProps<typeof View>>
     | React.ReactElement<React.ComponentProps<typeof View>>[];
-
-  dispatch: (action: {
-    type: "resize";
-    sizes: number[];
-    address: number[];
-  }) => void;
   address: number[];
   gap?: number;
+  panels: panelObject[];
 };
 
 export type panelObject =
-  | { size?: number; tabs: string[] }
-  | { size?: number; orientation?: "row" | "column"; panels: panelObject[] };
+  | { size?: number; tabs: string[]; id: string }
+  | {
+      size?: number;
+      orientation?: "row" | "column";
+      panels: panelObject[];
+      id: string;
+    };
 
 // a list of TabViews with horizontal or vertical orientation
 function PanelView({
   orientation = "row",
-  panels,
   children,
-  dispatch,
   address,
   gap,
+  panels,
 }: PanelProps) {
+  const { dispatch } = useDockable();
+
   const sizes = panels.map((panel) => panel.size || 1);
 
   // Normalize children to an array
@@ -51,6 +53,7 @@ function PanelView({
       onResizeEnd={handleResizeEnd}
     >
       {panels.map((panel, index) => {
+        console.log(panel);
         if ("tabs" in panel) {
           const panelTabs = panel.tabs.map((tabId) => {
             const tab = childArray.find(({ props }) => props.id === tabId);
@@ -63,7 +66,13 @@ function PanelView({
               content: tab,
             };
           });
-          return <TabView tabs={panelTabs} />;
+          return (
+            <TabView
+              id={panel.id}
+              tabs={panelTabs}
+              selected={(panel as WindowNode).selected.toString()}
+            />
+          );
         } else {
           return (
             <PanelView

@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Panel from "./Panel";
 
 type PanelGroupProps = {
@@ -7,6 +7,7 @@ type PanelGroupProps = {
   initialSizes?: number[];
   gap?: number;
   onResizeEnd?: (sizes: number[]) => void;
+  className?: string;
 };
 
 function PanelGroup({
@@ -15,6 +16,7 @@ function PanelGroup({
   initialSizes,
   onResizeEnd,
   gap = 3,
+  className,
 }: PanelGroupProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const panelRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -29,6 +31,11 @@ function PanelGroup({
     x: number;
     y: number;
   } | null>(null);
+
+  useEffect(() => {
+    const newSizes = calcNewSizes();
+    setSizes(newSizes);
+  }, [React.Children.count(children)]);
 
   const handleDrag = (delta: { x: number; y: number }) => {
     setDraggingDelta(delta);
@@ -86,6 +93,7 @@ function PanelGroup({
   return (
     <div
       ref={containerRef}
+      className={className}
       style={{
         display: "grid",
         [direction === "row" ? "gridTemplateColumns" : "gridTemplateRows"]:

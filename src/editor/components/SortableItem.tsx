@@ -5,10 +5,12 @@ export function SortableItem({
   id,
   children,
   type,
+  style,
 }: {
   id: string;
   children: React.ReactNode;
   type: "tab" | "behavior";
+  style?: React.CSSProperties;
 }) {
   const {
     attributes,
@@ -19,14 +21,19 @@ export function SortableItem({
     isDragging,
   } = useSortable({ id, data: { type, children } });
 
-  const style = {
+  const itemStyle = {
     transform: CSS.Translate.toString(transform),
     transition,
     opacity: isDragging ? 0 : 1,
   };
 
   return (
-    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
+    <div
+      ref={setNodeRef}
+      style={{ ...itemStyle, ...style }}
+      {...attributes}
+      {...listeners}
+    >
       {children}
     </div>
   );
