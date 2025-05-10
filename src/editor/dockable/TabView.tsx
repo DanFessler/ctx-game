@@ -17,6 +17,7 @@ export type tabObject = {
 // import { TiThMenu } from "react-icons/ti";
 // import { IoMenu as TiThMenu } from "react-icons/io5";
 import { HiDotsVertical as TiThMenu } from "react-icons/hi";
+import { useEffect } from "react";
 
 export type tabGroupObject = tabObject[];
 
@@ -33,16 +34,18 @@ function TabView({
 }) {
   // const [selectedTab, setSelectedTab] = useState(0);
   const { dispatch } = useDockable();
-  const { setNodeRef, isOver } = useDroppable({
-    id,
-  });
+  // const { setNodeRef, isOver } = useDroppable({
+  //   id,
+  // });
 
   // Get the current drag over state from the DnD context
   const { active, over } = useDndContext();
 
   // Check if we're over either the container or any of the sortable items
-  const isOverAny =
-    isOver || (active && over && tabs.some((tab) => tab.id === over.id));
+  // const isOverAny =
+  //   isOver || (active && over && tabs.some((tab) => tab.id === over.id));
+
+  const isOverAny = false;
 
   function renderTabs() {
     return (
@@ -106,7 +109,7 @@ function TabView({
 
   return (
     <div
-      ref={setNodeRef}
+      // ref={setNodeRef}
       className={`${styles.container} ${isOverAny ? styles.isOver : ""}`}
       style={{
         background: colors.headers,
@@ -125,6 +128,48 @@ function TabView({
       >
         {tabs.find((tab) => tab.id === selected)?.content}
       </div>
+    </div>
+  );
+}
+
+function Droppable({
+  id,
+  style,
+  className,
+  children,
+  onOver,
+}: {
+  id: string;
+  style?: React.CSSProperties;
+  className?: string;
+  children: React.ReactNode;
+  onOver?: (isOver: boolean) => void;
+}) {
+  const { setNodeRef, isOver } = useDroppable({
+    id,
+    data: {
+      type: "tab-bar",
+      accepts: ["tab"], // specify what types of items this droppable accepts
+    },
+  });
+
+  useEffect(() => {
+    if (onOver) {
+      onOver(isOver);
+    }
+  }, [isOver]);
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={{
+        ...style,
+        // Add visual feedback when dragging over
+        // backgroundColor: isOver ? "RED" : "BLUE",
+      }}
+      className={className}
+    >
+      {children}
     </div>
   );
 }
