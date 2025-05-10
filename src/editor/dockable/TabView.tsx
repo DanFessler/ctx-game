@@ -6,7 +6,7 @@ import {
   SortableContext,
   horizontalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { useDroppable } from "@dnd-kit/core";
+import { useDroppable, useDndContext } from "@dnd-kit/core";
 import { useDockable } from "./DockableContext";
 export type tabObject = {
   id: string;
@@ -33,6 +33,16 @@ function TabView({
 }) {
   // const [selectedTab, setSelectedTab] = useState(0);
   const { dispatch } = useDockable();
+  const { setNodeRef, isOver } = useDroppable({
+    id,
+  });
+
+  // Get the current drag over state from the DnD context
+  const { active, over } = useDndContext();
+
+  // Check if we're over either the container or any of the sortable items
+  const isOverAny =
+    isOver || (active && over && tabs.some((tab) => tab.id === over.id));
 
   function renderTabs() {
     return (
@@ -40,9 +50,11 @@ function TabView({
         items={tabs.map((tab) => tab.id)}
         strategy={horizontalListSortingStrategy}
       >
-        <Droppable
+        <div
           id={id}
-          className={"DROPPABLE " + styles.tabBar}
+          className={
+            isOverAny ? styles.isOver + " " + styles.tabBar : styles.tabBar
+          }
           style={{
             background: colors.background,
             // borderBottom: `4px solid ${colors.headers}`,
@@ -53,9 +65,11 @@ function TabView({
               key={tab.id}
               id={tab.id}
               type="tab"
-              style={{
-                flex: 1,
-              }}
+              style={
+                {
+                  // flex: 1,
+                }
+              }
             >
               <Tab
                 name={tab.name}
@@ -69,8 +83,8 @@ function TabView({
               />
             </SortableItem>
           ))}
-          {/* <div style={{ flex: 1 }} /> */}
-          {/* <div
+          <div style={{ flex: 1 }} />
+          <div
             style={{
               height: "100%",
               width: "24px",
@@ -80,18 +94,20 @@ function TabView({
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
+              zIndex: 1,
             }}
           >
             <TiThMenu style={{ width: 14, height: 14 }} />
-          </div> */}
-        </Droppable>
+          </div>
+        </div>
       </SortableContext>
     );
   }
 
   return (
     <div
-      className={styles.container}
+      ref={setNodeRef}
+      className={`${styles.container} ${isOverAny ? styles.isOver : ""}`}
       style={{
         background: colors.headers,
         flex: 1,
@@ -109,40 +125,6 @@ function TabView({
       >
         {tabs.find((tab) => tab.id === selected)?.content}
       </div>
-    </div>
-  );
-}
-
-function Droppable({
-  id,
-  style,
-  className,
-  children,
-}: {
-  id: string;
-  style?: React.CSSProperties;
-  className?: string;
-  children: React.ReactNode;
-}) {
-  const { setNodeRef, isOver } = useDroppable({
-    id,
-    data: {
-      type: "tab-bar",
-      accepts: ["tab"], // specify what types of items this droppable accepts
-    },
-  });
-
-  return (
-    <div
-      ref={setNodeRef}
-      style={{
-        ...style,
-        // Add visual feedback when dragging over
-        // backgroundColor: isOver ? "RED" : "BLUE",
-      }}
-      className={className}
-    >
-      {children}
     </div>
   );
 }

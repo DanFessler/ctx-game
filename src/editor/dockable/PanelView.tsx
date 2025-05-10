@@ -53,7 +53,6 @@ function PanelView({
       onResizeEnd={handleResizeEnd}
     >
       {panels.map((panel, index) => {
-        console.log(panel);
         if ("tabs" in panel) {
           const panelTabs = panel.tabs.map((tabId) => {
             const tab = childArray.find(({ props }) => props.id === tabId);

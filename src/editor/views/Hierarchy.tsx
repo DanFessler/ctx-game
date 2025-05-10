@@ -20,7 +20,6 @@ function SceneHierarchy({
       <div
         className={styles.header}
         style={{
-          borderBottom: `1px solid ${colors.border}`,
           background: colors.headers,
         }}
       >

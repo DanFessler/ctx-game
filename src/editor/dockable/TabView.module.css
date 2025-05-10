@@ -8,7 +8,8 @@
 }
 
 .container::after {
-  box-shadow: 0 0px 1px 1px rgba(255, 255, 255, 0.05) inset;
+  box-shadow: 0 0px 0px 1px rgba(255, 255, 255, 0.025) inset,
+    0 0px 2px 1px rgba(255, 255, 255, 0.05) inset;
   content: "";
   position: absolute;
   top: 0;
@@ -23,6 +24,22 @@
 .tabBar {
   background: var(--background-color);
   display: flex;
+  position: relative;
+}
+
+.isOver {
+}
+.isOver.container::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  box-shadow: 0 0 0 2px var(--selected) inset;
+  pointer-events: none;
 }
 
 .tab {
@@ -39,10 +56,73 @@
   /* opacity: 0.5; */
 }
 
-.tab:not(.selected) {
-  opacity: 0.75;
+.tab.selected {
+  background: var(--headers);
+  position: relative;
 }
 
-.tab:hover {
+.tab:not(.selected):hover {
+  backdrop-filter: brightness(1.1);
+  border-radius: var(--radius);
   opacity: 1;
+  z-index: 1;
+}
+
+.tab.selected::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.025),
+    transparent 95%
+  );
+}
+
+.tabCornerRight {
+  position: absolute;
+  bottom: 0;
+  right: calc(var(--radius) * -2);
+  width: calc(var(--radius) * 2);
+  height: calc(var(--radius) * 2);
+  background: var(--headers);
+}
+
+.tabCornerLeft::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--background);
+  border-radius: 0 0 var(--radius) 0;
+}
+
+.tabCornerLeft {
+  position: absolute;
+  bottom: 0;
+  left: calc(var(--radius) * -2);
+  width: calc(var(--radius) * 2);
+  height: calc(var(--radius) * 2);
+  background: var(--headers);
+}
+
+.tabCornerRight::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--background);
+  border-radius: 0 0 0 var(--radius);
+}
+
+.tab:not(.selected) {
+  opacity: 0.75;
 }

@@ -70,7 +70,6 @@ function Dockable({
   }
 
   function handleDragEnd({ active, over }) {
-    console.log("drag end", active, over);
     dispatch({
       type: "reorderTabs",
       activeId: active.id,
@@ -84,9 +83,10 @@ function Dockable({
   }
 
   function handleDragOver({ active, over }) {
-    console.log("drag over", active, over);
-    dispatch({ type: "moveTab", activeId: active.id, overId: over.id });
     // console.log("drag over", active, over);
+    if (!over) return;
+    console.log("drag over", active, over);
+    // dispatch({ type: "moveTab", activeId: active.id, overId: over.id });
   }
 
   console.log(active);
@@ -105,7 +105,7 @@ function Dockable({
       >
         <DndContext
           sensors={sensors}
-          collisionDetection={closestCenter}
+          // collisionDetection={closestCenter}
           onDragStart={handleDragStart}
           onDragEnd={handleDragEnd}
           onDragCancel={handleDragCancel}

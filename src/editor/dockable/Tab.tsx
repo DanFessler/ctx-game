@@ -1,4 +1,3 @@
-import colors from "../colors";
 import styles from "./TabView.module.css";
 
 function Tab({
@@ -13,12 +12,11 @@ function Tab({
   return (
     <span
       className={styles.tab + (selected ? " " + styles.selected : "")}
-      style={{
-        background: selected ? colors.headers : "transparent",
-      }}
       onPointerDown={onClick}
     >
       {name}
+      {selected && <div className={styles.tabCornerRight} />}
+      {selected && <div className={styles.tabCornerLeft} />}
     </span>
   );
 }

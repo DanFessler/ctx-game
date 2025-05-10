@@ -1,8 +1,8 @@
 const colors = {
   light: {
-    headers: "rgb(236, 239, 242)",
+    headers: "rgb(225, 229, 233)",
     selected: "rgb(66,137,204)",
-    background: "rgb(197, 204, 212)",
+    background: "rgb(191, 198, 207)",
     document: "rgb(92, 95, 99)",
     border: "rgba(0,0,0,0.1)",
     text: "rgb(63, 63, 63)",
@@ -22,9 +22,9 @@ const colors = {
     inputText: "rgb(255,255,255)",
   },
   dark: {
-    headers: "rgb(57, 60, 65)",
+    headers: "rgb(54, 57, 63)",
     selected: "rgb(46,104,162)",
-    background: "rgb(40, 43, 47)",
+    background: "rgb(40, 44, 48)",
     content: "rgb(46, 49, 54)",
     document: "rgb(13, 13, 14)",
     border: "rgba(0, 0, 0, 0.15)",
