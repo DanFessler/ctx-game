@@ -1,3 +1,4 @@
+import { useState } from "react";
 import colors from "../colors";
 import styles from "./TabView.module.css";
 import SortableItem from "../components/SortableItem";
@@ -32,19 +33,13 @@ function TabView({
   selected: string;
   id: string;
 }) {
-  // const [selectedTab, setSelectedTab] = useState(0);
-  const { dispatch } = useDockable();
-  // const { setNodeRef, isOver } = useDroppable({
-  //   id,
-  // });
+  // const [isOverDroppable, setIsOverDroppable] = useState(false);
+  // const [isOverTab, setIsOverTab] = useState<{ [key: string]: boolean }>({});
 
-  // Get the current drag over state from the DnD context
-  const { active, over } = useDndContext();
-
-  // Check if we're over either the container or any of the sortable items
   // const isOverAny =
-  //   isOver || (active && over && tabs.some((tab) => tab.id === over.id));
+  //   isOverDroppable || Object.values(isOverTab).some((isOver) => isOver);
 
+  const { active, over } = useDndContext();
   const isOverAny = false;
 
   function renderTabs() {
@@ -53,7 +48,7 @@ function TabView({
         items={tabs.map((tab) => tab.id)}
         strategy={horizontalListSortingStrategy}
       >
-        <div
+        <Droppable
           id={id}
           className={
             isOverAny ? styles.isOver + " " + styles.tabBar : styles.tabBar
@@ -62,12 +57,16 @@ function TabView({
             background: colors.background,
             // borderBottom: `4px solid ${colors.headers}`,
           }}
+          // onOver={(isOver) => setIsOverDroppable(isOver)}
         >
           {tabs.map((tab) => (
             <SortableItem
               key={tab.id}
               id={tab.id}
               type="tab"
+              // onOver={(isOver) =>
+              //   setIsOverTab((prev) => ({ ...prev, [tab.id]: isOver }))
+              // }
               style={
                 {
                   // flex: 1,
@@ -77,12 +76,12 @@ function TabView({
               <Tab
                 name={tab.name}
                 selected={tab.id === selected}
-                onClick={() =>
-                  dispatch({
-                    type: "selectTab",
-                    tabId: tab.id,
-                  })
-                }
+                // onClick={() =>
+                //   dispatch({
+                //     type: "selectTab",
+                //     tabId: tab.id,
+                //   })
+                // }
               />
             </SortableItem>
           ))}
@@ -102,7 +101,7 @@ function TabView({
           >
             <TiThMenu style={{ width: 14, height: 14 }} />
           </div>
-        </div>
+        </Droppable>
       </SortableContext>
     );
   }
