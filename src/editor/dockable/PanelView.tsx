@@ -1,7 +1,7 @@
 import TabView from "./TabView";
 import PanelGroup from "../panelgroup/PanelGroup";
 import React from "react";
-import { WindowNode } from "./serializeLayout";
+import { LayoutNode, PanelNode, WindowNode } from "./serializeLayout";
 import { useDockable } from "./DockableContext";
 import Droppable from "../components/Droppable";
 // import styles from "./PanelView.module.css";
@@ -13,17 +13,8 @@ type PanelProps = {
     | React.ReactElement<React.ComponentProps<typeof View>>[];
   address: number[];
   gap?: number;
-  panels: panelObject[];
+  panels: LayoutNode[];
 };
-
-export type panelObject =
-  | { size?: number; tabs: string[]; id: string }
-  | {
-      size?: number;
-      orientation?: "row" | "column";
-      panels: panelObject[];
-      id: string;
-    };
 
 // a list of TabViews with horizontal or vertical orientation
 function PanelView({
@@ -70,10 +61,11 @@ function PanelView({
       )}
     >
       {panels.map((panel, index) => {
-        if ("tabs" in panel) {
-          const panelTabs = panel.tabs.map((tabId) => {
+        if (panel.type === "Window") {
+          const panelTabs = panel.children.map((tabId) => {
             const tab = childArray.find(({ props }) => props.id === tabId);
             if (!tab) {
+              console.log("tabid", tabId);
               throw new Error(`Tab ${tabId} not found`);
             }
             return {
@@ -91,17 +83,18 @@ function PanelView({
             />
           );
         } else {
+          const _panel = panel as PanelNode;
           return (
             <PanelView
               key={index}
               orientation={
-                panel.orientation !== undefined
-                  ? panel.orientation
+                _panel.orientation !== undefined
+                  ? _panel.orientation
                   : orientation === "row"
                   ? "column"
                   : "row"
               }
-              panels={panel.panels}
+              panels={_panel.children}
               children={children}
               address={address.concat(index)}
               gap={gap}

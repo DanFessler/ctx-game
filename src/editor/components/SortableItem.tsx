@@ -10,7 +10,7 @@ export function SortableItem({
   id: string;
   children: React.ReactNode;
   style?: React.CSSProperties;
-  data?: any;
+  data?: any; // eslint-disable-line @typescript-eslint/no-explicit-any
 }) {
   const {
     attributes,
@@ -18,15 +18,15 @@ export function SortableItem({
     setNodeRef,
     transform,
     isDragging,
-    // transition,
+    transition,
   } = useSortable({ id, data: { children, ...data } });
 
   const itemStyle = {
     transform: CSS.Translate.toString(transform),
-    transition: "transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
+    // transition: "transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
     // for whatever reason the transition breaks when using the supplied transition
     // this only happens when I use a dndkit hook in the parent component
-    // transition,
+    transition,
     opacity: isDragging ? 0 : 1,
   };
 

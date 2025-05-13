@@ -14,7 +14,7 @@ import type {
   DragStartEvent,
   DragEndEvent,
   // DragCancelEvent,
-  DragOverEvent,
+  // DragOverEvent,
 } from "@dnd-kit/core";
 // import { createSnapModifier } from "@dnd-kit/modifiers";
 import { DockableContext } from "./DockableContext";
@@ -114,22 +114,47 @@ function Dockable({
 
   function handleDragEnd({ active, over }: DragEndEvent) {
     if (!over) return;
-    dispatch({
-      type: "reorderTabs",
-      activeId: active.id.toString(),
-      overId: over.id.toString(),
-    });
+    switch (over.data.current?.type) {
+      case "tab-bar":
+        return dispatch({
+          type: "moveTab",
+          sourceTabId: active.id.toString(),
+          targetWindowId: over.id.toString(),
+        });
+      case "tab":
+        if (active.data.current?.parentId === over.data.current?.parentId) {
+          return dispatch({
+            type: "reorderTabs",
+            activeId: active.id.toString(),
+            overId: over.id.toString(),
+          });
+        }
+        return dispatch({
+          type: "moveTab",
+          sourceTabId: active.id.toString(),
+          targetWindowId: over.data.current.parentId,
+        });
+      case "edge-zone":
+        return dispatch({
+          type: "splitWindow",
+          windowId: over.data.current.parentId,
+          direction: over.data.current.side,
+          sourceTabId: active.id.toString(),
+        });
+    }
     setActive(null);
   }
 
-  function handleDragOver({ active, over }: DragOverEvent) {
-    // console.log("drag over", active, over);
-    if (!over) return;
-    console.log("drag over", active, over);
-    // dispatch({ type: "moveTab", activeId: active.id, overId: over.id });
-  }
-
-  // console.log(active);
+  // function handleDragOver({ active, over }: DragOverEvent) {
+  //   if (!over) return;
+  //   const overType = over.data.current?.type;
+  //   if (overType !== "tab") return;
+  //   dispatch({
+  //     type: "moveTab",
+  //     activeId: active.id as string,
+  //     overId: over.id as string,
+  //   });
+  // }
 
   return (
     <DockableContext.Provider value={{ state, dispatch }}>
@@ -150,12 +175,7 @@ function Dockable({
           onDragStart={handleDragStart}
           onDragEnd={handleDragEnd}
           onDragCancel={handleDragCancel}
-          onDragOver={handleDragOver}
-          modifiers={
-            [
-              // restrictToVerticalAxis
-            ]
-          }
+          // onDragOver={handleDragOver}
         >
           <PanelView
             orientation={orientation}

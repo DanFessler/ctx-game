@@ -31,8 +31,15 @@ type SelectTabAction = {
 
 type MoveTabAction = {
   type: "moveTab";
-  activeId: string;
-  overId: string;
+  sourceTabId: string;
+  targetWindowId: string;
+};
+
+type SplitWindowAction = {
+  type: "splitWindow";
+  windowId: string;
+  direction: "Left" | "Right";
+  sourceTabId: string;
 };
 
 type Action =
@@ -40,7 +47,8 @@ type Action =
   | AddPanelAction
   | ReorderTabsAction
   | SelectTabAction
-  | MoveTabAction;
+  | MoveTabAction
+  | SplitWindowAction;
 
 const appReducer = createReducer<State, Action>({
   resize: (state, { sizes, address }: ResizeAction) => {
@@ -49,11 +57,11 @@ const appReducer = createReducer<State, Action>({
 
       let panel: ParsedNode | ParsedNode[] = panels[address[0]];
       if (address.length > 1) {
-        const innerPanels = (panel as PanelNode).panels;
+        const innerPanels = (panel as PanelNode).children;
         panel = getPanels(innerPanels, address.slice(1));
       }
 
-      return (panel as PanelNode).panels;
+      return (panel as PanelNode).children;
     }
 
     // get the panels at the address
@@ -72,10 +80,14 @@ const appReducer = createReducer<State, Action>({
   reorderTabs: (state, { activeId, overId }: ReorderTabsAction) => {
     const ParentPanel = findTabParent(state.panels, activeId) as WindowNode;
 
-    const activeIndex = ParentPanel.tabs.indexOf(activeId);
-    const overIndex = ParentPanel.tabs.indexOf(overId);
+    const activeIndex = ParentPanel.children.indexOf(activeId);
+    const overIndex = ParentPanel.children.indexOf(overId);
 
-    ParentPanel.tabs = arrayMove(ParentPanel.tabs, activeIndex, overIndex);
+    ParentPanel.children = arrayMove(
+      ParentPanel.children,
+      activeIndex,
+      overIndex
+    );
 
     ParentPanel.selected = activeId;
 
@@ -87,35 +99,64 @@ const appReducer = createReducer<State, Action>({
     ParentPanel.selected = tabId;
   },
 
-  moveTab: (state, { activeId, overId }: MoveTabAction) => {
-    const ActiveParentPanel = findTabParent(
-      state.panels,
-      activeId
-    ) as WindowNode;
-    const OverParentPanel = findTabParent(state.panels, overId) as WindowNode;
+  moveTab: (state, { sourceTabId, targetWindowId }: MoveTabAction) => {
+    const sourceWindow = findTabParent(state.panels, sourceTabId) as WindowNode;
+    const targetWindow = findWindow(state.panels, targetWindowId) as WindowNode;
 
-    if (ActiveParentPanel === OverParentPanel) {
-      return;
-    }
+    // dont need to move it if it's the same window
+    if (sourceWindow === targetWindow) return;
 
-    const activeIndex = ActiveParentPanel.tabs.indexOf(activeId);
-    const overIndex = OverParentPanel.tabs.indexOf(overId);
+    const activeIndex = sourceWindow.children.indexOf(sourceTabId);
+    const overIndex = targetWindow.children.length;
 
     // Remove tab from active parent
-    ActiveParentPanel.tabs.splice(activeIndex, 1);
+    sourceWindow.children.splice(activeIndex, 1);
 
     // Insert tab into over parent
-    OverParentPanel.tabs.splice(overIndex, 0, activeId);
+    targetWindow.children.splice(overIndex, 0, sourceTabId);
+    targetWindow.selected = sourceTabId;
 
     // If active tab was selected, select first remaining tab
-    if (ActiveParentPanel.selected === activeId) {
-      ActiveParentPanel.selected = ActiveParentPanel.tabs[0];
+    if (sourceWindow.selected === sourceTabId) {
+      sourceWindow.selected = sourceWindow.children[0];
     }
 
     // clean up the tree of empty nodes
-    if (ActiveParentPanel.tabs.length === 0) {
+    if (sourceWindow.children.length === 0) {
       deleteEmptyNodes(state.panels);
     }
+  },
+
+  splitWindow: (
+    state,
+    { windowId, direction, sourceTabId }: SplitWindowAction
+  ) => {
+    const sourceWindow = findTabParent(state.panels, sourceTabId) as WindowNode;
+    const destinationPanel = findWindowParent(
+      state.panels,
+      windowId
+    ) as PanelNode;
+
+    // remove tab from the source window
+    const tabIndex = sourceWindow.children.findIndex(
+      (child) => child === sourceTabId
+    );
+    sourceWindow.children.splice(tabIndex, 1);
+    sourceWindow.selected = sourceWindow.children[0];
+
+    // create new window
+    const newWindow: WindowNode = {
+      type: "Window",
+      id: windowId + "something",
+      children: [sourceTabId],
+      selected: sourceTabId,
+      size: 1,
+    };
+
+    // add new window to the parent panel
+    destinationPanel.children.push(newWindow);
+
+    deleteEmptyNodes(state.panels);
   },
 });
 
@@ -125,14 +166,43 @@ function findTabParent(
 ): ParsedNode | undefined {
   for (const panel of panels) {
     if (panel.type === "Panel") {
-      const innerPanels = (panel as PanelNode).panels;
+      const innerPanels = (panel as PanelNode).children;
       const result = findTabParent(innerPanels, id);
       if (result) return result;
     }
     if (panel.type === "Window") {
-      const tabs = (panel as WindowNode).tabs;
+      const tabs = (panel as WindowNode).children;
       const result = tabs.includes(id);
       if (result) return panel;
+    }
+  }
+}
+
+function findWindowParent(
+  panels: ParsedNode[],
+  windowId: string
+): PanelNode | undefined {
+  for (const panel of panels) {
+    const result = panel.children.find((child) => child.id === windowId);
+    if (result) return panel as PanelNode;
+    if (panel.type === "Panel") {
+      const innerPanels = (panel as PanelNode).children;
+      const result = findWindowParent(innerPanels, windowId);
+      if (result) return result;
+    }
+  }
+}
+
+// recursive window find
+function findWindow(panels: ParsedNode[], id: string): WindowNode | undefined {
+  for (const panel of panels) {
+    if (panel.type === "Panel") {
+      const innerPanels = (panel as PanelNode).children;
+      const result = findWindow(innerPanels, id);
+      if (result) return result;
+    }
+    if (panel.type === "Window") {
+      if (panel.id === id) return panel;
     }
   }
 }
@@ -145,16 +215,16 @@ function deleteEmptyNodes(root: ParsedNode[]) {
     if (node.type === "Window") {
       const windowNode = node as WindowNode;
       // If window has no tabs, remove it
-      if (windowNode.tabs.length === 0) {
+      if (windowNode.children.length === 0) {
         root.splice(i, 1);
       }
     } else if (node.type === "Panel") {
       const panelNode = node as PanelNode;
       // Recursively process child panels
-      deleteEmptyNodes(panelNode.panels);
+      deleteEmptyNodes(panelNode.children);
 
       // If panel has no children after processing, remove it
-      if (panelNode.panels.length === 0) {
+      if (panelNode.children.length === 0) {
         root.splice(i, 1);
       }
     }

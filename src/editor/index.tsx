@@ -41,15 +41,17 @@ function App() {
       }}
     >
       <Dockable panels={layout} onChange={setLayout} gap={3} radius={4}>
-        <Window>
-          <View id="hierarchy" name="Hierarchy">
-            <SceneHierarchy
-              gameObjects={game.gameObjects}
-              setSelectedGameObject={setSelectedGameObject}
-              selectedGameObject={selectedGameObject}
-            />
-          </View>
-        </Window>
+        <Panel>
+          <Window>
+            <View id="hierarchy" name="Hierarchy">
+              <SceneHierarchy
+                gameObjects={game.gameObjects}
+                setSelectedGameObject={setSelectedGameObject}
+                selectedGameObject={selectedGameObject}
+              />
+            </View>
+          </Window>
+        </Panel>
 
         <Panel size={3}>
           <Panel size={3}>

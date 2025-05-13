@@ -6,19 +6,19 @@ export type ParsedNode = LayoutNode;
 type ViewId = string;
 
 export type WindowNode = {
-  type: "Window";
   id: string;
-  tabs: ViewId[];
-  size?: number;
+  type: "Window";
   selected: ViewId;
+  children: ViewId[];
+  size?: number;
 };
 
 export type PanelNode = {
-  type: "Panel";
   id: string;
+  type: "Panel";
   orientation?: "row" | "column";
-  panels: LayoutNode[];
   size?: number;
+  children: LayoutNode[];
 };
 
 export type LayoutNode = PanelNode | WindowNode;
@@ -61,7 +61,7 @@ function serializeLayout(
       type: "Panel",
       id: `panel-${idNonce++}`,
       orientation,
-      panels: parsedChildren,
+      children: parsedChildren,
       size: props.size || 1,
     };
   }
@@ -78,7 +78,7 @@ function serializeLayout(
     return {
       type: "Window",
       id: `window-${idNonce++}`,
-      tabs: tabIds,
+      children: tabIds,
       size: props.size || 1,
       selected: tabIds[props.selected || 0],
     };
@@ -89,7 +89,7 @@ function serializeLayout(
     return {
       type: "Window",
       id: `window-${idNonce++}`,
-      tabs: [parseView(element)],
+      children: [parseView(element)],
       size: 1,
       selected: parseView(element),
     };
