@@ -1,39 +1,32 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { useEffect } from "react";
 
 export function SortableItem({
   id,
   children,
-  type,
   style,
-  onOver,
+  data,
 }: {
   id: string;
   children: React.ReactNode;
-  type: "tab" | "behavior";
   style?: React.CSSProperties;
-  onOver?: (isOver: boolean) => void;
+  data?: any;
 }) {
   const {
     attributes,
     listeners,
     setNodeRef,
     transform,
-    transition,
     isDragging,
-    isOver,
-  } = useSortable({ id, data: { type, children } });
-
-  useEffect(() => {
-    if (onOver) {
-      onOver(isOver);
-    }
-  }, [isOver]);
+    // transition,
+  } = useSortable({ id, data: { children, ...data } });
 
   const itemStyle = {
     transform: CSS.Translate.toString(transform),
-    transition,
+    transition: "transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
+    // for whatever reason the transition breaks when using the supplied transition
+    // this only happens when I use a dndkit hook in the parent component
+    // transition,
     opacity: isDragging ? 0 : 1,
   };
 

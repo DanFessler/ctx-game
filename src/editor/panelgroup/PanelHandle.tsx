@@ -1,6 +1,7 @@
 import styles from "./PanelHandle.module.css";
 
 function PanelHandle({
+  className,
   direction,
   onDrag,
   onDragStart,
@@ -8,6 +9,7 @@ function PanelHandle({
   gap = 3,
   size = gap + 4,
 }: {
+  className?: string;
   direction: "row" | "column";
   onDrag?: (delta: { x: number; y: number }) => void;
   onDragStart?: () => void;
@@ -72,7 +74,7 @@ function PanelHandle({
   return (
     <div
       onMouseDown={handleMouseDown}
-      className={styles.handle}
+      className={`${styles.handle} ${className}`}
       style={style}
     />
   );

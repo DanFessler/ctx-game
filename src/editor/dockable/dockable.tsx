@@ -13,6 +13,7 @@ import {
   DragOverlay,
 } from "@dnd-kit/core";
 import { DockableContext } from "./DockableContext";
+import { dockableCollision } from "./dockableCollision";
 
 type DockableProps = {
   orientation?: "row" | "column";
@@ -105,7 +106,7 @@ function Dockable({
       >
         <DndContext
           sensors={sensors}
-          // collisionDetection={closestCenter}
+          collisionDetection={dockableCollision}
           onDragStart={handleDragStart}
           onDragEnd={handleDragEnd}
           onDragCancel={handleDragCancel}

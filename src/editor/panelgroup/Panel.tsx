@@ -8,10 +8,19 @@ type PanelProps = {
   onDragStart: () => void;
   onDragEnd: () => void;
   gap?: number;
+  handleClassName?: string;
 };
 
 function Panel(
-  { children, direction, onDrag, onDragStart, onDragEnd, gap }: PanelProps,
+  {
+    children,
+    direction,
+    onDrag,
+    onDragStart,
+    onDragEnd,
+    gap,
+    handleClassName,
+  }: PanelProps,
   ref: React.Ref<HTMLDivElement>
 ) {
   return (
@@ -37,6 +46,7 @@ function Panel(
         onDragStart={onDragStart}
         onDragEnd={onDragEnd}
         gap={gap}
+        className={handleClassName}
       />
     </div>
   );

@@ -3,6 +3,7 @@ import PanelGroup from "../panelgroup/PanelGroup";
 import React from "react";
 import { WindowNode } from "./serializeLayout";
 import { useDockable } from "./DockableContext";
+import styles from "./PanelView.module.css";
 
 type PanelProps = {
   orientation: "row" | "column";
@@ -51,6 +52,7 @@ function PanelView({
       gap={gap}
       initialSizes={sizes}
       onResizeEnd={handleResizeEnd}
+      handleClassName={styles.handle}
     >
       {panels.map((panel, index) => {
         if ("tabs" in panel) {
@@ -70,6 +72,7 @@ function PanelView({
               id={panel.id}
               tabs={panelTabs}
               selected={(panel as WindowNode).selected.toString()}
+              orientation={orientation}
             />
           );
         } else {

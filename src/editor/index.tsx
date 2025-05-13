@@ -21,7 +21,7 @@ function App() {
 
   const [layout, setLayout] = useState<ParsedNode[]>();
 
-  console.log("layout", JSON.stringify(layout, null, 2));
+  // console.log("layout", JSON.stringify(layout, null, 2));
 
   // save layout to local storage
   useEffect(() => {
@@ -41,30 +41,29 @@ function App() {
       }}
     >
       <Dockable panels={layout} onChange={setLayout} gap={3} radius={4}>
-        <Panel>
-          <Window>
-            <View id="hierarchy" name="Hierarchy">
-              <SceneHierarchy
-                gameObjects={game.gameObjects}
-                setSelectedGameObject={setSelectedGameObject}
-                selectedGameObject={selectedGameObject}
-              />
-            </View>
-          </Window>
-        </Panel>
+        <Window>
+          <View id="hierarchy" name="Hierarchy">
+            <SceneHierarchy
+              gameObjects={game.gameObjects}
+              setSelectedGameObject={setSelectedGameObject}
+              selectedGameObject={selectedGameObject}
+            />
+          </View>
+        </Window>
 
         <Panel size={3}>
-          <Window size={3}>
-            <View id="scene1" name="Scene">
-              <SceneCanvas />
-            </View>
-            <View id="scene2" name="Scene1">
-              <SceneCanvas />
-            </View>
-            <View id="scene3" name="Scene2">
-              <SceneCanvas />
-            </View>
-          </Window>
+          <Panel size={3}>
+            <Window size={3}>
+              <View id="scene1" name="Scene">
+                <SceneCanvas />
+              </View>
+            </Window>
+            <Window size={3}>
+              <View id="scene2" name="Scene1">
+                <SceneCanvas />
+              </View>
+            </Window>
+          </Panel>
           <Window>
             <View id="assets" name="Assets">
               <div></div>

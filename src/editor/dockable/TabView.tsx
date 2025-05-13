@@ -7,7 +7,7 @@ import {
   SortableContext,
   horizontalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { useDroppable, useDndContext } from "@dnd-kit/core";
+import { useDroppable, useDndContext, useDndMonitor } from "@dnd-kit/core";
 import { useDockable } from "./DockableContext";
 export type tabObject = {
   id: string;
@@ -32,59 +32,129 @@ function TabView({
   hideTabs?: boolean;
   selected: string;
   id: string;
+  orientation?: "row" | "column";
 }) {
-  // const [isOverDroppable, setIsOverDroppable] = useState(false);
-  // const [isOverTab, setIsOverTab] = useState<{ [key: string]: boolean }>({});
-
-  // const isOverAny =
-  //   isOverDroppable || Object.values(isOverTab).some((isOver) => isOver);
-
   const { active, over } = useDndContext();
-  const isOverAny = false;
 
-  function renderTabs() {
+  const overId =
+    (over?.data?.current?.type === "tab" && over?.data?.current?.parentId) ||
+    over?.id;
+
+  const activeId =
+    (active?.data?.current?.type === "tab" &&
+      active?.data?.current?.parentId) ||
+    active?.id;
+
+  const currentEdgeZoneSide =
+    over?.data?.current?.parentId == id && over?.data?.current?.side;
+  console.log(overId, id, currentEdgeZoneSide, `margin${currentEdgeZoneSide}`);
+
+  // flag for styling when dragging over the tab bar (but not it's own tabBar)
+  // made slightly more verbose because we need to check if it's over a tab or the tabBar
+  const isOverAny = overId == id && activeId !== id;
+
+  function renderDropTargets(debug = false) {
+    const width = "50%";
+
     return (
-      <SortableContext
-        items={tabs.map((tab) => tab.id)}
-        strategy={horizontalListSortingStrategy}
-      >
+      <>
+        <Droppable
+          className={styles.edgeZone}
+          id={`${id}-split-left`}
+          data={{
+            type: "edge-zone",
+            parentId: id,
+            side: "Left",
+          }}
+          style={{
+            width: width,
+            left: 0,
+            backgroundColor: debug ? "blue" : "transparent",
+            ...(currentEdgeZoneSide === "Left" && {
+              backgroundColor: "var(--selected)",
+            }),
+          }}
+        />
+        <Droppable
+          className={styles.edgeZone}
+          id={`${id}-split-right`}
+          data={{
+            type: "edge-zone",
+            parentId: id,
+            side: "Right",
+          }}
+          style={{
+            width: width,
+            right: 0,
+            backgroundColor: debug ? "red" : "transparent",
+            ...(currentEdgeZoneSide === "Right" && {
+              backgroundColor: "var(--selected)",
+            }),
+          }}
+        />
+        <Droppable
+          className={styles.edgeZone}
+          id={`${id}-split-top`}
+          data={{
+            type: "edge-zone",
+            parentId: id,
+            side: "Top",
+          }}
+          style={{
+            height: width,
+            top: 0,
+            backgroundColor: debug ? "purple" : "transparent",
+            ...(currentEdgeZoneSide === "Top" && {
+              backgroundColor: "var(--selected)",
+            }),
+          }}
+        />
+        <Droppable
+          className={styles.edgeZone}
+          id={`${id}-split-bottom`}
+          data={{
+            type: "edge-zone",
+            parentId: id,
+            side: "Bottom",
+          }}
+          style={{
+            height: width,
+            bottom: 0,
+            backgroundColor: debug ? "green" : "transparent",
+            ...(currentEdgeZoneSide === "Bottom" && {
+              backgroundColor: "var(--selected)",
+            }),
+            // position: "relative",
+          }}
+        />
+      </>
+    );
+  }
+
+  return (
+    <div
+      className={`${styles.container} ${isOverAny ? styles.isOver : ""}`}
+      style={{
+        background: colors.headers,
+        flex: 1,
+        ...(currentEdgeZoneSide &&
+          {
+            // [`margin${currentEdgeZoneSide}`]: 64,
+          }),
+      }}
+    >
+      {!hideTabs && (
         <Droppable
           id={id}
-          className={
-            isOverAny ? styles.isOver + " " + styles.tabBar : styles.tabBar
-          }
+          data={{
+            type: "tab-bar",
+          }}
+          className={styles.tabBar}
           style={{
             background: colors.background,
-            // borderBottom: `4px solid ${colors.headers}`,
           }}
-          // onOver={(isOver) => setIsOverDroppable(isOver)}
         >
-          {tabs.map((tab) => (
-            <SortableItem
-              key={tab.id}
-              id={tab.id}
-              type="tab"
-              // onOver={(isOver) =>
-              //   setIsOverTab((prev) => ({ ...prev, [tab.id]: isOver }))
-              // }
-              style={
-                {
-                  // flex: 1,
-                }
-              }
-            >
-              <Tab
-                name={tab.name}
-                selected={tab.id === selected}
-                // onClick={() =>
-                //   dispatch({
-                //     type: "selectTab",
-                //     tabId: tab.id,
-                //   })
-                // }
-              />
-            </SortableItem>
-          ))}
+          <SortableTabs tabs={tabs} id={id} selected={selected} />
           <div style={{ flex: 1 }} />
           <div
             style={{
@@ -102,20 +172,7 @@ function TabView({
             <TiThMenu style={{ width: 14, height: 14 }} />
           </div>
         </Droppable>
-      </SortableContext>
-    );
-  }
-
-  return (
-    <div
-      // ref={setNodeRef}
-      className={`${styles.container} ${isOverAny ? styles.isOver : ""}`}
-      style={{
-        background: colors.headers,
-        flex: 1,
-      }}
-    >
-      {!hideTabs && renderTabs()}
+      )}
 
       <div
         style={{
@@ -127,7 +184,46 @@ function TabView({
       >
         {tabs.find((tab) => tab.id === selected)?.content}
       </div>
+
+      {renderDropTargets()}
     </div>
+  );
+}
+
+type SortableTabsProps = {
+  tabs: tabGroupObject;
+  id: string;
+  selected: string;
+};
+function SortableTabs({ tabs, id, selected }: SortableTabsProps) {
+  const { dispatch } = useDockable();
+  return (
+    <SortableContext
+      items={tabs.map((tab) => tab.id)}
+      strategy={horizontalListSortingStrategy}
+    >
+      {tabs.map((tab) => (
+        <SortableItem
+          key={tab.id}
+          id={tab.id}
+          data={{
+            type: "tab",
+            parentId: id,
+          }}
+        >
+          <Tab
+            name={tab.name}
+            selected={tab.id === selected}
+            onClick={() =>
+              dispatch({
+                type: "selectTab",
+                tabId: tab.id,
+              })
+            }
+          />
+        </SortableItem>
+      ))}
+    </SortableContext>
   );
 }
 
@@ -136,20 +232,19 @@ function Droppable({
   style,
   className,
   children,
+  data,
   onOver,
 }: {
   id: string;
   style?: React.CSSProperties;
   className?: string;
-  children: React.ReactNode;
+  children?: React.ReactNode;
+  data?: any;
   onOver?: (isOver: boolean) => void;
 }) {
   const { setNodeRef, isOver } = useDroppable({
     id,
-    data: {
-      type: "tab-bar",
-      accepts: ["tab"], // specify what types of items this droppable accepts
-    },
+    data: data,
   });
 
   useEffect(() => {

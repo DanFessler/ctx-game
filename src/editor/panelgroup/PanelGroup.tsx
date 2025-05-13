@@ -8,6 +8,7 @@ type PanelGroupProps = {
   gap?: number;
   onResizeEnd?: (sizes: number[]) => void;
   className?: string;
+  handleClassName?: string;
 };
 
 function PanelGroup({
@@ -17,6 +18,7 @@ function PanelGroup({
   onResizeEnd,
   gap = 3,
   className,
+  handleClassName,
 }: PanelGroupProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const panelRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -116,6 +118,7 @@ function PanelGroup({
           onDragStart={() => handleDragStart(index)}
           onDragEnd={() => handleDragEnd()}
           gap={gap}
+          handleClassName={handleClassName}
         >
           {child}
         </Panel>
