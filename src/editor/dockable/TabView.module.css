@@ -40,7 +40,7 @@
   bottom: 0;
   width: 100%;
   height: 100%;
-  box-shadow: 0 0 0 2px var(--selected) inset;
+  box-shadow: 0 0 0 3px var(--selected) inset;
   pointer-events: none;
 }
 
@@ -135,11 +135,78 @@
   align-items: center;
   justify-content: center;
   z-index: 1;
-  opacity: 0.5;
+  opacity: 0.75;
   width: 100%;
   height: 100%;
   text-align: center;
   pointer-events: none;
   border-radius: inherit;
   transition: background 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+  --edge-width: 50%;
+  /* mix-blend-mode: screen; */
+}
+
+.edgeZone::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  transform: scale(0);
+  background-color: var(--selected);
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: inherit;
+  /* border: 2px solid rgba(255, 255, 255, 0.5); */
+  box-sizing: border-box;
+}
+
+.edgeZoneLeft {
+  width: var(--edge-width);
+  left: 0;
+}
+
+.edgeZoneRight {
+  width: var(--edge-width);
+  right: 0;
+}
+
+.edgeZoneBottom {
+  height: var(--edge-width);
+  bottom: 0;
+}
+
+.edgeZoneTop {
+  height: var(--edge-width);
+  top: 0;
+}
+
+.edgeZoneLeft::after {
+  transform-origin: left;
+  transform: scaleX(0) scaleY(1);
+  /* background: linear-gradient(to right, var(--selected), transparent 100%); */
+}
+
+.edgeZoneRight::after {
+  transform-origin: right;
+  transform: scaleX(0) scaleY(1);
+  /* background: linear-gradient(to left, var(--selected), transparent 100%); */
+}
+
+.edgeZoneBottom::after {
+  transform-origin: bottom;
+  transform: scaleX(1) scaleY(0);
+  /* background: linear-gradient(to top, var(--selected), transparent 100%); */
+}
+
+.edgeZoneTop::after {
+  transform-origin: top;
+  transform: scaleX(1) scaleY(0);
+  /* background: linear-gradient(to bottom, var(--selected), transparent 100%); */
+}
+
+.edgeZoneHover::after {
+  width: 100%;
+  height: 100%;
+  transform: scaleX(1) scaleY(1);
 }

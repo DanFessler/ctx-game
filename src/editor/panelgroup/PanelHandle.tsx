@@ -8,6 +8,7 @@ function PanelHandle({
   onDragEnd,
   gap = 3,
   size = gap + 4,
+  handleComponent,
 }: {
   className?: string;
   direction: "row" | "column";
@@ -16,6 +17,7 @@ function PanelHandle({
   onDragEnd?: () => void;
   size?: number;
   gap?: number;
+  handleComponent?: React.ReactNode;
 }) {
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -76,7 +78,9 @@ function PanelHandle({
       onMouseDown={handleMouseDown}
       className={`${styles.handle} ${className}`}
       style={style}
-    />
+    >
+      {handleComponent}
+    </div>
   );
 }
 

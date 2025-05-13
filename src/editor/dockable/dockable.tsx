@@ -12,6 +12,7 @@ import {
   closestCenter,
   DragOverlay,
 } from "@dnd-kit/core";
+// import { createSnapModifier } from "@dnd-kit/modifiers";
 import { DockableContext } from "./DockableContext";
 import { dockableCollision } from "./dockableCollision";
 

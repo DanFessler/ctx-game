@@ -4,6 +4,7 @@ import React from "react";
 import { WindowNode } from "./serializeLayout";
 import { useDockable } from "./DockableContext";
 import styles from "./PanelView.module.css";
+import Droppable from "../components/Droppable";
 
 type PanelProps = {
   orientation: "row" | "column";
@@ -52,7 +53,17 @@ function PanelView({
       gap={gap}
       initialSizes={sizes}
       onResizeEnd={handleResizeEnd}
-      handleClassName={styles.handle}
+      // handleClassName={styles.handle}
+      handleComponent={(index: number) => (
+        <Droppable
+          id={`${address.join("-")}-handle-${index}`}
+          data={{ type: "edge-zone" }}
+          style={{ width: "100%", height: "100%" }}
+          overStyle={{
+            backgroundColor: "var(--selected)",
+          }}
+        />
+      )}
     >
       {panels.map((panel, index) => {
         if ("tabs" in panel) {

@@ -9,6 +9,7 @@ type PanelGroupProps = {
   onResizeEnd?: (sizes: number[]) => void;
   className?: string;
   handleClassName?: string;
+  handleComponent?: React.ReactNode | ((index: number) => React.ReactNode);
 };
 
 function PanelGroup({
@@ -19,6 +20,7 @@ function PanelGroup({
   gap = 3,
   className,
   handleClassName,
+  handleComponent,
 }: PanelGroupProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const panelRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -119,6 +121,12 @@ function PanelGroup({
           onDragEnd={() => handleDragEnd()}
           gap={gap}
           handleClassName={handleClassName}
+          isLast={index === React.Children.count(children) - 1}
+          handleComponent={
+            typeof handleComponent === "function"
+              ? handleComponent(index)
+              : handleComponent
+          }
         >
           {child}
         </Panel>

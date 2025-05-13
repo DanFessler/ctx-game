@@ -9,6 +9,8 @@ type PanelProps = {
   onDragEnd: () => void;
   gap?: number;
   handleClassName?: string;
+  isLast?: boolean;
+  handleComponent?: React.ReactNode;
 };
 
 function Panel(
@@ -20,6 +22,8 @@ function Panel(
     onDragEnd,
     gap,
     handleClassName,
+    isLast,
+    handleComponent,
   }: PanelProps,
   ref: React.Ref<HTMLDivElement>
 ) {
@@ -40,14 +44,17 @@ function Panel(
       >
         {children}
       </div>
-      <PanelHandle
-        direction={direction}
-        onDrag={onDrag}
-        onDragStart={onDragStart}
-        onDragEnd={onDragEnd}
-        gap={gap}
-        className={handleClassName}
-      />
+      {!isLast && (
+        <PanelHandle
+          direction={direction}
+          onDrag={onDrag}
+          onDragStart={onDragStart}
+          onDragEnd={onDragEnd}
+          gap={gap}
+          className={handleClassName}
+          handleComponent={handleComponent}
+        />
+      )}
     </div>
   );
 }

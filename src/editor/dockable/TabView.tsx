@@ -1,13 +1,13 @@
-import { useState } from "react";
 import colors from "../colors";
 import styles from "./TabView.module.css";
 import SortableItem from "../components/SortableItem";
+import Droppable from "../components/Droppable";
 import Tab from "./Tab";
 import {
   SortableContext,
   horizontalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { useDroppable, useDndContext, useDndMonitor } from "@dnd-kit/core";
+import { useDndContext } from "@dnd-kit/core";
 import { useDockable } from "./DockableContext";
 export type tabObject = {
   id: string;
@@ -18,22 +18,23 @@ export type tabObject = {
 // import { TiThMenu } from "react-icons/ti";
 // import { IoMenu as TiThMenu } from "react-icons/io5";
 import { HiDotsVertical as TiThMenu } from "react-icons/hi";
-import { useEffect } from "react";
 
 export type tabGroupObject = tabObject[];
 
+type TabViewProps = {
+  tabs: tabGroupObject;
+  hideTabs?: boolean;
+  selected: string;
+  id: string;
+  orientation: "row" | "column";
+};
 function TabView({
   tabs,
   hideTabs = false,
   selected,
   id,
-}: {
-  tabs: tabGroupObject;
-  hideTabs?: boolean;
-  selected: string;
-  id: string;
-  orientation?: "row" | "column";
-}) {
+  orientation,
+}: TabViewProps) {
   const { active, over } = useDndContext();
 
   const overId =
@@ -52,84 +53,6 @@ function TabView({
   // flag for styling when dragging over the tab bar (but not it's own tabBar)
   // made slightly more verbose because we need to check if it's over a tab or the tabBar
   const isOverAny = overId == id && activeId !== id;
-
-  function renderDropTargets(debug = false) {
-    const width = "50%";
-
-    return (
-      <>
-        <Droppable
-          className={styles.edgeZone}
-          id={`${id}-split-left`}
-          data={{
-            type: "edge-zone",
-            parentId: id,
-            side: "Left",
-          }}
-          style={{
-            width: width,
-            left: 0,
-            backgroundColor: debug ? "blue" : "transparent",
-            ...(currentEdgeZoneSide === "Left" && {
-              backgroundColor: "var(--selected)",
-            }),
-          }}
-        />
-        <Droppable
-          className={styles.edgeZone}
-          id={`${id}-split-right`}
-          data={{
-            type: "edge-zone",
-            parentId: id,
-            side: "Right",
-          }}
-          style={{
-            width: width,
-            right: 0,
-            backgroundColor: debug ? "red" : "transparent",
-            ...(currentEdgeZoneSide === "Right" && {
-              backgroundColor: "var(--selected)",
-            }),
-          }}
-        />
-        <Droppable
-          className={styles.edgeZone}
-          id={`${id}-split-top`}
-          data={{
-            type: "edge-zone",
-            parentId: id,
-            side: "Top",
-          }}
-          style={{
-            height: width,
-            top: 0,
-            backgroundColor: debug ? "purple" : "transparent",
-            ...(currentEdgeZoneSide === "Top" && {
-              backgroundColor: "var(--selected)",
-            }),
-          }}
-        />
-        <Droppable
-          className={styles.edgeZone}
-          id={`${id}-split-bottom`}
-          data={{
-            type: "edge-zone",
-            parentId: id,
-            side: "Bottom",
-          }}
-          style={{
-            height: width,
-            bottom: 0,
-            backgroundColor: debug ? "green" : "transparent",
-            ...(currentEdgeZoneSide === "Bottom" && {
-              backgroundColor: "var(--selected)",
-            }),
-            // position: "relative",
-          }}
-        />
-      </>
-    );
-  }
 
   return (
     <div
@@ -185,7 +108,11 @@ function TabView({
         {tabs.find((tab) => tab.id === selected)?.content}
       </div>
 
-      {renderDropTargets()}
+      <DroppableTargets
+        id={id}
+        currentEdge={currentEdgeZoneSide}
+        orientation={orientation}
+      />
     </div>
   );
 }
@@ -227,44 +154,71 @@ function SortableTabs({ tabs, id, selected }: SortableTabsProps) {
   );
 }
 
-function Droppable({
-  id,
-  style,
-  className,
-  children,
-  data,
-  onOver,
-}: {
+type DroppableTargetsProps = {
   id: string;
-  style?: React.CSSProperties;
-  className?: string;
-  children?: React.ReactNode;
-  data?: any;
-  onOver?: (isOver: boolean) => void;
-}) {
-  const { setNodeRef, isOver } = useDroppable({
-    id,
-    data: data,
-  });
-
-  useEffect(() => {
-    if (onOver) {
-      onOver(isOver);
-    }
-  }, [isOver]);
-
+  currentEdge: string;
+  orientation: "row" | "column";
+};
+function DroppableTargets({
+  id,
+  currentEdge,
+  orientation,
+}: DroppableTargetsProps) {
   return (
-    <div
-      ref={setNodeRef}
-      style={{
-        ...style,
-        // Add visual feedback when dragging over
-        // backgroundColor: isOver ? "RED" : "BLUE",
-      }}
-      className={className}
-    >
-      {children}
-    </div>
+    <>
+      <Droppable
+        className={[
+          styles.edgeZone,
+          styles.edgeZoneLeft,
+          currentEdge === "Left" ? styles.edgeZoneHover : "",
+        ].join(" ")}
+        id={`${id}-split-left`}
+        data={{
+          type: "edge-zone",
+          parentId: id,
+          side: "Left",
+        }}
+      />
+      <Droppable
+        className={[
+          styles.edgeZone,
+          styles.edgeZoneRight,
+          currentEdge === "Right" ? styles.edgeZoneHover : "",
+        ].join(" ")}
+        id={`${id}-split-right`}
+        data={{
+          type: "edge-zone",
+          parentId: id,
+          side: "Right",
+        }}
+      />
+      <Droppable
+        className={[
+          styles.edgeZone,
+          styles.edgeZoneTop,
+          currentEdge === "Top" ? styles.edgeZoneHover : "",
+        ].join(" ")}
+        id={`${id}-split-top`}
+        data={{
+          type: "edge-zone",
+          parentId: id,
+          side: "Top",
+        }}
+      />
+      <Droppable
+        className={[
+          styles.edgeZone,
+          styles.edgeZoneBottom,
+          currentEdge === "Bottom" ? styles.edgeZoneHover : "",
+        ].join(" ")}
+        id={`${id}-split-bottom`}
+        data={{
+          type: "edge-zone",
+          parentId: id,
+          side: "Bottom",
+        }}
+      />
+    </>
   );
 }
 

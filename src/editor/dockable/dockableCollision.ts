@@ -23,11 +23,6 @@ export const dockableCollision: CollisionDetection = ({
   const tabBarDroppables: DroppableContainer[] = [];
   const edgeZoneDroppables: DroppableContainer[] = [];
 
-  // console.log("collisionRect", collisionRect);
-  // console.log("droppableRects", droppableRects);
-  // console.log("droppableContainers", droppableContainers);
-  // console.log("pointerCoordinates", pointerCoordinates);
-
   for (const droppable of droppableContainers) {
     const data = droppable?.data?.current as TypedDroppableData | undefined;
     if (!data || !droppableRects.has(droppable.id)) continue;
