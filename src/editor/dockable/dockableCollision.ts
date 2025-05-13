@@ -6,7 +6,7 @@ import {
   closestCenter,
 } from "@dnd-kit/core";
 
-type DroppableType = "tab-bar" | "edge-zone" | "tab";
+type DroppableType = "tab-bar" | "edge-zone" | "tab" | "insert-panel";
 
 interface TypedDroppableData {
   type: DroppableType;
@@ -21,6 +21,7 @@ export const dockableCollision: CollisionDetection = ({
   pointerCoordinates,
 }): Collision[] => {
   const tabBarDroppables: DroppableContainer[] = [];
+  const insertPanelDroppables: DroppableContainer[] = [];
   const edgeZoneDroppables: DroppableContainer[] = [];
 
   for (const droppable of droppableContainers) {
@@ -29,9 +30,23 @@ export const dockableCollision: CollisionDetection = ({
 
     if (data.type === "tab-bar" || data.type === "tab") {
       tabBarDroppables.push(droppable);
+    } else if (data.type === "insert-panel") {
+      insertPanelDroppables.push(droppable);
     } else if (data.type === "edge-zone") {
       edgeZoneDroppables.push(droppable);
     }
+  }
+
+  const insertPanelHits: Collision[] = rectIntersection({
+    active,
+    collisionRect,
+    droppableRects,
+    droppableContainers: insertPanelDroppables,
+    pointerCoordinates, // ✅ add this
+  });
+
+  if (insertPanelHits.length > 0) {
+    return insertPanelHits;
   }
 
   const tabBarHits: Collision[] = rectIntersection({

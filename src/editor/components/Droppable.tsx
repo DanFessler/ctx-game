@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { useDroppable } from "@dnd-kit/core";
 
 type DroppableProps = {
@@ -7,7 +6,7 @@ type DroppableProps = {
   overStyle?: React.CSSProperties;
   className?: string;
   children?: React.ReactNode;
-  data?: any;
+  data?: any; // eslint-disable-line @typescript-eslint/no-explicit-any
 };
 function Droppable({
   id,

@@ -8,13 +8,48 @@ import {
   useSensor,
   useSensors,
   PointerSensor,
-  closestCorners,
-  closestCenter,
   DragOverlay,
+} from "@dnd-kit/core";
+import type {
+  DragStartEvent,
+  DragEndEvent,
+  // DragCancelEvent,
+  DragOverEvent,
 } from "@dnd-kit/core";
 // import { createSnapModifier } from "@dnd-kit/modifiers";
 import { DockableContext } from "./DockableContext";
 import { dockableCollision } from "./dockableCollision";
+
+import { useDndContext } from "@dnd-kit/core";
+
+type Size = { width: number; height: number } | null;
+
+function useOverlaySizeFromDroppable(): Size {
+  const { over } = useDndContext();
+  const [size, setSize] = useState<Size>(null);
+
+  useEffect(() => {
+    if (!over?.id) {
+      setSize(null);
+      return;
+    }
+
+    const selector = `[data-droppable-id="${over.id}"]`;
+    const el = document.querySelector<HTMLElement>(selector);
+
+    if (!el) {
+      setSize(null);
+      return;
+    }
+
+    const rect = el.getBoundingClientRect();
+    setSize({ width: rect.width, height: rect.height });
+
+    // Optional: you could also watch for resize/mutation here
+  }, [over?.id]);
+
+  return size;
+}
 
 type DockableProps = {
   orientation?: "row" | "column";
@@ -39,6 +74,8 @@ function Dockable({
     type: string;
     children: React.ReactNode;
   } | null>(null);
+  const overlaySize = useOverlaySizeFromDroppable();
+  console.log(overlaySize);
 
   const childrenArray = React.Children.toArray(
     children
@@ -65,33 +102,34 @@ function Dockable({
   });
   const sensors = useSensors(pointerSensor);
 
-  function handleDragStart({ active }) {
-    const type = active.data?.current?.type;
-    const children = active.data?.current?.children;
-    setActive({ id: active.id, type, children });
-  }
-
-  function handleDragEnd({ active, over }) {
-    dispatch({
-      type: "reorderTabs",
-      activeId: active.id,
-      overId: over.id,
-    });
-    setActive(null);
+  function handleDragStart({ active }: DragStartEvent) {
+    const type = active.data.current?.type;
+    const children = active.data.current?.children;
+    setActive({ id: active.id.toString(), type, children });
   }
 
   function handleDragCancel() {
     // console.log("drag cancel");
   }
 
-  function handleDragOver({ active, over }) {
+  function handleDragEnd({ active, over }: DragEndEvent) {
+    if (!over) return;
+    dispatch({
+      type: "reorderTabs",
+      activeId: active.id.toString(),
+      overId: over.id.toString(),
+    });
+    setActive(null);
+  }
+
+  function handleDragOver({ active, over }: DragOverEvent) {
     // console.log("drag over", active, over);
     if (!over) return;
     console.log("drag over", active, over);
     // dispatch({ type: "moveTab", activeId: active.id, overId: over.id });
   }
 
-  console.log(active);
+  // console.log(active);
 
   return (
     <DockableContext.Provider value={{ state, dispatch }}>
@@ -102,6 +140,7 @@ function Dockable({
           padding: gap,
           color: colors.text,
           background: colors.gap,
+          // @ts-expect-error - radius is variable
           "--radius": radius + "px",
         }}
       >
@@ -133,6 +172,8 @@ function Dockable({
                   borderRadius: radius,
                   overflow: "hidden",
                   boxShadow: "0 1px 5px 1px rgba(0, 0, 0, 0.25)",
+                  width: overlaySize?.width,
+                  height: overlaySize?.height,
                 }}
               >
                 {active.children}

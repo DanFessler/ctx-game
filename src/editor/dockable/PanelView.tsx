@@ -3,8 +3,8 @@ import PanelGroup from "../panelgroup/PanelGroup";
 import React from "react";
 import { WindowNode } from "./serializeLayout";
 import { useDockable } from "./DockableContext";
-import styles from "./PanelView.module.css";
 import Droppable from "../components/Droppable";
+// import styles from "./PanelView.module.css";
 
 type PanelProps = {
   orientation: "row" | "column";
@@ -57,8 +57,12 @@ function PanelView({
       handleComponent={(index: number) => (
         <Droppable
           id={`${address.join("-")}-handle-${index}`}
-          data={{ type: "edge-zone" }}
-          style={{ width: "100%", height: "100%" }}
+          data={{ type: "insert-panel" }}
+          style={{
+            width: "100%",
+            height: "100%",
+            transition: "all 0.1s ease-in-out",
+          }}
           overStyle={{
             backgroundColor: "var(--selected)",
           }}

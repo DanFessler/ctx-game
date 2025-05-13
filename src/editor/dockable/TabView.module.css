@@ -29,8 +29,6 @@
   position: relative;
 }
 
-.isOver {
-}
 .isOver.container::after {
   content: "";
   position: absolute;

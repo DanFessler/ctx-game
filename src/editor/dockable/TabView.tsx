@@ -48,7 +48,7 @@ function TabView({
 
   const currentEdgeZoneSide =
     over?.data?.current?.parentId == id && over?.data?.current?.side;
-  console.log(overId, id, currentEdgeZoneSide, `margin${currentEdgeZoneSide}`);
+  // console.log(overId, id, currentEdgeZoneSide, `margin${currentEdgeZoneSide}`);
 
   // flag for styling when dragging over the tab bar (but not it's own tabBar)
   // made slightly more verbose because we need to check if it's over a tab or the tabBar
@@ -162,8 +162,8 @@ type DroppableTargetsProps = {
 function DroppableTargets({
   id,
   currentEdge,
-  orientation,
-}: DroppableTargetsProps) {
+}: // orientation,
+DroppableTargetsProps) {
   return (
     <>
       <Droppable

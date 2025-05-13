@@ -38,11 +38,11 @@ const colors = {
 // get the user's preferred theme
 const userPreferredTheme = window.matchMedia("(prefers-color-scheme: dark)")
   .matches
-  ? "medium"
+  ? "dark"
   : "light";
 
-// const currentTheme = colors[userPreferredTheme];
-const currentTheme = colors.dark;
+const currentTheme = colors[userPreferredTheme];
+// const currentTheme = colors.dark;
 
 // Set CSS variables on body for current theme
 Object.entries(currentTheme).forEach(([key, value]) => {

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import Panel from "./Panel";
 
 type PanelGroupProps = {
@@ -36,10 +36,28 @@ function PanelGroup({
     y: number;
   } | null>(null);
 
+  const getPanelPixelSizes = useCallback(() => {
+    return panelRefs.current
+      .map((ref) => {
+        if (!ref) return null;
+        const rect = ref.getBoundingClientRect();
+        return direction === "row" ? rect.width : rect.height;
+      })
+      .filter(Boolean) as number[];
+  }, [direction, panelRefs]);
+
+  const calcNewSizes = useCallback(() => {
+    const panelPixelSizes = getPanelPixelSizes();
+    const totalSize = panelPixelSizes.reduce((acc, size) => acc + size, 0);
+    const newSizes = panelPixelSizes.map((size) => size / totalSize);
+    return newSizes;
+  }, [getPanelPixelSizes]);
+
+  const childrenCount = React.Children.count(children);
   useEffect(() => {
     const newSizes = calcNewSizes();
     setSizes(newSizes);
-  }, [React.Children.count(children)]);
+  }, [childrenCount, calcNewSizes]);
 
   const handleDrag = (delta: { x: number; y: number }) => {
     setDraggingDelta(delta);
@@ -57,23 +75,6 @@ function PanelGroup({
     setSizes(newSizes);
     onResizeEnd?.(newSizes);
   };
-
-  function getPanelPixelSizes() {
-    return panelRefs.current
-      .map((ref) => {
-        if (!ref) return null;
-        const rect = ref.getBoundingClientRect();
-        return direction === "row" ? rect.width : rect.height;
-      })
-      .filter(Boolean) as number[];
-  }
-
-  function calcNewSizes() {
-    const panelPixelSizes = getPanelPixelSizes();
-    const totalSize = panelPixelSizes.reduce((acc, size) => acc + size, 0);
-    const newSizes = panelPixelSizes.map((size) => size / totalSize);
-    return newSizes;
-  }
 
   function getFrSizes() {
     if (draggingIndex === null || !draggingDelta)
