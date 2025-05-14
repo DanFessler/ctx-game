@@ -60,11 +60,6 @@ function App() {
                 <SceneCanvas />
               </View>
             </Window>
-            <Window size={3}>
-              <View id="scene2" name="Scene1">
-                <SceneCanvas />
-              </View>
-            </Window>
           </Panel>
           <Window>
             <View id="assets" name="Assets">
