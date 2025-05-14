@@ -10,46 +10,9 @@ import {
   PointerSensor,
   DragOverlay,
 } from "@dnd-kit/core";
-import type {
-  DragStartEvent,
-  DragEndEvent,
-  // DragCancelEvent,
-  // DragOverEvent,
-} from "@dnd-kit/core";
-// import { createSnapModifier } from "@dnd-kit/modifiers";
+import type { DragStartEvent, DragEndEvent } from "@dnd-kit/core";
 import { DockableContext } from "./DockableContext";
 import { dockableCollision } from "./dockableCollision";
-
-import { useDndContext } from "@dnd-kit/core";
-
-type Size = { width: number; height: number } | null;
-
-function useOverlaySizeFromDroppable(): Size {
-  const { over } = useDndContext();
-  const [size, setSize] = useState<Size>(null);
-
-  useEffect(() => {
-    if (!over?.id) {
-      setSize(null);
-      return;
-    }
-
-    const selector = `[data-droppable-id="${over.id}"]`;
-    const el = document.querySelector<HTMLElement>(selector);
-
-    if (!el) {
-      setSize(null);
-      return;
-    }
-
-    const rect = el.getBoundingClientRect();
-    setSize({ width: rect.width, height: rect.height });
-
-    // Optional: you could also watch for resize/mutation here
-  }, [over?.id]);
-
-  return size;
-}
 
 type DockableProps = {
   orientation?: "row" | "column";
@@ -74,7 +37,6 @@ function Dockable({
     type: string;
     children: React.ReactNode;
   } | null>(null);
-  const overlaySize = useOverlaySizeFromDroppable();
 
   const childrenArray = React.Children.toArray(
     children
@@ -196,8 +158,6 @@ function Dockable({
                   borderRadius: radius,
                   overflow: "hidden",
                   boxShadow: "0 1px 5px 1px rgba(0, 0, 0, 0.25)",
-                  width: overlaySize?.width,
-                  height: overlaySize?.height,
                 }}
               >
                 {active.children}

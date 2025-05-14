@@ -167,12 +167,14 @@ const appReducer = createReducer<State, Action>({
     sourceWindow.selected = sourceWindow.children[0];
 
     // create new window
+    const halfSize = (targetWindow.size || 1) / 2;
+    targetWindow.size = halfSize;
     const newWindow: WindowNode = {
       type: "Window",
       id: "window-" + Date.now(),
       children: [tabId],
       selected: tabId,
-      size: 1,
+      size: halfSize,
     };
 
     const isAligned =
