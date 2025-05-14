@@ -9,6 +9,7 @@ import {
   useSensor,
   useSensors,
   DragOverlay,
+  DragEndEvent,
 } from "@dnd-kit/core";
 import {
   arrayMove,
@@ -23,8 +24,6 @@ import Behavior from "../../engine/Behavior";
 import colors from "../colors";
 import { PiBoundingBoxFill } from "react-icons/pi";
 import { FaCode } from "react-icons/fa";
-// import { TiThMenu } from "react-icons/ti";
-import { HiDotsVertical as TiThMenu } from "react-icons/hi";
 import SortableItem from "../components/SortableItem";
 import styles from "./Inspector.module.css";
 
@@ -178,7 +177,7 @@ function SortableBehaviors({
       <SortableContext items={items} strategy={verticalListSortingStrategy}>
         {items.map((id) => {
           return (
-            <SortableItem key={id} id={id} type="behavior">
+            <SortableItem key={id} id={id} data={{ type: "behavior" }}>
               <InspectorBehavior
                 behavior={behaviors[id]}
                 key={id}
@@ -206,12 +205,12 @@ function SortableBehaviors({
     </DndContext>
   );
 
-  function handleDragEnd(event) {
+  function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;
-
+    if (!over) return;
     if (active.id !== over.id) {
-      const oldIndex = items.indexOf(active.id);
-      const newIndex = items.indexOf(over.id);
+      const oldIndex = items.indexOf(active.id.toString());
+      const newIndex = items.indexOf(over.id.toString());
 
       const newArray = arrayMove(items, oldIndex, newIndex);
 

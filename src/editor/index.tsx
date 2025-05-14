@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import GameObject from "../engine/GameObject";
 import game from "../game";
 

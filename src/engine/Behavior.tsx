@@ -21,6 +21,9 @@ abstract class Behavior {
   active = true;
   canDisable = true;
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [key: string]: any;
+
   start?(): void;
   update?(deltaTime: number): void;
   draw?(ctx: CanvasRenderingContext2D, renderPass?: string): void;
