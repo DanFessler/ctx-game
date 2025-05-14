@@ -20,8 +20,9 @@ type AddPanelAction = {
 
 type ReorderTabsAction = {
   type: "reorderTabs";
-  activeId: string;
-  overId: string;
+  sourceTabId: string;
+  targetTabId: string;
+  address: number[];
 };
 
 type SelectTabAction = {
@@ -42,7 +43,8 @@ type SplitWindowAction = {
   tabId: string;
   sourceWindowAddress: number[];
   targetWindowAddress: number[];
-  direction: "Left" | "Right";
+  direction: "Left" | "Right" | "Top" | "Bottom";
+  orientation: "row" | "column";
 };
 
 type Action =
@@ -55,12 +57,11 @@ type Action =
 
 const appReducer = createReducer<State, Action>({
   resize: (state, { sizes, address }: ResizeAction) => {
-    // get the panels at the address
-    const panel = getNodeFromAddress(state.panels, address) as PanelNode;
-    if (panel === undefined) throw new Error("Panel not found!!");
+    const children = getNodeFromAddress(state.panels, address)
+      .children as PanelNode[];
 
     // update the size of the panels
-    panel.children.forEach((p, i) => {
+    children.forEach((p, i) => {
       p.size = sizes[i];
     });
   },
@@ -69,19 +70,19 @@ const appReducer = createReducer<State, Action>({
     state.panels.push(panel);
   },
 
-  reorderTabs: (state, { activeId, overId }: ReorderTabsAction) => {
-    const ParentPanel = findTabParent(state.panels, activeId) as WindowNode;
-
-    const activeIndex = ParentPanel.children.indexOf(activeId);
-    const overIndex = ParentPanel.children.indexOf(overId);
-
+  reorderTabs: (
+    state,
+    { sourceTabId, targetTabId, address }: ReorderTabsAction
+  ) => {
+    const ParentPanel = getNodeFromAddress(state.panels, address) as WindowNode;
+    const activeIndex = ParentPanel.children.indexOf(sourceTabId);
+    const overIndex = ParentPanel.children.indexOf(targetTabId);
+    ParentPanel.selected = sourceTabId;
     ParentPanel.children = arrayMove(
       ParentPanel.children,
       activeIndex,
       overIndex
     );
-
-    ParentPanel.selected = activeId;
   },
 
   selectTab: (state, { tabId, address }: SelectTabAction) => {
@@ -132,75 +133,74 @@ const appReducer = createReducer<State, Action>({
       tabId,
       sourceWindowAddress,
       targetWindowAddress,
-    }: // direction,
-    SplitWindowAction
+      direction,
+      orientation,
+    }: SplitWindowAction
   ) => {
     const sourceWindow = getNodeFromAddress(
       state.panels,
       sourceWindowAddress
     ) as WindowNode;
 
-    console.log(targetWindowAddress);
-    const destinationPanel = getNodeFromAddress(
+    const targetWindow = getNodeFromAddress(
+      state.panels,
+      targetWindowAddress
+    ) as WindowNode;
+
+    const targetPanel = getNodeFromAddress(
       state.panels,
       targetWindowAddress.slice(0, -1)
     ) as PanelNode;
 
+    const targetWindowIndex = targetWindowAddress.slice(-1)[0];
+
+    // if the source window is the same as the target window and the source window has only one tab, we don't need to do anything
+    if (sourceWindow === targetWindow && sourceWindow.children.length === 1) {
+      return;
+    }
+
     // remove tab from the source window
-    const tabIndex = sourceWindow.children.findIndex(
-      (child) => child === tabId
-    );
+    const tabIndex = sourceWindow.children.indexOf(tabId);
     sourceWindow.children.splice(tabIndex, 1);
+
+    // select the first tab in the window since we (likely) removed the selected tab
     sourceWindow.selected = sourceWindow.children[0];
 
     // create new window
     const newWindow: WindowNode = {
       type: "Window",
-      id: "somethingsomething",
+      id: "window-" + Date.now(),
       children: [tabId],
       selected: tabId,
       size: 1,
     };
 
-    // add new window to the parent panel
-    destinationPanel.children.push(newWindow);
+    const isAligned =
+      (orientation === "row" && ["Left", "Right"].includes(direction)) ||
+      (orientation === "column" && ["Top", "Bottom"].includes(direction));
+
+    // if the split direction is aligned with the parent panel, we only need to insert into the panel's children
+    if (isAligned) {
+      const offset = direction === "Left" ? 0 : 1;
+      targetPanel.children.splice(targetWindowIndex + offset, 0, newWindow);
+    }
+
+    // otherwise we need to encapsulate the target window and source window in a new panel with a new orientation
+    if (!isAligned) {
+      const shouldReverse = direction === "Left" || direction === "Top";
+      const newPanel: PanelNode = {
+        type: "Panel",
+        id: "panel-" + Date.now(),
+        children: shouldReverse
+          ? [newWindow, targetWindow]
+          : [targetWindow, newWindow],
+      };
+      targetPanel.children[targetWindowIndex] = newPanel;
+    }
 
     deleteEmptyNodes(state.panels);
   },
 });
-
-function findTabParent(
-  panels: ParsedNode[],
-  id: string
-): ParsedNode | undefined {
-  for (const panel of panels) {
-    if (panel.type === "Panel") {
-      const innerPanels = (panel as PanelNode).children;
-      const result = findTabParent(innerPanels, id);
-      if (result) return result;
-    }
-    if (panel.type === "Window") {
-      const tabs = (panel as WindowNode).children;
-      const result = tabs.includes(id);
-      if (result) return panel;
-    }
-  }
-}
-
-function findWindowParent(
-  panels: ParsedNode[],
-  windowId: string
-): PanelNode | undefined {
-  for (const panel of panels) {
-    const result = panel.children.find((child) => child.id === windowId);
-    if (result) return panel as PanelNode;
-    if (panel.type === "Panel") {
-      const innerPanels = (panel as PanelNode).children;
-      const result = findWindowParent(innerPanels, windowId);
-      if (result) return result;
-    }
-  }
-}
 
 function deleteEmptyNodes(root: ParsedNode[]) {
   // Process nodes in reverse order to avoid index shifting issues
@@ -230,8 +230,21 @@ function getNodeFromAddress(
   panels: ParsedNode[],
   address: number[]
 ): ParsedNode {
-  if (address.length === 0) throw new Error("Address is empty");
+  // if the address is empty, we create a "root" panel
+  // because it doesn't really exist in the tree
+  if (address.length === 0)
+    return {
+      id: "root",
+      type: "Panel",
+      children: panels,
+      size: 1,
+    };
+
+  // if the address has only one element, we return the panel at that index
   if (address.length === 1) return panels[address[0]];
+
+  // otherwise, we get the children of the panel at the first address index
+  // and recursively call the function, slicing off the first index each time
   const children = panels[address[0]].children;
   return getNodeFromAddress(children as ParsedNode[], address.slice(1));
 }

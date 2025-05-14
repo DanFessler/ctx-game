@@ -40,9 +40,6 @@ function serializeLayout(
   if (element.type === Panel) {
     const props = element.props as PanelProps;
     const orientation = props.orientation;
-    // if (orientation !== "row" && orientation !== "column") {
-    //   throw new Error(`Panel must have orientation 'row' or 'column'`);
-    // }
 
     const children = React.Children.toArray(
       props.children

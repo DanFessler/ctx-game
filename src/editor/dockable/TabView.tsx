@@ -176,8 +176,14 @@ function DroppableTargets({
   id,
   currentEdge,
   address,
-}: // orientation,
-DroppableTargetsProps) {
+  orientation,
+}: DroppableTargetsProps) {
+  const commonData = {
+    type: "edge-zone",
+    orientation,
+    parentId: id,
+    address,
+  };
   return (
     <>
       <Droppable
@@ -188,10 +194,8 @@ DroppableTargetsProps) {
         ].join(" ")}
         id={`${id}-split-left`}
         data={{
-          type: "edge-zone",
-          parentId: id,
+          ...commonData,
           side: "Left",
-          address,
         }}
       />
       <Droppable
@@ -202,10 +206,8 @@ DroppableTargetsProps) {
         ].join(" ")}
         id={`${id}-split-right`}
         data={{
-          type: "edge-zone",
-          parentId: id,
+          ...commonData,
           side: "Right",
-          address,
         }}
       />
       <Droppable
@@ -216,10 +218,8 @@ DroppableTargetsProps) {
         ].join(" ")}
         id={`${id}-split-top`}
         data={{
-          type: "edge-zone",
-          parentId: id,
+          ...commonData,
           side: "Top",
-          address,
         }}
       />
       <Droppable
@@ -230,10 +230,8 @@ DroppableTargetsProps) {
         ].join(" ")}
         id={`${id}-split-bottom`}
         data={{
-          type: "edge-zone",
-          parentId: id,
+          ...commonData,
           side: "Bottom",
-          address,
         }}
       />
     </>

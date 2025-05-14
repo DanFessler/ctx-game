@@ -125,8 +125,9 @@ function Dockable({
         if (active.data.current?.parentId === over.data.current?.parentId) {
           return dispatch({
             type: "reorderTabs",
-            activeId: active.id.toString(),
-            overId: over.id.toString(),
+            sourceTabId: active.id.toString(),
+            targetTabId: over.id.toString(),
+            address: active.data.current?.address,
           });
         }
         return dispatch({
@@ -142,6 +143,7 @@ function Dockable({
           sourceWindowAddress: active.data.current?.address,
           targetWindowAddress: over.data.current?.address,
           direction: over.data.current.side,
+          orientation: over.data.current.orientation,
         });
     }
     setActive(null);
