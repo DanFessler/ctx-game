@@ -48,7 +48,7 @@ function PanelView({
       handleComponent={(index: number) => (
         <Droppable
           id={`${address.join("-")}-handle-${index}`}
-          data={{ type: "insert-panel" }}
+          data={{ type: "insert-panel", address: address.concat(index) }}
           style={{
             width: "calc(100% + 16px)",
             height: "calc(100% + 16px)",

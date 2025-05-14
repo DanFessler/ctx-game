@@ -2,7 +2,7 @@ import React, { createContext, useContext } from "react";
 import { ParsedNode } from "./serializeLayout";
 
 type DockableState = {
-  panels: ParsedNode[];
+  children: ParsedNode[];
 };
 
 type DockableContextType = {

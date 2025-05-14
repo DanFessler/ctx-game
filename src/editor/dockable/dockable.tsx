@@ -10,7 +10,11 @@ import {
   PointerSensor,
   DragOverlay,
 } from "@dnd-kit/core";
-import type { DragStartEvent, DragEndEvent } from "@dnd-kit/core";
+import type {
+  DragStartEvent,
+  DragEndEvent,
+  DragOverEvent,
+} from "@dnd-kit/core";
 import { DockableContext } from "./DockableContext";
 import { dockableCollision } from "./dockableCollision";
 
@@ -47,12 +51,15 @@ function Dockable({
   );
 
   const [state, dispatch] = useReducer(appReducer, {
-    panels: controledPanels || declarativePanels,
+    children: controledPanels || declarativePanels,
+    id: "root",
+    type: "Panel",
+    size: 1,
   });
 
   useEffect(() => {
     if (onChange) {
-      onChange(state.panels);
+      onChange(state.children);
     }
   }, [state, onChange]);
 
@@ -107,20 +114,21 @@ function Dockable({
           direction: over.data.current.side,
           orientation: over.data.current.orientation,
         });
+      case "insert-panel":
+        return dispatch({
+          type: "insertPanel",
+          tabId: active.id.toString(),
+          sourceAddress: active.data.current?.address,
+          targetAddress: over.data.current.address,
+        });
     }
     setActive(null);
   }
 
-  // function handleDragOver({ active, over }: DragOverEvent) {
-  //   if (!over) return;
-  //   const overType = over.data.current?.type;
-  //   if (overType !== "tab") return;
-  //   dispatch({
-  //     type: "moveTab",
-  //     activeId: active.id as string,
-  //     overId: over.id as string,
-  //   });
-  // }
+  function handleDragOver({ over }: DragOverEvent) {
+    if (!over) return;
+    console.log(over.data.current?.type);
+  }
 
   return (
     <DockableContext.Provider value={{ state, dispatch }}>
@@ -141,11 +149,11 @@ function Dockable({
           onDragStart={handleDragStart}
           onDragEnd={handleDragEnd}
           onDragCancel={handleDragCancel}
-          // onDragOver={handleDragOver}
+          onDragOver={handleDragOver}
         >
           <PanelView
             orientation={orientation}
-            panels={state.panels}
+            panels={state.children}
             address={[]}
             gap={gap}
           >

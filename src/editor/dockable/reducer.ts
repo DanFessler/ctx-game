@@ -3,8 +3,8 @@ import { ParsedNode, PanelNode, WindowNode } from "./serializeLayout";
 // import { current } from "immer";
 import { arrayMove } from "@dnd-kit/sortable";
 
-type State = {
-  panels: ParsedNode[];
+type State = PanelNode & {
+  // children: ParsedNode[];
 };
 
 type ResizeAction = {
@@ -47,17 +47,25 @@ type SplitWindowAction = {
   orientation: "row" | "column";
 };
 
+type InsertPanelAction = {
+  type: "insertPanel";
+  tabId: string;
+  sourceAddress: number[];
+  targetAddress: number[];
+};
+
 type Action =
   | ResizeAction
   | AddPanelAction
   | ReorderTabsAction
   | SelectTabAction
   | MoveTabAction
-  | SplitWindowAction;
+  | SplitWindowAction
+  | InsertPanelAction;
 
 const appReducer = createReducer<State, Action>({
   resize: (state, { sizes, address }: ResizeAction) => {
-    const children = getNodeFromAddress(state.panels, address)
+    const children = getNodeFromAddress(state.children, address)
       .children as PanelNode[];
 
     // update the size of the panels
@@ -67,14 +75,45 @@ const appReducer = createReducer<State, Action>({
   },
 
   addPanel: (state, { panel }: AddPanelAction) => {
-    state.panels.push(panel);
+    state.children.push(panel);
+  },
+
+  insertPanel: (
+    state,
+    { tabId, sourceAddress, targetAddress }: InsertPanelAction
+  ) => {
+    // return console.log(tabId, sourceAddress, targetAddress);
+    const sourceWindow = getNodeFromAddress(
+      state.children,
+      sourceAddress
+    ) as WindowNode;
+    const targetParent = getNodeFromAddress(
+      state.children,
+      targetAddress.slice(0, -1)
+    ) as PanelNode;
+    const targetIndex = targetAddress.slice(-1)[0];
+    const tabIndex = sourceWindow.children.indexOf(tabId);
+    const newPanel: WindowNode = {
+      type: "Window",
+      id: "window-" + Date.now(),
+      children: [tabId],
+      selected: tabId,
+      size: 1,
+    };
+    sourceWindow.children.splice(tabIndex, 1);
+    sourceWindow.selected = sourceWindow.children[0];
+    targetParent.children.splice(targetIndex + 1, 0, newPanel);
+    cleanup(state);
   },
 
   reorderTabs: (
     state,
     { sourceTabId, targetTabId, address }: ReorderTabsAction
   ) => {
-    const ParentPanel = getNodeFromAddress(state.panels, address) as WindowNode;
+    const ParentPanel = getNodeFromAddress(
+      state.children,
+      address
+    ) as WindowNode;
     const activeIndex = ParentPanel.children.indexOf(sourceTabId);
     const overIndex = ParentPanel.children.indexOf(targetTabId);
     ParentPanel.selected = sourceTabId;
@@ -86,7 +125,10 @@ const appReducer = createReducer<State, Action>({
   },
 
   selectTab: (state, { tabId, address }: SelectTabAction) => {
-    const ParentPanel = getNodeFromAddress(state.panels, address) as WindowNode;
+    const ParentPanel = getNodeFromAddress(
+      state.children,
+      address
+    ) as WindowNode;
     ParentPanel.selected = tabId;
   },
 
@@ -95,11 +137,11 @@ const appReducer = createReducer<State, Action>({
     { tabId, sourceWindowAddress, targetWindowAddress }: MoveTabAction
   ) => {
     const sourceWindow = getNodeFromAddress(
-      state.panels,
+      state.children,
       sourceWindowAddress
     ) as WindowNode;
     const targetWindow = getNodeFromAddress(
-      state.panels,
+      state.children,
       targetWindowAddress
     ) as WindowNode;
 
@@ -123,7 +165,7 @@ const appReducer = createReducer<State, Action>({
 
     // clean up the tree of empty nodes
     if (sourceWindow.children.length === 0) {
-      cleanup(state.panels);
+      cleanup(state);
     }
   },
 
@@ -138,17 +180,17 @@ const appReducer = createReducer<State, Action>({
     }: SplitWindowAction
   ) => {
     const sourceWindow = getNodeFromAddress(
-      state.panels,
+      state.children,
       sourceWindowAddress
     ) as WindowNode;
 
     const targetWindow = getNodeFromAddress(
-      state.panels,
+      state.children,
       targetWindowAddress
     ) as WindowNode;
 
     const targetPanel = getNodeFromAddress(
-      state.panels,
+      state.children,
       targetWindowAddress.slice(0, -1)
     ) as PanelNode;
 
@@ -203,26 +245,26 @@ const appReducer = createReducer<State, Action>({
       targetPanel.children[targetWindowIndex] = newPanel;
     }
 
-    cleanup(state.panels);
+    cleanup(state);
   },
 });
 
-function cleanup(root: ParsedNode[]) {
-  // Process nodes in reverse order to avoid index shifting issues
-  for (let i = root.length - 1; i >= 0; i--) {
-    const node = root[i];
+function cleanup(root: ParsedNode) {
+  const children = root.children as ParsedNode[];
+  for (let i = children.length - 1; i >= 0; i--) {
+    const node = children[i];
 
     if (node.type === "Window") {
       const windowNode = node as WindowNode;
       // If window has no tabs, remove it
       if (windowNode.children.length === 0) {
-        root.splice(i, 1);
+        children.splice(i, 1);
       }
     } else if (node.type === "Panel") {
       const panelNode = node as PanelNode;
 
       // Recursively process child panels
-      cleanup(panelNode.children);
+      cleanup(node);
 
       // if a panel-child has a single child that is also a panel, we can inline the grandchildren
       // TODO we may have to consider the sizing implications of inlining panels
@@ -244,24 +286,28 @@ function cleanup(root: ParsedNode[]) {
           newChildren.push(child);
         }
       });
-      panelNode.children = newChildren;
 
       // normalize the sizes of the children
-      const totalSize = newChildren.reduce((acc, child) => {
-        const size = child.size || 1;
-        return acc + size;
-      }, 0);
+      normalize(newChildren);
+      panelNode.children = newChildren;
 
-      newChildren.forEach((child) => {
-        child.size = child.size ? child.size / totalSize : 1;
-      });
-
-      // If panel has no children after processing, remove it
-      if (panelNode.children.length === 0) {
-        root.splice(i, 1);
+      // If panel has no children after processing, remove it and also renormalize the sizes of the remaining children
+      if (newChildren.length === 0) {
+        children.splice(i, 1);
+        normalize(children);
       }
     }
   }
+}
+
+function normalize(children: ParsedNode[]) {
+  const totalSize = children.reduce((acc, child) => {
+    const size = child.size || 1;
+    return acc + size;
+  }, 0);
+  children.forEach((child) => {
+    child.size = child.size ? child.size / totalSize : 1;
+  });
 }
 
 function getNodeFromAddress(
