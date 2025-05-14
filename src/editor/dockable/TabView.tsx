@@ -27,6 +27,7 @@ type TabViewProps = {
   selected: string;
   id: string;
   orientation: "row" | "column";
+  address: number[];
 };
 function TabView({
   tabs,
@@ -34,6 +35,7 @@ function TabView({
   selected,
   id,
   orientation,
+  address,
 }: TabViewProps) {
   const { active, over } = useDndContext();
 
@@ -71,13 +73,19 @@ function TabView({
           id={id}
           data={{
             type: "tab-bar",
+            address,
           }}
           className={styles.tabBar}
           style={{
             background: colors.background,
           }}
         >
-          <SortableTabs tabs={tabs} id={id} selected={selected} />
+          <SortableTabs
+            tabs={tabs}
+            id={id}
+            selected={selected}
+            address={address}
+          />
           <div style={{ flex: 1 }} />
           <div
             style={{
@@ -112,6 +120,7 @@ function TabView({
         id={id}
         currentEdge={currentEdgeZoneSide}
         orientation={orientation}
+        address={address}
       />
     </div>
   );
@@ -121,8 +130,9 @@ type SortableTabsProps = {
   tabs: tabGroupObject;
   id: string;
   selected: string;
+  address: number[];
 };
-function SortableTabs({ tabs, id, selected }: SortableTabsProps) {
+function SortableTabs({ tabs, id, selected, address }: SortableTabsProps) {
   const { dispatch } = useDockable();
   return (
     <SortableContext
@@ -136,6 +146,7 @@ function SortableTabs({ tabs, id, selected }: SortableTabsProps) {
           data={{
             type: "tab",
             parentId: id,
+            address,
           }}
         >
           <Tab
@@ -145,6 +156,7 @@ function SortableTabs({ tabs, id, selected }: SortableTabsProps) {
               dispatch({
                 type: "selectTab",
                 tabId: tab.id,
+                address,
               })
             }
           />
@@ -158,10 +170,12 @@ type DroppableTargetsProps = {
   id: string;
   currentEdge: string;
   orientation: "row" | "column";
+  address: number[];
 };
 function DroppableTargets({
   id,
   currentEdge,
+  address,
 }: // orientation,
 DroppableTargetsProps) {
   return (
@@ -177,6 +191,7 @@ DroppableTargetsProps) {
           type: "edge-zone",
           parentId: id,
           side: "Left",
+          address,
         }}
       />
       <Droppable
@@ -190,6 +205,7 @@ DroppableTargetsProps) {
           type: "edge-zone",
           parentId: id,
           side: "Right",
+          address,
         }}
       />
       <Droppable
@@ -203,6 +219,7 @@ DroppableTargetsProps) {
           type: "edge-zone",
           parentId: id,
           side: "Top",
+          address,
         }}
       />
       <Droppable
@@ -216,6 +233,7 @@ DroppableTargetsProps) {
           type: "edge-zone",
           parentId: id,
           side: "Bottom",
+          address,
         }}
       />
     </>

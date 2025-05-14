@@ -50,8 +50,11 @@ function PanelView({
           id={`${address.join("-")}-handle-${index}`}
           data={{ type: "insert-panel" }}
           style={{
-            width: "100%",
-            height: "100%",
+            width: "calc(100% + 16px)",
+            height: "calc(100% + 16px)",
+            position: "absolute",
+            top: "-8px",
+            left: "-8px",
             transition: "all 0.1s ease-in-out",
           }}
           overStyle={{
@@ -80,6 +83,7 @@ function PanelView({
               tabs={panelTabs}
               selected={(panel as WindowNode).selected.toString()}
               orientation={orientation}
+              address={address.concat(index)}
             />
           );
         } else {

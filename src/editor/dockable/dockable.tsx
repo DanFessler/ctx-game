@@ -75,7 +75,6 @@ function Dockable({
     children: React.ReactNode;
   } | null>(null);
   const overlaySize = useOverlaySizeFromDroppable();
-  console.log(overlaySize);
 
   const childrenArray = React.Children.toArray(
     children
@@ -118,8 +117,9 @@ function Dockable({
       case "tab-bar":
         return dispatch({
           type: "moveTab",
-          sourceTabId: active.id.toString(),
-          targetWindowId: over.id.toString(),
+          tabId: active.id.toString(),
+          sourceWindowAddress: active.data.current?.address,
+          targetWindowAddress: over.data.current?.address,
         });
       case "tab":
         if (active.data.current?.parentId === over.data.current?.parentId) {
@@ -131,15 +131,17 @@ function Dockable({
         }
         return dispatch({
           type: "moveTab",
-          sourceTabId: active.id.toString(),
-          targetWindowId: over.data.current.parentId,
+          tabId: active.id.toString(),
+          sourceWindowAddress: active.data.current?.address,
+          targetWindowAddress: over.data.current?.address,
         });
       case "edge-zone":
         return dispatch({
           type: "splitWindow",
-          windowId: over.data.current.parentId,
+          tabId: active.id.toString(),
+          sourceWindowAddress: active.data.current?.address,
+          targetWindowAddress: over.data.current?.address,
           direction: over.data.current.side,
-          sourceTabId: active.id.toString(),
         });
     }
     setActive(null);

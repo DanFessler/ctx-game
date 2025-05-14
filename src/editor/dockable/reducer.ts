@@ -27,19 +27,22 @@ type ReorderTabsAction = {
 type SelectTabAction = {
   type: "selectTab";
   tabId: string;
+  address: number[];
 };
 
 type MoveTabAction = {
   type: "moveTab";
-  sourceTabId: string;
-  targetWindowId: string;
+  tabId: string;
+  sourceWindowAddress: number[];
+  targetWindowAddress: number[];
 };
 
 type SplitWindowAction = {
   type: "splitWindow";
-  windowId: string;
+  tabId: string;
+  sourceWindowAddress: number[];
+  targetWindowAddress: number[];
   direction: "Left" | "Right";
-  sourceTabId: string;
 };
 
 type Action =
@@ -52,23 +55,12 @@ type Action =
 
 const appReducer = createReducer<State, Action>({
   resize: (state, { sizes, address }: ResizeAction) => {
-    function getPanels(panels: ParsedNode[], address: number[]): ParsedNode[] {
-      if (address.length === 0) return panels;
-
-      let panel: ParsedNode | ParsedNode[] = panels[address[0]];
-      if (address.length > 1) {
-        const innerPanels = (panel as PanelNode).children;
-        panel = getPanels(innerPanels, address.slice(1));
-      }
-
-      return (panel as PanelNode).children;
-    }
-
     // get the panels at the address
-    const panel = getPanels(state.panels, address);
+    const panel = getNodeFromAddress(state.panels, address) as PanelNode;
+    if (panel === undefined) throw new Error("Panel not found!!");
 
     // update the size of the panels
-    panel.forEach((p: ParsedNode, i: number) => {
+    panel.children.forEach((p, i) => {
       p.size = sizes[i];
     });
   },
@@ -90,34 +82,41 @@ const appReducer = createReducer<State, Action>({
     );
 
     ParentPanel.selected = activeId;
-
-    console.log("ParentPanel", current(ParentPanel));
   },
 
-  selectTab: (state, { tabId }: SelectTabAction) => {
-    const ParentPanel = findTabParent(state.panels, tabId) as WindowNode;
+  selectTab: (state, { tabId, address }: SelectTabAction) => {
+    const ParentPanel = getNodeFromAddress(state.panels, address) as WindowNode;
     ParentPanel.selected = tabId;
   },
 
-  moveTab: (state, { sourceTabId, targetWindowId }: MoveTabAction) => {
-    const sourceWindow = findTabParent(state.panels, sourceTabId) as WindowNode;
-    const targetWindow = findWindow(state.panels, targetWindowId) as WindowNode;
+  moveTab: (
+    state,
+    { tabId, sourceWindowAddress, targetWindowAddress }: MoveTabAction
+  ) => {
+    const sourceWindow = getNodeFromAddress(
+      state.panels,
+      sourceWindowAddress
+    ) as WindowNode;
+    const targetWindow = getNodeFromAddress(
+      state.panels,
+      targetWindowAddress
+    ) as WindowNode;
 
     // dont need to move it if it's the same window
     if (sourceWindow === targetWindow) return;
 
-    const activeIndex = sourceWindow.children.indexOf(sourceTabId);
-    const overIndex = targetWindow.children.length;
+    const activeIndex = sourceWindow.children.indexOf(tabId);
+    const overIndex = targetWindow.children.length; // always the last tab
 
     // Remove tab from active parent
     sourceWindow.children.splice(activeIndex, 1);
 
     // Insert tab into over parent
-    targetWindow.children.splice(overIndex, 0, sourceTabId);
-    targetWindow.selected = sourceTabId;
+    targetWindow.children.splice(overIndex, 0, tabId);
+    targetWindow.selected = tabId;
 
     // If active tab was selected, select first remaining tab
-    if (sourceWindow.selected === sourceTabId) {
+    if (sourceWindow.selected === tabId) {
       sourceWindow.selected = sourceWindow.children[0];
     }
 
@@ -129,17 +128,27 @@ const appReducer = createReducer<State, Action>({
 
   splitWindow: (
     state,
-    { windowId, direction, sourceTabId }: SplitWindowAction
+    {
+      tabId,
+      sourceWindowAddress,
+      targetWindowAddress,
+    }: // direction,
+    SplitWindowAction
   ) => {
-    const sourceWindow = findTabParent(state.panels, sourceTabId) as WindowNode;
-    const destinationPanel = findWindowParent(
+    const sourceWindow = getNodeFromAddress(
       state.panels,
-      windowId
+      sourceWindowAddress
+    ) as WindowNode;
+
+    console.log(targetWindowAddress);
+    const destinationPanel = getNodeFromAddress(
+      state.panels,
+      targetWindowAddress.slice(0, -1)
     ) as PanelNode;
 
     // remove tab from the source window
     const tabIndex = sourceWindow.children.findIndex(
-      (child) => child === sourceTabId
+      (child) => child === tabId
     );
     sourceWindow.children.splice(tabIndex, 1);
     sourceWindow.selected = sourceWindow.children[0];
@@ -147,9 +156,9 @@ const appReducer = createReducer<State, Action>({
     // create new window
     const newWindow: WindowNode = {
       type: "Window",
-      id: windowId + "something",
-      children: [sourceTabId],
-      selected: sourceTabId,
+      id: "somethingsomething",
+      children: [tabId],
+      selected: tabId,
       size: 1,
     };
 
@@ -193,20 +202,6 @@ function findWindowParent(
   }
 }
 
-// recursive window find
-function findWindow(panels: ParsedNode[], id: string): WindowNode | undefined {
-  for (const panel of panels) {
-    if (panel.type === "Panel") {
-      const innerPanels = (panel as PanelNode).children;
-      const result = findWindow(innerPanels, id);
-      if (result) return result;
-    }
-    if (panel.type === "Window") {
-      if (panel.id === id) return panel;
-    }
-  }
-}
-
 function deleteEmptyNodes(root: ParsedNode[]) {
   // Process nodes in reverse order to avoid index shifting issues
   for (let i = root.length - 1; i >= 0; i--) {
@@ -229,6 +224,16 @@ function deleteEmptyNodes(root: ParsedNode[]) {
       }
     }
   }
+}
+
+function getNodeFromAddress(
+  panels: ParsedNode[],
+  address: number[]
+): ParsedNode {
+  if (address.length === 0) throw new Error("Address is empty");
+  if (address.length === 1) return panels[address[0]];
+  const children = panels[address[0]].children;
+  return getNodeFromAddress(children as ParsedNode[], address.slice(1));
 }
 
 export default appReducer;

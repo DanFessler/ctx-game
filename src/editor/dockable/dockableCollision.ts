@@ -37,18 +37,6 @@ export const dockableCollision: CollisionDetection = ({
     }
   }
 
-  const insertPanelHits: Collision[] = rectIntersection({
-    active,
-    collisionRect,
-    droppableRects,
-    droppableContainers: insertPanelDroppables,
-    pointerCoordinates, // ✅ add this
-  });
-
-  if (insertPanelHits.length > 0) {
-    return insertPanelHits;
-  }
-
   const tabBarHits: Collision[] = rectIntersection({
     active,
     collisionRect,
@@ -59,6 +47,18 @@ export const dockableCollision: CollisionDetection = ({
 
   if (tabBarHits.length > 0) {
     return tabBarHits;
+  }
+
+  const insertPanelHits: Collision[] = rectIntersection({
+    active,
+    collisionRect,
+    droppableRects,
+    droppableContainers: insertPanelDroppables,
+    pointerCoordinates, // ✅ add this
+  });
+
+  if (insertPanelHits.length > 0) {
+    return insertPanelHits;
   }
 
   const edgeZoneHits: Collision[] = closestCenter({
