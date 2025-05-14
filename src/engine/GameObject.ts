@@ -20,10 +20,10 @@ export class GameObject {
 
   subscribe = (callback: () => void): (() => void) => {
     this.subscribers.add(callback);
-    console.log("subscribed to", this.name, callback);
+    // console.log("subscribed to", this.name, callback);
     return () => {
       this.subscribers.delete(callback);
-      console.log("unsubscribed from", this.name, callback);
+      // console.log("unsubscribed from", this.name, callback);
     };
   };
 

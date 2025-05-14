@@ -42,7 +42,7 @@ function PanelView({
     <PanelGroup
       direction={orientation}
       gap={gap}
-      initialSizes={sizes}
+      sizes={sizes}
       onResizeEnd={handleResizeEnd}
       // handleClassName={styles.handle}
       handleComponent={(index: number) => (

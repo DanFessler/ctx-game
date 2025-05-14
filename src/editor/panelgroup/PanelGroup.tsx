@@ -4,7 +4,7 @@ import Panel from "./Panel";
 type PanelGroupProps = {
   children: React.ReactNode;
   direction: "row" | "column";
-  initialSizes?: number[];
+  sizes?: number[];
   gap?: number;
   onResizeEnd?: (sizes: number[]) => void;
   className?: string;
@@ -15,7 +15,7 @@ type PanelGroupProps = {
 function PanelGroup({
   children,
   direction,
-  initialSizes,
+  sizes,
   onResizeEnd,
   gap = 3,
   className,
@@ -24,9 +24,8 @@ function PanelGroup({
 }: PanelGroupProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const panelRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const [sizes, setSizes] = useState<number[]>(
-    initialSizes ||
-      Array.from({ length: React.Children.count(children) }, () => 1)
+  const [_sizes, _setSizes] = useState<number[]>(
+    sizes || Array.from({ length: React.Children.count(children) }, () => 1)
   );
   const [pixelSizes, setPixelSizes] = useState<number[]>([]);
 
@@ -53,11 +52,19 @@ function PanelGroup({
     return newSizes;
   }, [getPanelPixelSizes]);
 
+  // in an uncontrolled state, calculate new sizes when children count changes
   const childrenCount = React.Children.count(children);
   useEffect(() => {
+    if (sizes) return; // if sizes are provided, don't calculate new sizes
     const newSizes = calcNewSizes();
-    setSizes(newSizes);
+    _setSizes(newSizes);
+    onResizeEnd?.(newSizes);
   }, [childrenCount, calcNewSizes]);
+
+  // keep sizes in sync with the provided sizes
+  useEffect(() => {
+    _setSizes(sizes || Array.from({ length: childrenCount }, () => 1));
+  }, [sizes, childrenCount]);
 
   const handleDrag = (delta: { x: number; y: number }) => {
     setDraggingDelta(delta);
@@ -72,13 +79,13 @@ function PanelGroup({
     setDraggingIndex(null);
     setDraggingDelta(null);
     const newSizes = calcNewSizes();
-    setSizes(newSizes);
+    _setSizes(newSizes);
     onResizeEnd?.(newSizes);
   };
 
   function getFrSizes() {
     if (draggingIndex === null || !draggingDelta)
-      return sizes.map((size) => `${size}fr`).join(" ");
+      return _sizes.map((size) => `${size}fr`).join(" ");
 
     const XorY = direction === "row" ? "x" : "y";
 

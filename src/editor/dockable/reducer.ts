@@ -123,7 +123,7 @@ const appReducer = createReducer<State, Action>({
 
     // clean up the tree of empty nodes
     if (sourceWindow.children.length === 0) {
-      deleteEmptyNodes(state.panels);
+      cleanup(state.panels);
     }
   },
 
@@ -167,14 +167,11 @@ const appReducer = createReducer<State, Action>({
     sourceWindow.selected = sourceWindow.children[0];
 
     // create new window
-    const halfSize = (targetWindow.size || 1) / 2;
-    targetWindow.size = halfSize;
     const newWindow: WindowNode = {
       type: "Window",
       id: "window-" + Date.now(),
       children: [tabId],
       selected: tabId,
-      size: halfSize,
     };
 
     const isAligned =
@@ -183,7 +180,10 @@ const appReducer = createReducer<State, Action>({
 
     // if the split direction is aligned with the parent panel, we only need to insert into the panel's children
     if (isAligned) {
+      const halfSize = (targetWindow.size || 1) / 2;
       const offset = direction === "Left" ? 0 : 1;
+      targetWindow.size = halfSize;
+      newWindow.size = halfSize;
       targetPanel.children.splice(targetWindowIndex + offset, 0, newWindow);
     }
 
@@ -196,15 +196,18 @@ const appReducer = createReducer<State, Action>({
         children: shouldReverse
           ? [newWindow, targetWindow]
           : [targetWindow, newWindow],
+        size: targetWindow.size,
       };
+      newWindow.size = 1;
+      targetWindow.size = 1;
       targetPanel.children[targetWindowIndex] = newPanel;
     }
 
-    deleteEmptyNodes(state.panels);
+    cleanup(state.panels);
   },
 });
 
-function deleteEmptyNodes(root: ParsedNode[]) {
+function cleanup(root: ParsedNode[]) {
   // Process nodes in reverse order to avoid index shifting issues
   for (let i = root.length - 1; i >= 0; i--) {
     const node = root[i];
@@ -217,8 +220,41 @@ function deleteEmptyNodes(root: ParsedNode[]) {
       }
     } else if (node.type === "Panel") {
       const panelNode = node as PanelNode;
+
       // Recursively process child panels
-      deleteEmptyNodes(panelNode.children);
+      cleanup(panelNode.children);
+
+      // if a panel-child has a single child that is also a panel, we can inline the grandchildren
+      // TODO we may have to consider the sizing implications of inlining panels
+      const newChildren: ParsedNode[] = [];
+      panelNode.children.forEach((child) => {
+        if (
+          child.type === "Panel" &&
+          child.children.length === 1 &&
+          child.children[0].type === "Panel"
+        ) {
+          // renormalize the size of the grandchild and push it into the new children array
+          child.children[0].children.forEach((grandchild) => {
+            const grandchildSize = grandchild.size || 1;
+            const parentSize = child.size || 1;
+            grandchild.size = grandchildSize * parentSize;
+            newChildren.push(grandchild);
+          });
+        } else {
+          newChildren.push(child);
+        }
+      });
+      panelNode.children = newChildren;
+
+      // normalize the sizes of the children
+      const totalSize = newChildren.reduce((acc, child) => {
+        const size = child.size || 1;
+        return acc + size;
+      }, 0);
+
+      newChildren.forEach((child) => {
+        child.size = child.size ? child.size / totalSize : 1;
+      });
 
       // If panel has no children after processing, remove it
       if (panelNode.children.length === 0) {
