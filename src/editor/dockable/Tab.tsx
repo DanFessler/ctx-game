@@ -15,6 +15,7 @@ function Tab({
     <span
       className={styles.tab + (selected ? " " + styles.selected : "")}
       onPointerDown={onClick}
+      title={name}
     >
       {name}
       {selected && (

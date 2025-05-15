@@ -156,6 +156,11 @@ function SortableTabs({ tabs, id, selected, address }: SortableTabsProps) {
             parentId: id,
             address,
           }}
+          style={{
+            flexShrink: 1,
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+          }}
         >
           <Tab
             name={tab.name}

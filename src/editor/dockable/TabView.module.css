@@ -53,6 +53,9 @@
   box-sizing: border-box;
   cursor: pointer;
   position: relative;
+  /* flex-shrink: 1; */
+  overflow: hidden;
+  text-overflow: ellipsis;
   /* opacity: 0.5; */
 }
 
