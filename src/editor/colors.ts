@@ -33,6 +33,18 @@ const colors = {
     input: "rgba(0,0,0,0.2)",
     inputText: "rgb(255,255,255)",
   },
+  darker: {
+    headers: "rgb(39, 44, 53)",
+    selected: "rgb(46,104,162)",
+    background: "rgb(31, 36, 43)",
+    content: "rgb(46, 49, 54)",
+    document: "rgb(13, 13, 14)",
+    border: "rgba(0, 0, 0, 0.15)",
+    text: "rgb(200, 207, 211)",
+    gap: "rgb(20, 20, 20)",
+    input: "rgba(0,0,0,0.2)",
+    inputText: "rgb(200, 207, 211)",
+  },
 };
 
 // get the user's preferred theme

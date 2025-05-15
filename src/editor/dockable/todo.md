@@ -3,12 +3,19 @@
 ## publish to github
 
 - fix the tab reorder transition bug
-- tabbar styling for overflowing tabs
 - context menu button
 - theming api
-- cascading panelgroup resizing
-- meta cascading resizing between panelgroups
+
+## official launch
+
+- publish to npm
 - documentation
 - website
+- commercial license
+
+## later
+
+- cascading panelgroup resizing
 - imperative api
 - BUG: weird sizing sometimes when redocking
+- closable tabs

@@ -17,7 +17,9 @@ function Tab({
       onPointerDown={onClick}
       title={name}
     >
-      {name}
+      <span className={styles.tabNameContainer}>
+        <span className={styles.tabName}>{name}</span>
+      </span>
       {selected && (
         <>
           <svg

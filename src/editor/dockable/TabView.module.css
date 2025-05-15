@@ -43,20 +43,32 @@
 }
 
 .tab {
-  display: block;
+  display: flex;
+  flex-shrink: 1;
+  overflow: visible;
   text-align: center;
   font-size: 12px;
   font-weight: bold;
-  padding: 8px 16px;
   line-height: 12px;
   border-radius: var(--radius) var(--radius) 0 0;
   box-sizing: border-box;
   cursor: pointer;
-  position: relative;
-  /* flex-shrink: 1; */
+  min-width: 0;
+}
+
+.tabNameContainer {
+  display: flex;
+  flex-shrink: 1;
+  overflow: hidden;
+}
+
+.tabName {
+  min-width: 0;
+  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  /* opacity: 0.5; */
+  flex: 1 1 auto;
+  padding: 8px 16px;
 }
 
 .tab.selected {
