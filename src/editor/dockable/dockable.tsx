@@ -17,6 +17,8 @@ import type {
 } from "@dnd-kit/core";
 import { DockableContext } from "./DockableContext";
 import { dockableCollision } from "./dockableCollision";
+import DroppableDivider from "../components/DroppableDivider";
+import Droppable from "../components/Droppable";
 
 type DockableProps = {
   orientation?: "row" | "column";
@@ -159,6 +161,103 @@ function Dockable({
           >
             {views}
           </PanelView>
+
+          <div
+            style={{
+              width: gap + 4,
+              height: "100%",
+              position: "absolute",
+              left: 0,
+              top: 0,
+              zIndex: 10,
+              overflow: "hidden",
+              borderRadius: 2,
+            }}
+          >
+            <DroppableDivider address={[]} index={-1} />
+          </div>
+          <div
+            style={{
+              width: gap + 4,
+              height: "100%",
+              position: "absolute",
+              right: 0,
+              top: 0,
+              zIndex: 10,
+              overflow: "hidden",
+              borderRadius: 2,
+            }}
+          >
+            <DroppableDivider address={[]} index={state.children.length} />
+          </div>
+          <div
+            style={{
+              width: "100%",
+              height: gap + 4,
+              position: "absolute",
+              left: 0,
+              bottom: 0,
+              zIndex: 10,
+              overflow: "hidden",
+              borderRadius: 2,
+            }}
+          >
+            <Droppable
+              id={`bottom-edge`}
+              data={{
+                type: "edge-zone",
+                orientation,
+                parentId: "root",
+                address: [],
+                side: "Bottom",
+              }}
+              style={{
+                width: "calc(100% + 16px)",
+                height: "calc(100% + 16px)",
+                position: "absolute",
+                top: "-8px",
+                left: "-8px",
+                transition: "all 0.1s ease-in-out",
+              }}
+              overStyle={{
+                backgroundColor: "var(--selected)",
+              }}
+            />
+          </div>
+          <div
+            style={{
+              width: "100%",
+              height: gap + 4,
+              position: "absolute",
+              left: 0,
+              top: 0,
+              zIndex: 10,
+              overflow: "hidden",
+              borderRadius: 2,
+            }}
+          >
+            <Droppable
+              id={`top-edge`}
+              data={{
+                type: "edge-zone",
+                orientation,
+                parentId: "root",
+                address: [],
+                side: "Top",
+              }}
+              style={{
+                width: "calc(100% + 16px)",
+                height: "calc(100% + 16px)",
+                position: "absolute",
+                top: "-8px",
+                left: "-8px",
+                transition: "all 0.1s ease-in-out",
+              }}
+              overStyle={{
+                backgroundColor: "var(--selected)",
+              }}
+            />
+          </div>
           <DragOverlay>
             {active ? (
               <div

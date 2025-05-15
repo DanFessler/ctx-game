@@ -1,6 +1,6 @@
 import createReducer from "./utils/createReducer";
 import { ParsedNode, PanelNode, WindowNode } from "./serializeLayout";
-// import { current } from "immer";
+import { current } from "immer";
 import { arrayMove } from "@dnd-kit/sortable";
 
 type State = PanelNode & {
@@ -65,8 +65,7 @@ type Action =
 
 const appReducer = createReducer<State, Action>({
   resize: (state, { sizes, address }: ResizeAction) => {
-    const children = getNodeFromAddress(state.children, address)
-      .children as PanelNode[];
+    const children = getNodeFromAddress(state, address).children as PanelNode[];
 
     // update the size of the panels
     children.forEach((p, i) => {
@@ -83,12 +82,9 @@ const appReducer = createReducer<State, Action>({
     { tabId, sourceAddress, targetAddress }: InsertPanelAction
   ) => {
     // return console.log(tabId, sourceAddress, targetAddress);
-    const sourceWindow = getNodeFromAddress(
-      state.children,
-      sourceAddress
-    ) as WindowNode;
+    const sourceWindow = getNodeFromAddress(state, sourceAddress) as WindowNode;
     const targetParent = getNodeFromAddress(
-      state.children,
+      state,
       targetAddress.slice(0, -1)
     ) as PanelNode;
     const targetIndex = targetAddress.slice(-1)[0];
@@ -110,10 +106,7 @@ const appReducer = createReducer<State, Action>({
     state,
     { sourceTabId, targetTabId, address }: ReorderTabsAction
   ) => {
-    const ParentPanel = getNodeFromAddress(
-      state.children,
-      address
-    ) as WindowNode;
+    const ParentPanel = getNodeFromAddress(state, address) as WindowNode;
     const activeIndex = ParentPanel.children.indexOf(sourceTabId);
     const overIndex = ParentPanel.children.indexOf(targetTabId);
     ParentPanel.selected = sourceTabId;
@@ -125,10 +118,7 @@ const appReducer = createReducer<State, Action>({
   },
 
   selectTab: (state, { tabId, address }: SelectTabAction) => {
-    const ParentPanel = getNodeFromAddress(
-      state.children,
-      address
-    ) as WindowNode;
+    const ParentPanel = getNodeFromAddress(state, address) as WindowNode;
     ParentPanel.selected = tabId;
   },
 
@@ -137,11 +127,11 @@ const appReducer = createReducer<State, Action>({
     { tabId, sourceWindowAddress, targetWindowAddress }: MoveTabAction
   ) => {
     const sourceWindow = getNodeFromAddress(
-      state.children,
+      state,
       sourceWindowAddress
     ) as WindowNode;
     const targetWindow = getNodeFromAddress(
-      state.children,
+      state,
       targetWindowAddress
     ) as WindowNode;
 
@@ -179,22 +169,24 @@ const appReducer = createReducer<State, Action>({
       orientation,
     }: SplitWindowAction
   ) => {
+    console.log(state, sourceWindowAddress, targetWindowAddress);
     const sourceWindow = getNodeFromAddress(
-      state.children,
+      state,
       sourceWindowAddress
     ) as WindowNode;
 
     const targetWindow = getNodeFromAddress(
-      state.children,
+      state,
       targetWindowAddress
     ) as WindowNode;
 
     const targetPanel = getNodeFromAddress(
-      state.children,
+      state,
       targetWindowAddress.slice(0, -1)
     ) as PanelNode;
 
     const targetWindowIndex = targetWindowAddress.slice(-1)[0];
+    console.log(current(targetPanel), targetWindowIndex);
 
     // if the source window is the same as the target window and the source window has only one tab, we don't need to do anything
     if (sourceWindow === targetWindow && sourceWindow.children.length === 1) {
@@ -236,13 +228,18 @@ const appReducer = createReducer<State, Action>({
         type: "Panel",
         id: "panel-" + Date.now(),
         children: shouldReverse
-          ? [newWindow, targetWindow]
-          : [targetWindow, newWindow],
+          ? [newWindow, { ...targetWindow }]
+          : [{ ...targetWindow }, newWindow],
         size: targetWindow.size,
       };
       newWindow.size = 1;
       targetWindow.size = 1;
-      targetPanel.children[targetWindowIndex] = newPanel;
+
+      if (targetWindowIndex === undefined) {
+        state.children = [newPanel];
+      } else {
+        targetPanel.children[targetWindowIndex] = newPanel;
+      }
     }
 
     cleanup(state);
@@ -259,6 +256,7 @@ function cleanup(root: ParsedNode) {
       // If window has no tabs, remove it
       if (windowNode.children.length === 0) {
         children.splice(i, 1);
+        normalize(children);
       }
     } else if (node.type === "Panel") {
       const panelNode = node as PanelNode;
@@ -310,27 +308,18 @@ function normalize(children: ParsedNode[]) {
   });
 }
 
-function getNodeFromAddress(
-  panels: ParsedNode[],
-  address: number[]
-): ParsedNode {
+function getNodeFromAddress(root: ParsedNode, address: number[]): ParsedNode {
   // if the address is empty, we create a "root" panel
   // because it doesn't really exist in the tree
-  if (address.length === 0)
-    return {
-      id: "root",
-      type: "Panel",
-      children: panels,
-      size: 1,
-    };
+  if (address.length === 0) return root;
+
+  const children = root.children as ParsedNode[];
 
   // if the address has only one element, we return the panel at that index
-  if (address.length === 1) return panels[address[0]];
+  if (address.length === 1) return children[address[0]];
 
-  // otherwise, we get the children of the panel at the first address index
-  // and recursively call the function, slicing off the first index each time
-  const children = panels[address[0]].children;
-  return getNodeFromAddress(children as ParsedNode[], address.slice(1));
+  // otherwise, recursively call the function, slicing off the first index each time
+  return getNodeFromAddress(children[address[0]], address.slice(1));
 }
 
 export default appReducer;
