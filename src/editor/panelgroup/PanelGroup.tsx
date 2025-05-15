@@ -1,9 +1,14 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import Panel from "./Panel";
 
+const minSize = {
+  x: 32,
+  y: 32,
+};
+
 type PanelGroupProps = {
   children: React.ReactNode;
-  direction: "row" | "column";
+  orientation: "row" | "column";
   sizes?: number[];
   gap?: number;
   onResizeEnd?: (sizes: number[]) => void;
@@ -14,7 +19,7 @@ type PanelGroupProps = {
 
 function PanelGroup({
   children,
-  direction,
+  orientation,
   sizes,
   onResizeEnd,
   gap = 3,
@@ -24,33 +29,32 @@ function PanelGroup({
 }: PanelGroupProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const panelRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const [pixelSizes, setPixelSizes] = useState<number[]>([]);
   const [_sizes, _setSizes] = useState<number[]>(
     sizes || Array.from({ length: React.Children.count(children) }, () => 1)
   );
-  const [pixelSizes, setPixelSizes] = useState<number[]>([]);
-
   const [draggingIndex, setDraggingIndex] = useState<number | null>(null);
   const [draggingDelta, setDraggingDelta] = useState<{
     x: number;
     y: number;
   } | null>(null);
 
-  const getPanelPixelSizes = useCallback(() => {
+  const getBoundingRectSizes = useCallback(() => {
     return panelRefs.current
       .map((ref) => {
         if (!ref) return null;
         const rect = ref.getBoundingClientRect();
-        return direction === "row" ? rect.width : rect.height;
+        return orientation === "row" ? rect.width : rect.height;
       })
       .filter(Boolean) as number[];
-  }, [direction, panelRefs]);
+  }, [orientation, panelRefs]);
 
   const calcNewSizes = useCallback(() => {
-    const panelPixelSizes = getPanelPixelSizes();
+    const panelPixelSizes = getBoundingRectSizes();
     const totalSize = panelPixelSizes.reduce((acc, size) => acc + size, 0);
     const newSizes = panelPixelSizes.map((size) => size / totalSize);
     return newSizes;
-  }, [getPanelPixelSizes]);
+  }, [getBoundingRectSizes]);
 
   // in an uncontrolled state, calculate new sizes when children count changes
   const childrenCount = React.Children.count(children);
@@ -59,7 +63,7 @@ function PanelGroup({
     const newSizes = calcNewSizes();
     _setSizes(newSizes);
     onResizeEnd?.(newSizes);
-  }, [childrenCount, calcNewSizes]);
+  }, [childrenCount, calcNewSizes, sizes, onResizeEnd]);
 
   // keep sizes in sync with the provided sizes
   useEffect(() => {
@@ -72,7 +76,7 @@ function PanelGroup({
 
   const handleDragStart = (index: number) => {
     setDraggingIndex(index);
-    setPixelSizes(getPanelPixelSizes());
+    setPixelSizes(getBoundingRectSizes());
   };
 
   const handleDragEnd = () => {
@@ -83,45 +87,53 @@ function PanelGroup({
     onResizeEnd?.(newSizes);
   };
 
-  function getFrSizes() {
-    const XorY = direction === "row" ? "x" : "y";
-    const maxDelta = {
-      x: 32,
-      y: 32,
-    };
+  function getSizeStyle() {
+    const xy = orientation === "row" ? "x" : "y";
 
     // if we're not dragging, return the sizes as fr
     // we multiply by a constant because values under 1 might not fill the container
     // and multiplying proportionally has otherwise no effect on the size
-    if (draggingIndex === null || !draggingDelta)
+    if (draggingIndex === null || !draggingDelta) {
       return _sizes
-        .map((size) => `minmax(${maxDelta[XorY]}px, ${100 * size}fr)`)
+        .map((size) => `minmax(${minSize[xy]}px, ${100 * size}fr)`)
         .join(" ");
+    }
 
-    // we adjust the drag delta so that the panels can't get too small
-    const firstPanelSize = pixelSizes[draggingIndex] + draggingDelta[XorY];
-    const firstPanelDifference =
-      firstPanelSize < maxDelta[XorY] ? firstPanelSize - maxDelta[XorY] : 0;
+    // otherwise, we're dragging, so we return the sizes as px which are easier to work with
+    const sizes = getPanelDraggingSizes(
+      draggingIndex,
+      draggingDelta[xy],
+      pixelSizes,
+      minSize[xy]
+    );
 
-    const secondPanelSize = pixelSizes[draggingIndex + 1] - draggingDelta[XorY];
-    const secondPanelDifference =
-      secondPanelSize < maxDelta[XorY] ? secondPanelSize - maxDelta[XorY] : 0;
+    return sizes.map((size) => `minmax(${minSize[xy]}px, ${size}px)`).join(" ");
+  }
 
-    draggingDelta[XorY] =
-      draggingDelta[XorY] - firstPanelDifference + secondPanelDifference;
+  function getPanelDraggingSizes(
+    index: number,
+    delta: number,
+    sizes: number[],
+    minSize: number
+  ) {
+    const newSizes = [...sizes];
 
-    // when dragging, we return the sizes as px which are easier to work with
-    return pixelSizes
-      .map((size, index) => {
-        if (index === draggingIndex) {
-          return `minmax(${maxDelta[XorY]}px, ${size + draggingDelta[XorY]}px)`;
-        }
-        if (index === draggingIndex + 1) {
-          return `minmax(${maxDelta[XorY]}px, ${size - draggingDelta[XorY]}px)`;
-        }
-        return `minmax(${maxDelta[XorY]}px, ${size}px)`;
-      })
-      .join(" ");
+    // update the sizes with the drag delta
+    newSizes[index] += delta;
+    newSizes[index + 1] -= delta;
+
+    // if either panel is too small, calculate the difference and
+    // recursively call the function to push the neighboring panels
+    if (newSizes[index] < minSize) {
+      const difference = minSize - newSizes[index];
+      return getPanelDraggingSizes(index - 1, -difference, newSizes, minSize);
+    }
+    if (newSizes[index + 1] < minSize) {
+      const difference = minSize - newSizes[index + 1];
+      return getPanelDraggingSizes(index + 1, difference, newSizes, minSize);
+    }
+
+    return newSizes;
   }
 
   return (
@@ -130,8 +142,8 @@ function PanelGroup({
       className={className}
       style={{
         display: "grid",
-        [direction === "row" ? "gridTemplateColumns" : "gridTemplateRows"]:
-          getFrSizes(),
+        [orientation === "row" ? "gridTemplateColumns" : "gridTemplateRows"]:
+          getSizeStyle(),
         gap: gap,
         minWidth: "100%",
         width: "100%",
@@ -145,7 +157,7 @@ function PanelGroup({
           ref={(el) => {
             panelRefs.current[index] = el;
           }}
-          direction={direction}
+          direction={orientation}
           onDrag={(delta) => handleDrag(delta)}
           onDragStart={() => handleDragStart(index)}
           onDragEnd={() => handleDragEnd()}

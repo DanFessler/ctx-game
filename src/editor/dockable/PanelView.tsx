@@ -41,7 +41,7 @@ function PanelView({
   return (
     <>
       <PanelGroup
-        direction={orientation}
+        orientation={orientation}
         gap={gap}
         sizes={sizes}
         onResizeEnd={handleResizeEnd}
