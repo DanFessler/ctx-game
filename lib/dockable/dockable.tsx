@@ -2,7 +2,7 @@ import React, { useReducer, useEffect, useState } from "react";
 import PanelView from "./PanelView";
 import appReducer from "./reducer";
 import serializeLayout, { ParsedNode } from "./serializeLayout";
-import colors from "../colors";
+import colors from "../../src/editor/colors";
 import {
   DndContext,
   useSensor,
@@ -17,8 +17,8 @@ import type {
 } from "@dnd-kit/core";
 import { DockableContext } from "./DockableContext";
 import { dockableCollision } from "./dockableCollision";
-import DroppableDivider from "../components/DroppableDivider";
-import Droppable from "../components/Droppable";
+import DroppableDivider from "../../src/editor/components/DroppableDivider";
+import Droppable from "../../src/editor/components/Droppable";
 import {
   MoveTabAction,
   ReorderTabsAction,

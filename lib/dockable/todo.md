@@ -19,3 +19,4 @@
 - imperative api
 - BUG: weird sizing sometimes when redocking
 - closable tabs
+- floating windows

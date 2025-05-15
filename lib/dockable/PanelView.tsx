@@ -3,7 +3,7 @@ import PanelGroup from "../panelgroup/PanelGroup";
 import React from "react";
 import { LayoutNode, PanelNode, WindowNode } from "./serializeLayout";
 import { useDockable } from "./DockableContext";
-import DroppableDivider from "../components/DroppableDivider";
+import DroppableDivider from "../../src/editor/components/DroppableDivider";
 // import styles from "./PanelView.module.css";
 
 type PanelProps = {

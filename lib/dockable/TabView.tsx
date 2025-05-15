@@ -1,7 +1,7 @@
-import colors from "../colors";
+import colors from "../../src/editor/colors";
 import styles from "./TabView.module.css";
-import SortableItem from "../components/SortableItem";
-import Droppable from "../components/Droppable";
+import SortableItem from "../../src/editor/components/SortableItem";
+import Droppable from "../../src/editor/components/Droppable";
 import Tab from "./Tab";
 import {
   SortableContext,
