@@ -249,6 +249,18 @@ function DroppableTargets({
           side: "Bottom",
         }}
       />
+      {/* <Droppable
+        className={[
+          styles.edgeZone,
+          styles.edgeZoneCenter,
+          currentEdge === "Center" && !hide ? styles.edgeZoneHover : "",
+        ].join(" ")}
+        id={`${id}-split-center`}
+        data={{
+          ...commonData,
+          side: "Center",
+        }}
+      /> */}
     </>
   );
 }

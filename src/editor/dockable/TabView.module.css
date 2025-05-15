@@ -198,6 +198,13 @@
   top: 0;
 }
 
+.edgeZoneCenter {
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+}
+
 .edgeZoneLeft::after {
   transform-origin: left;
   transform: scaleX(0) scaleY(1);
