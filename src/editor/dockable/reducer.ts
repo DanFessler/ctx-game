@@ -81,7 +81,6 @@ const appReducer = createReducer<State, Action>({
     state,
     { tabId, sourceAddress, targetAddress }: InsertPanelAction
   ) => {
-    // return console.log(tabId, sourceAddress, targetAddress);
     const sourceWindow = getNodeFromAddress(state, sourceAddress) as WindowNode;
     const targetParent = getNodeFromAddress(
       state,
@@ -169,7 +168,6 @@ const appReducer = createReducer<State, Action>({
       orientation,
     }: SplitWindowAction
   ) => {
-    console.log(state, sourceWindowAddress, targetWindowAddress);
     const sourceWindow = getNodeFromAddress(
       state,
       sourceWindowAddress
@@ -186,7 +184,6 @@ const appReducer = createReducer<State, Action>({
     ) as PanelNode;
 
     const targetWindowIndex = targetWindowAddress.slice(-1)[0];
-    console.log(current(targetPanel), targetWindowIndex);
 
     // if the source window is the same as the target window and the source window has only one tab, we don't need to do anything
     if (sourceWindow === targetWindow && sourceWindow.children.length === 1) {
@@ -215,7 +212,7 @@ const appReducer = createReducer<State, Action>({
     // if the split direction is aligned with the parent panel, we only need to insert into the panel's children
     if (isAligned) {
       const halfSize = (targetWindow.size || 1) / 2;
-      const offset = direction === "Left" ? 0 : 1;
+      const offset = direction === "Left" || direction === "Top" ? 0 : 1;
       targetWindow.size = halfSize;
       newWindow.size = halfSize;
       targetPanel.children.splice(targetWindowIndex + offset, 0, newWindow);
@@ -284,6 +281,7 @@ function cleanup(root: ParsedNode) {
           newChildren.push(child);
         }
       });
+      // const newChildren = panelNode.children;
 
       // normalize the sizes of the children
       normalize(newChildren);
@@ -309,8 +307,7 @@ function normalize(children: ParsedNode[]) {
 }
 
 function getNodeFromAddress(root: ParsedNode, address: number[]): ParsedNode {
-  // if the address is empty, we create a "root" panel
-  // because it doesn't really exist in the tree
+  // if the address is empty, we found the node
   if (address.length === 0) return root;
 
   const children = root.children as ParsedNode[];
