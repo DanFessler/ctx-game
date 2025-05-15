@@ -35,7 +35,7 @@ type DockableProps = {
   radius?: number;
 };
 
-function Dockable({
+export function Dockable({
   orientation = "row",
   children,
   panels: controledPanels,
@@ -334,4 +334,9 @@ export function Panel(props: PanelProps) {
   return props.children;
 }
 
-export default Dockable;
+export default {
+  Root: Dockable,
+  Panel,
+  Window,
+  View,
+};
