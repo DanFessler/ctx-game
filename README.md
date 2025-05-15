@@ -4,6 +4,8 @@ CTX is a web-first game engine with a unity-like editor and component system wit
 
 The project is still very early in development and not production ready, but feel free to try it out if you're feeling adventurous.
 
+![image](https://github.com/user-attachments/assets/10955340-f219-44b1-bc72-c8bd1c4d03c4)
+
 ## Key Features
 
 - Intuitive Unity-like visual editor
