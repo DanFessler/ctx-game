@@ -6,4 +6,5 @@
 - tabbar styling for overflowing tabs
 - context menu button
 - fix the tab reorder transition bug
-- allow dropping on border handles
+- disable drop zones for noop splits
+- BUG: sometimes the split direction isn't respected
