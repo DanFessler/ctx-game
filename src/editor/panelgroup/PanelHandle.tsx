@@ -1,5 +1,3 @@
-import styles from "./PanelHandle.module.css";
-
 function PanelHandle({
   className,
   direction,
@@ -76,8 +74,16 @@ function PanelHandle({
   return (
     <div
       onMouseDown={handleMouseDown}
-      className={`${styles.handle} ${className}`}
-      style={style}
+      className={className}
+      style={{
+        position: "absolute",
+        zIndex: 1000,
+        backgroundColor: "transparent",
+        transition: "background-color 0.1s ease-in-out",
+        borderRadius: 2,
+        overflow: "hidden",
+        ...style,
+      }}
     >
       {handleComponent}
     </div>

@@ -26,21 +26,10 @@ import { PiBoundingBoxFill } from "react-icons/pi";
 import { FaCode } from "react-icons/fa";
 import SortableItem from "../components/SortableItem";
 import styles from "./Inspector.module.css";
-
-function useGameObjejct(gameObject: GameObject) {
-  const [count, setCount] = useState(0);
-  useEffect(() => {
-    const unsubscribe = gameObject.subscribe(() => {
-      setCount((count) => count + 1);
-    });
-    return () => unsubscribe();
-  }, [gameObject]);
-
-  return count;
-}
+import useGameObject from "../hooks/useGameObject";
 
 function Inspector({ gameObject }: { gameObject: GameObject }) {
-  useGameObjejct(gameObject);
+  useGameObject(gameObject);
 
   const behaviors = gameObject.behaviors;
 
