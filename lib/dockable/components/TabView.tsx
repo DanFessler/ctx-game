@@ -1,14 +1,14 @@
-import colors from "../../src/editor/colors";
+import colors from "../../../src/editor/colors";
 import styles from "./TabView.module.css";
 import SortableItem from "./SortableItem";
-import Droppable from "../../src/editor/components/Droppable";
+import Droppable from "../../../src/editor/components/Droppable";
 import Tab from "./Tab";
 import {
   SortableContext,
   horizontalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { useDndContext } from "@dnd-kit/core";
-import { useDockable } from "./DockableContext";
+import { useDockable } from "../DockableContext";
 export type tabObject = {
   id: string;
   name: string;

@@ -1,5 +1,5 @@
 import React, { createContext, useContext } from "react";
-import { ParsedNode } from "./serializeLayout";
+import { ParsedNode } from "./utils/serializeLayout";
 
 type DockableState = {
   children: ParsedNode[];

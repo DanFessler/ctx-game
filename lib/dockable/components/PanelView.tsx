@@ -1,9 +1,9 @@
 import TabView from "./TabView";
-import PanelGroup from "../panelgroup/PanelGroup";
+import PanelGroup from "../../panelgroup/PanelGroup";
 import React from "react";
-import { LayoutNode, PanelNode, WindowNode } from "./serializeLayout";
-import { useDockable } from "./DockableContext";
-import DroppableDivider from "../../src/editor/components/DroppableDivider";
+import { LayoutNode, PanelNode, WindowNode } from "../utils/serializeLayout";
+import { useDockable } from "../DockableContext";
+import DroppableDivider from "../../../src/editor/components/DroppableDivider";
 // import styles from "./PanelView.module.css";
 
 type PanelProps = {
