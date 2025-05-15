@@ -19,6 +19,12 @@ import { DockableContext } from "./DockableContext";
 import { dockableCollision } from "./dockableCollision";
 import DroppableDivider from "../components/DroppableDivider";
 import Droppable from "../components/Droppable";
+import {
+  MoveTabAction,
+  ReorderTabsAction,
+  SplitWindowAction,
+  InsertPanelAction,
+} from "./reducer";
 
 type DockableProps = {
   orientation?: "row" | "column";
@@ -85,29 +91,31 @@ function Dockable({
   function handleDragEnd({ active, over }: DragEndEvent) {
     if (!over) return;
     switch (over.data.current?.type) {
-      case "tab-bar":
+      case "tab-bar": {
         return dispatch({
           type: "moveTab",
           tabId: active.id.toString(),
           sourceWindowAddress: active.data.current?.address,
           targetWindowAddress: over.data.current?.address,
-        });
-      case "tab":
+        } as MoveTabAction);
+      }
+      case "tab": {
         if (active.data.current?.parentId === over.data.current?.parentId) {
           return dispatch({
             type: "reorderTabs",
             sourceTabId: active.id.toString(),
             targetTabId: over.id.toString(),
             address: active.data.current?.address,
-          });
+          } as ReorderTabsAction);
         }
         return dispatch({
           type: "moveTab",
           tabId: active.id.toString(),
           sourceWindowAddress: active.data.current?.address,
           targetWindowAddress: over.data.current?.address,
-        });
-      case "edge-zone":
+        } as MoveTabAction);
+      }
+      case "edge-zone": {
         return dispatch({
           type: "splitWindow",
           tabId: active.id.toString(),
@@ -115,14 +123,16 @@ function Dockable({
           targetWindowAddress: over.data.current?.address,
           direction: over.data.current.side,
           orientation: over.data.current.orientation,
-        });
-      case "insert-panel":
+        } as SplitWindowAction);
+      }
+      case "insert-panel": {
         return dispatch({
           type: "insertPanel",
           tabId: active.id.toString(),
           sourceAddress: active.data.current?.address,
           targetAddress: over.data.current.address,
-        });
+        } as InsertPanelAction);
+      }
     }
     setActive(null);
   }

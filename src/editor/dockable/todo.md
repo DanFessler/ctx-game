@@ -7,4 +7,3 @@
 - context menu button
 - fix the tab reorder transition bug
 - disable drop zones for noop splits
-- BUG: sometimes the split direction isn't respected

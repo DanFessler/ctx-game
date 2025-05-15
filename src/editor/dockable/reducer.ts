@@ -7,38 +7,38 @@ type State = PanelNode & {
   // children: ParsedNode[];
 };
 
-type ResizeAction = {
+export type ResizeAction = {
   type: "resize";
   sizes: number[];
   address: number[];
 };
 
-type AddPanelAction = {
+export type AddPanelAction = {
   type: "addPanel";
   panel: ParsedNode;
 };
 
-type ReorderTabsAction = {
+export type ReorderTabsAction = {
   type: "reorderTabs";
   sourceTabId: string;
   targetTabId: string;
   address: number[];
 };
 
-type SelectTabAction = {
+export type SelectTabAction = {
   type: "selectTab";
   tabId: string;
   address: number[];
 };
 
-type MoveTabAction = {
+export type MoveTabAction = {
   type: "moveTab";
   tabId: string;
   sourceWindowAddress: number[];
   targetWindowAddress: number[];
 };
 
-type SplitWindowAction = {
+export type SplitWindowAction = {
   type: "splitWindow";
   tabId: string;
   sourceWindowAddress: number[];
@@ -47,7 +47,7 @@ type SplitWindowAction = {
   orientation: "row" | "column";
 };
 
-type InsertPanelAction = {
+export type InsertPanelAction = {
   type: "insertPanel";
   tabId: string;
   sourceAddress: number[];
