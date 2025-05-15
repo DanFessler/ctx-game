@@ -1,6 +1,6 @@
 import colors from "../../src/editor/colors";
 import styles from "./TabView.module.css";
-import SortableItem from "../../src/editor/components/SortableItem";
+import SortableItem from "./SortableItem";
 import Droppable from "../../src/editor/components/Droppable";
 import Tab from "./Tab";
 import {
