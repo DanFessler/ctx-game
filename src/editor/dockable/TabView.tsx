@@ -21,6 +21,13 @@ import { HiDotsVertical as TiThMenu } from "react-icons/hi";
 
 export type tabGroupObject = tabObject[];
 
+function isSame(activeAddress: number[], overAddress: number[]) {
+  if (!activeAddress || !overAddress) return false;
+  return activeAddress.every(
+    (value: number, index: number) => value === overAddress[index]
+  );
+}
+
 type TabViewProps = {
   tabs: tabGroupObject;
   hideTabs?: boolean;
@@ -39,6 +46,11 @@ function TabView({
 }: TabViewProps) {
   const { active, over } = useDndContext();
 
+  const isSameWindow = isSame(
+    active?.data?.current?.address,
+    over?.data?.current?.address
+  );
+
   const overId =
     (over?.data?.current?.type === "tab" && over?.data?.current?.parentId) ||
     over?.id;
@@ -50,7 +62,6 @@ function TabView({
 
   const currentEdgeZoneSide =
     over?.data?.current?.parentId == id && over?.data?.current?.side;
-  // console.log(overId, id, currentEdgeZoneSide, `margin${currentEdgeZoneSide}`);
 
   // flag for styling when dragging over the tab bar (but not it's own tabBar)
   // made slightly more verbose because we need to check if it's over a tab or the tabBar
@@ -62,10 +73,6 @@ function TabView({
       style={{
         background: colors.headers,
         flex: 1,
-        ...(currentEdgeZoneSide &&
-          {
-            // [`margin${currentEdgeZoneSide}`]: 64,
-          }),
       }}
     >
       {!hideTabs && (
@@ -121,6 +128,7 @@ function TabView({
         currentEdge={currentEdgeZoneSide}
         orientation={orientation}
         address={address}
+        hide={isSameWindow && tabs.length == 1}
       />
     </div>
   );
@@ -171,12 +179,14 @@ type DroppableTargetsProps = {
   currentEdge: string;
   orientation: "row" | "column";
   address: number[];
+  hide: boolean;
 };
 function DroppableTargets({
   id,
   currentEdge,
   address,
   orientation,
+  hide,
 }: DroppableTargetsProps) {
   const commonData = {
     type: "edge-zone",
@@ -190,7 +200,7 @@ function DroppableTargets({
         className={[
           styles.edgeZone,
           styles.edgeZoneLeft,
-          currentEdge === "Left" ? styles.edgeZoneHover : "",
+          currentEdge === "Left" && !hide ? styles.edgeZoneHover : "",
         ].join(" ")}
         id={`${id}-split-left`}
         data={{
@@ -202,7 +212,7 @@ function DroppableTargets({
         className={[
           styles.edgeZone,
           styles.edgeZoneRight,
-          currentEdge === "Right" ? styles.edgeZoneHover : "",
+          currentEdge === "Right" && !hide ? styles.edgeZoneHover : "",
         ].join(" ")}
         id={`${id}-split-right`}
         data={{
@@ -214,7 +224,7 @@ function DroppableTargets({
         className={[
           styles.edgeZone,
           styles.edgeZoneTop,
-          currentEdge === "Top" ? styles.edgeZoneHover : "",
+          currentEdge === "Top" && !hide ? styles.edgeZoneHover : "",
         ].join(" ")}
         id={`${id}-split-top`}
         data={{
@@ -226,7 +236,7 @@ function DroppableTargets({
         className={[
           styles.edgeZone,
           styles.edgeZoneBottom,
-          currentEdge === "Bottom" ? styles.edgeZoneHover : "",
+          currentEdge === "Bottom" && !hide ? styles.edgeZoneHover : "",
         ].join(" ")}
         id={`${id}-split-bottom`}
         data={{
