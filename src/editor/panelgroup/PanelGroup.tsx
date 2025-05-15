@@ -84,20 +84,42 @@ function PanelGroup({
   };
 
   function getFrSizes() {
-    if (draggingIndex === null || !draggingDelta)
-      return _sizes.map((size) => `${size}fr`).join(" ");
-
     const XorY = direction === "row" ? "x" : "y";
+    const maxDelta = {
+      x: 32,
+      y: 32,
+    };
 
+    // if we're not dragging, return the sizes as fr
+    // we multiply by a constant because values under 1 might not fill the container
+    // and multiplying proportionally has otherwise no effect on the size
+    if (draggingIndex === null || !draggingDelta)
+      return _sizes
+        .map((size) => `minmax(${maxDelta[XorY]}px, ${100 * size}fr)`)
+        .join(" ");
+
+    // we adjust the drag delta so that the panels can't get too small
+    const firstPanelSize = pixelSizes[draggingIndex] + draggingDelta[XorY];
+    const firstPanelDifference =
+      firstPanelSize < maxDelta[XorY] ? firstPanelSize - maxDelta[XorY] : 0;
+
+    const secondPanelSize = pixelSizes[draggingIndex + 1] - draggingDelta[XorY];
+    const secondPanelDifference =
+      secondPanelSize < maxDelta[XorY] ? secondPanelSize - maxDelta[XorY] : 0;
+
+    draggingDelta[XorY] =
+      draggingDelta[XorY] - firstPanelDifference + secondPanelDifference;
+
+    // when dragging, we return the sizes as px which are easier to work with
     return pixelSizes
       .map((size, index) => {
         if (index === draggingIndex) {
-          return `${size + draggingDelta[XorY]}px`;
+          return `minmax(${maxDelta[XorY]}px, ${size + draggingDelta[XorY]}px)`;
         }
         if (index === draggingIndex + 1) {
-          return `${size - draggingDelta[XorY]}px`;
+          return `minmax(${maxDelta[XorY]}px, ${size - draggingDelta[XorY]}px)`;
         }
-        return `${size}px`;
+        return `minmax(${maxDelta[XorY]}px, ${size}px)`;
       })
       .join(" ");
   }
