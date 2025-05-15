@@ -1,6 +1,6 @@
 import createReducer from "./utils/createReducer";
 import { ParsedNode, PanelNode, WindowNode } from "./serializeLayout";
-import { current } from "immer";
+// import { current } from "immer";
 import { arrayMove } from "@dnd-kit/sortable";
 
 type State = PanelNode & {
@@ -168,22 +168,12 @@ const appReducer = createReducer<State, Action>({
       orientation,
     }: SplitWindowAction
   ) => {
-    const sourceWindow = getNodeFromAddress(
-      state,
-      sourceWindowAddress
-    ) as WindowNode;
-
-    const targetWindow = getNodeFromAddress(
-      state,
-      targetWindowAddress
-    ) as WindowNode;
-
-    const targetPanel = getNodeFromAddress(
-      state,
-      targetWindowAddress.slice(0, -1)
-    ) as PanelNode;
-
-    const targetWindowIndex = targetWindowAddress.slice(-1)[0];
+    const [sourceWindow, targetWindow, targetPanel, targetWindowIndex] = [
+      getNodeFromAddress(state, sourceWindowAddress) as WindowNode,
+      getNodeFromAddress(state, targetWindowAddress) as WindowNode,
+      getNodeFromAddress(state, targetWindowAddress.slice(0, -1)) as PanelNode,
+      targetWindowAddress.slice(-1)[0],
+    ];
 
     // if the source window is the same as the target window and the source window has only one tab, we don't need to do anything
     if (sourceWindow === targetWindow && sourceWindow.children.length === 1) {
