@@ -157,7 +157,6 @@ function SortableTabs({ tabs, id, selected, address }: SortableTabsProps) {
             address,
           }}
           style={{
-            flexShrink: 0,
             display: "flex",
             minWidth: 0,
             flexShrink: 1,
