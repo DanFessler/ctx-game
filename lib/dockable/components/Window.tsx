@@ -1,6 +1,5 @@
 import colors from "../../../src/editor/colors";
-import styles from "./TabView.module.css";
-import SortableItem from "./SortableItem";
+import styles from "./Window.module.css";
 import Droppable from "../../../src/editor/components/Droppable";
 import Tab from "./Tab";
 import {
@@ -8,16 +7,15 @@ import {
   horizontalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { useDndContext } from "@dnd-kit/core";
-import { useDockable } from "../DockableContext";
+import { useDockable } from "../store";
 export type tabObject = {
   id: string;
   name: string;
   content: React.ReactNode;
   renderTabs?: boolean;
 };
-// import { TiThMenu } from "react-icons/ti";
-// import { IoMenu as TiThMenu } from "react-icons/io5";
-import { HiDotsVertical as TiThMenu } from "react-icons/hi";
+
+// import { HiDotsVertical } from "react-icons/hi";
 
 export type tabGroupObject = tabObject[];
 
@@ -45,6 +43,7 @@ function TabView({
   address,
 }: TabViewProps) {
   const { active, over } = useDndContext();
+  const { dispatch } = useDockable();
 
   const isSameWindow = isSame(
     active?.data?.current?.address,
@@ -87,14 +86,30 @@ function TabView({
             background: colors.background,
           }}
         >
-          <SortableTabs
-            tabs={tabs}
-            id={id}
-            selected={selected}
-            address={address}
-          />
+          <SortableContext
+            items={tabs.map((tab) => tab.id)}
+            strategy={horizontalListSortingStrategy}
+          >
+            {tabs.map((tab) => (
+              <Tab
+                key={tab.id}
+                id={tab.id}
+                parentId={id}
+                name={tab.name}
+                selected={tab.id === selected}
+                address={address}
+                onClick={() =>
+                  dispatch({
+                    type: "selectTab",
+                    tabId: tab.id,
+                    address,
+                  })
+                }
+              />
+            ))}
+          </SortableContext>
           <div style={{ flex: 1 }} />
-          <div
+          {/* <div
             style={{
               height: "100%",
               width: "24px",
@@ -107,8 +122,8 @@ function TabView({
               zIndex: 1,
             }}
           >
-            <TiThMenu style={{ width: 14, height: 14 }} />
-          </div>
+            <HiDotsVertical style={{ width: 14, height: 14 }} />
+          </div> */}
         </Droppable>
       )}
 
@@ -131,51 +146,6 @@ function TabView({
         hide={isSameWindow && tabs.length == 1}
       />
     </div>
-  );
-}
-
-type SortableTabsProps = {
-  tabs: tabGroupObject;
-  id: string;
-  selected: string;
-  address: number[];
-};
-function SortableTabs({ tabs, id, selected, address }: SortableTabsProps) {
-  const { dispatch } = useDockable();
-  return (
-    <SortableContext
-      items={tabs.map((tab) => tab.id)}
-      strategy={horizontalListSortingStrategy}
-    >
-      {tabs.map((tab) => (
-        <SortableItem
-          key={tab.id}
-          id={tab.id}
-          data={{
-            type: "tab",
-            parentId: id,
-            address,
-          }}
-          style={{
-            display: "flex",
-            minWidth: 0,
-            flexShrink: 1,
-          }}
-        >
-          <Tab
-            name={tab.name}
-            selected={tab.id === selected}
-            onClick={() =>
-              dispatch({
-                type: "selectTab",
-                tabId: tab.id,
-                address,
-              })
-            }
-          />
-        </SortableItem>
-      ))}
-    </SortableContext>
   );
 }
 

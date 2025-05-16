@@ -1,10 +1,10 @@
-import TabView from "./TabView";
+import TabView from "./Window";
 import PanelGroup from "../../panelgroup/PanelGroup";
 import React from "react";
 import { LayoutNode, PanelNode, WindowNode } from "../utils/serializeLayout";
-import { useDockable } from "../DockableContext";
-import DroppableDivider from "../../../src/editor/components/DroppableDivider";
-// import styles from "./PanelView.module.css";
+import { useDockable } from "../store";
+import DroppableDivider from "../dndkit/DroppableDivider";
+import styles from "./Panel.module.css";
 
 type PanelProps = {
   orientation: "row" | "column";
@@ -45,7 +45,7 @@ function PanelView({
         gap={gap}
         sizes={sizes}
         onResizeEnd={handleResizeEnd}
-        // handleClassName={styles.handle}
+        handleClassName={styles.handle}
         handleComponent={(index: number) => (
           <DroppableDivider address={address} index={index} />
         )}

@@ -1,5 +1,5 @@
 import React from "react";
-import { Panel, Window, View } from "../Dockable";
+import { Panel, Window, View } from "..";
 
 export type ParsedNode = LayoutNode;
 
@@ -23,7 +23,7 @@ export type PanelNode = {
 
 export type LayoutNode = PanelNode | WindowNode;
 
-import type { PanelProps, WindowProps, ViewProps } from "../Dockable";
+import type { PanelProps, WindowProps, ViewProps } from "..";
 
 let idNonce = 0;
 

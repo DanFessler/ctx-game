@@ -72,8 +72,8 @@ function PanelHandle({
       className={className}
       style={{
         position: "absolute",
-        zIndex: 1000,
-        backgroundColor: "transparent",
+        zIndex: 10,
+        // backgroundColor: "transparent",
         transition: "background-color 0.1s ease-in-out",
         borderRadius: 2,
         overflow: "hidden",

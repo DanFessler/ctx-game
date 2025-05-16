@@ -10,12 +10,12 @@ type DockableContextType = {
   dispatch: React.Dispatch<any>;
 };
 
-export const DockableContext = createContext<DockableContextType | undefined>(
+export const StoreContext = createContext<DockableContextType | undefined>(
   undefined
 );
 
 export function useDockable() {
-  const context = useContext(DockableContext);
+  const context = useContext(StoreContext);
   if (context === undefined) {
     throw new Error("useDockable must be used within a DockableProvider");
   }

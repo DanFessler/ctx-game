@@ -1,5 +1,5 @@
 import { useState } from "react";
-import Dockable, { useDockableLocalStorage } from "../../lib/dockable/Dockable";
+import Dockable, { useDockableLocalStorage } from "../../lib/dockable";
 
 // Game engine related imports
 import GameObject from "../engine/GameObject";

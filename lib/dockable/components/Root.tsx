@@ -1,8 +1,8 @@
 import React, { useReducer, useEffect, useState } from "react";
-import PanelView from "./components/PanelView";
-import appReducer from "./reducer";
-import serializeLayout, { ParsedNode } from "./utils/serializeLayout";
-import colors from "../../src/editor/colors";
+import PanelView from "../components/Panel";
+import appReducer from "../reducer";
+import serializeLayout, { ParsedNode } from "../utils/serializeLayout";
+import colors from "../../../src/editor/colors";
 import {
   DndContext,
   useSensor,
@@ -15,16 +15,17 @@ import type {
   DragEndEvent,
   DragOverEvent,
 } from "@dnd-kit/core";
-import { DockableContext } from "./DockableContext";
-import { dockableCollision } from "./utils/dockableCollision";
-import DroppableDivider from "../../src/editor/components/DroppableDivider";
-import Droppable from "../../src/editor/components/Droppable";
+import { StoreContext } from "../store";
+import { dockableCollision } from "../dndkit/dockableCollision";
+import DroppableDivider from "../dndkit/DroppableDivider";
+import Droppable from "../../../src/editor/components/Droppable";
 import {
   MoveTabAction,
   ReorderTabsAction,
   SplitWindowAction,
   InsertPanelAction,
-} from "./reducer";
+} from "../reducer";
+import { ViewProps } from "..";
 
 type DockableProps = {
   orientation?: "row" | "column";
@@ -246,7 +247,7 @@ export function Dockable({
   }
 
   return (
-    <DockableContext.Provider value={{ state, dispatch }}>
+    <StoreContext.Provider value={{ state, dispatch }}>
       <div
         style={{
           width: "100%",
@@ -292,60 +293,6 @@ export function Dockable({
           {renderEdgeDroppables()}
         </DndContext>
       </div>
-    </DockableContext.Provider>
+    </StoreContext.Provider>
   );
 }
-
-export function useDockableLocalStorage(version: number) {
-  const savedLayout = localStorage.getItem("layout");
-  const parsedLayout = savedLayout ? JSON.parse(savedLayout) : undefined;
-  const [layout, setLayout] = useState<ParsedNode[]>(
-    parsedLayout && parsedLayout.version === version
-      ? parsedLayout.layout
-      : undefined
-  );
-
-  useEffect(() => {
-    localStorage.setItem(
-      "layout",
-      JSON.stringify({ version: version, layout: layout })
-    );
-  }, [layout]);
-
-  return { layout, setLayout };
-}
-
-export type WindowProps = {
-  children: React.ReactNode;
-  size?: number;
-  selected?: number;
-};
-export function Window(props: WindowProps) {
-  return props.children;
-}
-
-export type ViewProps = {
-  id: string;
-  name: string;
-  children: React.ReactNode;
-};
-export function View(props: ViewProps) {
-  return props.children;
-}
-
-export type PanelProps = {
-  orientation?: "row" | "column";
-  size?: number;
-  children: React.ReactNode;
-};
-
-export function Panel(props: PanelProps) {
-  return props.children;
-}
-
-export default {
-  Root: Dockable,
-  Panel,
-  Window,
-  View,
-};

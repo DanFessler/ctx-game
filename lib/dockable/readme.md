@@ -2,13 +2,16 @@
 
 ## publish to github
 
-- fix the tab reorder transition bug
-- context menu button
-- theming api
+- remove dependency on index.css styles
+- remove context menu (for now)
+- readme documentation
+- free license
 
 ## official launch
 
 - website
+  - static build with react router
+  - automatic deployment
   - marketing page
     - beautiful dockable interfaces
     - simple declarative api
@@ -16,10 +19,12 @@
   - documentation
   - demos / examples
 - publish to npm
+  - auto releases?
+- theming api
+  - remove opinionated styles from default
+  - surface classname interface
+  - clean up css variable names
 - commercial license
-
-## unsorted
-
 - imperative api
   - add
   - remove
@@ -30,6 +35,7 @@
   - resize
   - load layout
   - save layout
+  - reset layout
 - floating windows
   - overlay mode
   - popout mode
@@ -37,5 +43,18 @@
   - maximize windows
   - closable tabs
   - add tabs
+
+## unsorted
+
 - super cascading panelgroup resizing
-- BUG: weird sizing sometimes when redocking
+- right click handler on tab
+- double click to maximize/minimize
+
+## bugs
+
+- fix the tab reorder transition bug
+- weird sizing sometimes when redocking
+- cascading panel resizing issues when pushed against edge
+- top and bottom window edge dropzones should have different collision strategy
+- panel minsize should consider the minsize of its children
+- when drag-resizing beyond the bottom or right edges, dragging abruptly cancels
