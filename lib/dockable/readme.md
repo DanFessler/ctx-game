@@ -8,15 +8,34 @@
 
 ## official launch
 
-- publish to npm
-- documentation
 - website
+  - marketing page
+    - beautiful dockable interfaces
+    - simple declarative api
+    - customizable themes
+  - documentation
+  - demos / examples
+- publish to npm
 - commercial license
 
-## later
+## unsorted
 
-- cascading panelgroup resizing
 - imperative api
-- BUG: weird sizing sometimes when redocking
-- closable tabs
+  - add
+  - remove
+  - maximize
+  - minimize
+  - move
+  - popout
+  - resize
+  - load layout
+  - save layout
 - floating windows
+  - overlay mode
+  - popout mode
+- context menu
+  - maximize windows
+  - closable tabs
+  - add tabs
+- super cascading panelgroup resizing
+- BUG: weird sizing sometimes when redocking

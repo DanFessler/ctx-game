@@ -22,11 +22,6 @@ function PanelHandle({
     e.stopPropagation();
     onDragStart?.();
 
-    const dragStart = {
-      x: e.clientX,
-      y: e.clientY,
-    };
-
     // set cursor
     document.body.style.cursor =
       direction === "row" ? "col-resize" : "row-resize";
@@ -35,8 +30,8 @@ function PanelHandle({
       e.preventDefault();
       e.stopPropagation();
       onDrag?.({
-        x: e.clientX - dragStart.x,
-        y: e.clientY - dragStart.y,
+        x: e.movementX,
+        y: e.movementY,
       });
     };
 

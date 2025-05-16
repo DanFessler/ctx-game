@@ -34,10 +34,10 @@ function PanelGroup({
     sizes || Array.from({ length: React.Children.count(children) }, () => 1)
   );
   const [draggingIndex, setDraggingIndex] = useState<number | null>(null);
-  const [draggingDelta, setDraggingDelta] = useState<{
-    x: number;
-    y: number;
-  } | null>(null);
+  // const [draggingDelta, setDraggingDelta] = useState<{
+  //   x: number;
+  //   y: number;
+  // } | null>(null);
 
   const getBoundingRectSizes = useCallback(() => {
     return panelRefs.current
@@ -70,8 +70,15 @@ function PanelGroup({
     _setSizes(sizes || Array.from({ length: childrenCount }, () => 1));
   }, [sizes, childrenCount]);
 
-  const handleDrag = (delta: { x: number; y: number }) => {
-    setDraggingDelta(delta);
+  const handleDrag = (delta: { x: number; y: number }, index: number) => {
+    setPixelSizes((sizes) => {
+      return getPanelDraggingSizes(
+        index,
+        delta[orientation === "row" ? "x" : "y"],
+        sizes,
+        minSize[orientation === "row" ? "x" : "y"]
+      );
+    });
   };
 
   const handleDragStart = (index: number) => {
@@ -81,7 +88,6 @@ function PanelGroup({
 
   const handleDragEnd = () => {
     setDraggingIndex(null);
-    setDraggingDelta(null);
     const newSizes = calcNewSizes();
     _setSizes(newSizes);
     onResizeEnd?.(newSizes);
@@ -93,21 +99,23 @@ function PanelGroup({
     // if we're not dragging, return the sizes as fr
     // we multiply by a constant because values under 1 might not fill the container
     // and multiplying proportionally has otherwise no effect on the size
-    if (draggingIndex === null || !draggingDelta) {
+    if (draggingIndex === null) {
       return _sizes
         .map((size) => `minmax(${minSize[xy]}px, ${100 * size}fr)`)
         .join(" ");
     }
 
     // otherwise, we're dragging, so we return the sizes as px which are easier to work with
-    const sizes = getPanelDraggingSizes(
-      draggingIndex,
-      draggingDelta[xy],
-      pixelSizes,
-      minSize[xy]
-    );
+    // const sizes = getPanelDraggingSizes(
+    //   draggingIndex,
+    //   draggingDelta[xy],
+    //   pixelSizes,
+    //   minSize[xy]
+    // );
 
-    return sizes.map((size) => `minmax(${minSize[xy]}px, ${size}px)`).join(" ");
+    return pixelSizes
+      .map((size) => `minmax(${minSize[xy]}px, ${size}px)`)
+      .join(" ");
   }
 
   function getPanelDraggingSizes(
@@ -116,6 +124,7 @@ function PanelGroup({
     sizes: number[],
     minSize: number
   ) {
+    if (index < 0 || index >= sizes.length) return sizes;
     const newSizes = [...sizes];
 
     // update the sizes with the drag delta
@@ -158,7 +167,7 @@ function PanelGroup({
             panelRefs.current[index] = el;
           }}
           direction={orientation}
-          onDrag={(delta) => handleDrag(delta)}
+          onDrag={(delta) => handleDrag(delta, index)}
           onDragStart={() => handleDragStart(index)}
           onDragEnd={() => handleDragEnd()}
           gap={gap}

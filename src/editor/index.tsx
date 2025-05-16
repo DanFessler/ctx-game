@@ -14,7 +14,7 @@ function App() {
   const [selectedGameObject, setSelectedGameObject] =
     useState<GameObject | null>(game.gameObjects[0]);
 
-  const { layout, setLayout } = useDockableLocalStorage(1);
+  const { layout, setLayout } = useDockableLocalStorage(2);
   // console.log("layout", JSON.stringify(layout, null, 2));
 
   return (
