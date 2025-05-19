@@ -1,5 +1,4 @@
 import styles from "./Hierarchy.module.css";
-import colors from "../colors";
 import { FaSearch } from "react-icons/fa";
 import HierarchyList from "../components/HierarchyList";
 import GameObject from "../../engine/GameObject";
@@ -17,12 +16,7 @@ function SceneHierarchy({
 }: SceneHierarchyProps) {
   return (
     <div className={styles.container}>
-      <div
-        className={styles.header}
-        style={{
-          background: colors.headers,
-        }}
-      >
+      <div className={styles.header}>
         <div className={styles.searchContainer}>
           <FaSearch className={styles.searchIcon} />
           <input

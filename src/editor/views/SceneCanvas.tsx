@@ -37,7 +37,7 @@ function SceneCanvas() {
       <div
         ref={canvasContainer}
         className={styles.canvasContainer}
-        style={{ background: colors.document }}
+        style={{ background: "var(--dockable-colors-document)" }}
       />
     </div>
   );

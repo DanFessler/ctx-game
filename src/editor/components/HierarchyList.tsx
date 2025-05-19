@@ -61,7 +61,9 @@ function HierarchyItem({
         className={styles.item}
         style={{
           background:
-            selectedGameObject === gameObject ? colors.selected : "transparent",
+            selectedGameObject === gameObject
+              ? "var(--dockable-colors-selected)"
+              : "transparent",
         }}
         onClick={() => setSelectedGameObject(gameObject)}
       >

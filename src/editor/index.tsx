@@ -1,5 +1,6 @@
 import { useState } from "react";
-import Dockable, { useDockableLocalStorage } from "../../lib/dockable";
+import { Dockable, useDockableLocalStorage } from "@danfessler/react-dockable";
+import "@danfessler/react-dockable/style.css";
 
 // Game engine related imports
 import GameObject from "../engine/GameObject";
@@ -18,43 +19,49 @@ function App() {
   // console.log("layout", JSON.stringify(layout, null, 2));
 
   return (
-    <Dockable.Root panels={layout} onChange={setLayout} gap={3} radius={4}>
+    <Dockable.Root
+      layout={layout}
+      onChange={setLayout}
+      gap={3}
+      radius={4}
+      theme="dark"
+    >
       <Dockable.Panel>
         <Dockable.Window>
-          <Dockable.View id="hierarchy" name="Hierarchy">
+          <Dockable.Tab id="hierarchy" name="Hierarchy">
             <SceneHierarchy
               gameObjects={game.gameObjects}
               setSelectedGameObject={setSelectedGameObject}
               selectedGameObject={selectedGameObject}
             />
-          </Dockable.View>
+          </Dockable.Tab>
         </Dockable.Window>
       </Dockable.Panel>
       <Dockable.Panel size={3}>
         <Dockable.Window size={3}>
-          <Dockable.View id="scene1" name="Scene">
+          <Dockable.Tab id="scene1" name="Scene">
             <SceneCanvas />
-          </Dockable.View>
+          </Dockable.Tab>
         </Dockable.Window>
         <Dockable.Window>
-          <Dockable.View id="assets" name="Assets">
+          <Dockable.Tab id="assets" name="Assets">
             <div></div>
-          </Dockable.View>
+          </Dockable.Tab>
         </Dockable.Window>
       </Dockable.Panel>
       <Dockable.Panel>
         <Dockable.Window>
-          <Dockable.View id="inspector" name="Inspector">
+          <Dockable.Tab id="inspector" name="Inspector">
             <Inspector gameObject={selectedGameObject!} />
-          </Dockable.View>
-          <Dockable.View id="inspector2" name="Inspector">
+          </Dockable.Tab>
+          <Dockable.Tab id="inspector2" name="Inspector">
             <Inspector gameObject={selectedGameObject!} />
-          </Dockable.View>
+          </Dockable.Tab>
         </Dockable.Window>
         <Dockable.Window>
-          <Dockable.View id="inspector3" name="Inspector">
+          <Dockable.Tab id="inspector3" name="Inspector">
             <Inspector gameObject={selectedGameObject!} />
-          </Dockable.View>
+          </Dockable.Tab>
         </Dockable.Window>
       </Dockable.Panel>
     </Dockable.Root>

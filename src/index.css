@@ -84,9 +84,9 @@ input {
   width: 0;
   min-width: 16px;
   border: none;
-  background: var(--input);
+  background: var(--dockable-colors-input);
   box-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.2) inset;
-  color: var(--inputText);
+  color: var(--dockable-colors-inputText);
   padding: 4px;
   border-radius: 4px;
   box-sizing: border-box;
@@ -95,7 +95,7 @@ input {
 
 textarea:focus,
 input:focus {
-  outline: 2px solid var(--selected);
+  outline: 2px solid var(--dockable-colors-selected);
 }
 
 input[type="checkbox"] {

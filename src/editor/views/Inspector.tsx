@@ -21,7 +21,6 @@ import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 
 import GameObject from "../../engine/GameObject";
 import Behavior from "../../engine/Behavior";
-import colors from "../colors";
 import { PiBoundingBoxFill } from "react-icons/pi";
 import { FaCode } from "react-icons/fa";
 import SortableItem from "../components/SortableItem";
@@ -35,13 +34,7 @@ function Inspector({ gameObject }: { gameObject: GameObject }) {
 
   return (
     <div className={styles.inspector}>
-      <div
-        className={styles.header}
-        style={{
-          // borderBottom: `1px solid ${colors.border}`,
-          background: colors.headers,
-        }}
-      >
+      <div className={styles.header}>
         <input
           type="checkbox"
           checked={gameObject.isActive}
@@ -67,7 +60,6 @@ function Inspector({ gameObject }: { gameObject: GameObject }) {
         style={{
           overflow: "auto",
           flex: 1,
-          // background: colors.content,
         }}
       >
         <SortableBehaviors
@@ -233,9 +225,7 @@ function InspectorBehavior({
     <div
       className={styles.behaviorContainer}
       style={{
-        // borderBottom: isLast ? "none" : `1px solid ${colors.border}`,
-        boxShadow: `0 -1px 0 ${colors.border}`,
-        // background: !isDragging ? colors.headers : colors.content,
+        boxShadow: `0 -1px 0 rgba(0, 0, 0, 0.1)`,
       }}
     >
       <div
@@ -263,10 +253,7 @@ function InspectorBehavior({
         {/* <TiThMenu style={{ minWidth: 14, minHeight: 14 }} /> */}
       </div>
       {!isCollapsed ? (
-        <div
-          className={styles.behaviorContent}
-          // style={{ background: colors.content }}
-        >
+        <div className={styles.behaviorContent}>
           <behavior.inspector
             refresh={() => {
               behavior.gameObject!.updateSubscribers();
