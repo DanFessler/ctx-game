@@ -1,11 +1,24 @@
 import Game from "./Game";
 import Behavior from "./Behavior";
 import { Transform } from "./behaviors/Transform";
+import { nanoid } from "nanoid";
 
 type GameObjectProps = {
   behaviors?: Behavior[];
   children?: GameObject[];
   name?: string;
+};
+
+type SerializedGameObject = {
+  name: string;
+  id: string;
+  behaviors: SerializedBehavior[];
+  children: SerializedGameObject[];
+};
+
+type SerializedBehavior = {
+  name: string;
+  properties: Record<string, any>;
 };
 
 export class GameObject {
@@ -15,6 +28,7 @@ export class GameObject {
   parent: GameObject | undefined;
   name: string;
   isActive: boolean = true;
+  id: string;
 
   private subscribers = new Set<() => void>();
 
@@ -29,6 +43,7 @@ export class GameObject {
 
   constructor({ behaviors, children, name }: GameObjectProps) {
     this.name = name || this.constructor.name;
+    this.id = nanoid();
 
     if (behaviors) {
       // Map behaviors to their constructor name
@@ -40,6 +55,7 @@ export class GameObject {
       // add default transform if not present
       // make sure it's the first behavior
       if (!this.behaviors.Transform) {
+        console.log("ADDING TRANSFORM");
         this.behaviors = {
           Transform: new Transform(0, 0, 0, 0),
           ...this.behaviors,
@@ -50,6 +66,10 @@ export class GameObject {
       Object.values(this.behaviors).forEach((behavior) => {
         behavior.gameObject = this;
       });
+    } else {
+      this.behaviors = {
+        Transform: new Transform(0, 0, 0, 0),
+      };
     }
 
     if (children) {
@@ -60,10 +80,24 @@ export class GameObject {
     }
   }
 
+  serialize(): SerializedGameObject {
+    return {
+      name: this.name,
+      id: this.id,
+      behaviors: Object.values(this.behaviors).map((behavior) =>
+        behavior.serialize()
+      ),
+      children: this.children.map((child) => child.serialize()),
+    };
+  }
+
   start() {
     Object.values(this.behaviors).forEach((behavior) => {
       behavior.ctx = Game.instance?.ctx;
       behavior.start?.();
+    });
+    this.children.forEach((child) => {
+      child.start();
     });
   }
 

@@ -17,7 +17,7 @@ export class Rectangle extends Behavior {
     const transform = this.gameObject!.behaviors.Transform as Transform;
 
     switch (renderPass) {
-      case "Editor":
+      case "editor":
         ctx.strokeStyle = "rgb(0,255,0)";
         ctx.strokeRect(0, 0, transform.scale.x, transform.scale.y);
         break;

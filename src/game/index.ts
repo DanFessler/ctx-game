@@ -2,6 +2,7 @@ import Game from "../engine/Game";
 import PlayerCamera from "./objects/PlayerCamera";
 import RedRectangle from "./objects/RedRectangle";
 import TileMap from "./objects/TileMap";
+import { parse, stringify } from "yaml";
 
 let game: Game;
 if (!Game.instance) {
@@ -14,5 +15,267 @@ if (!Game.instance) {
 } else {
   game = Game.instance;
 }
+
+const serialized = game.serialize();
+console.log("SERIALIZED", JSON.stringify(serialized, null, 2));
+
+const result = {
+  name: "Scene",
+  id: "_Bd1dcpw4rt3SxTkkafPb",
+  behaviors: [
+    {
+      name: "Transform",
+      id: "5tHecl2hg_zt1NFuzBodk",
+      properties: {
+        position: {
+          value: {
+            x: 0,
+            y: 0,
+          },
+          type: "vector2",
+        },
+        scale: {
+          value: {
+            x: 0,
+            y: 0,
+          },
+          type: "vector2",
+        },
+        origin: {
+          value: {
+            x: 0,
+            y: 0,
+          },
+          type: "vector2",
+        },
+        rotation: {
+          value: 0,
+          type: "number",
+        },
+      },
+    },
+  ],
+  children: [
+    {
+      name: "TileMap",
+      id: "4XYk6jnEA7BZ4xSj3_lvo",
+      behaviors: [
+        {
+          name: "Transform",
+          id: "WV-BSQbeNEfoXbsFHfeK8",
+          properties: {
+            position: {
+              value: {
+                x: 0,
+                y: 0,
+              },
+              type: "vector2",
+            },
+            scale: {
+              value: {
+                x: 0,
+                y: 0,
+              },
+              type: "vector2",
+            },
+            origin: {
+              value: {
+                x: 0,
+                y: 0,
+              },
+              type: "vector2",
+            },
+            rotation: {
+              value: 0,
+              type: "number",
+            },
+          },
+        },
+        {
+          name: "TileMapBehavior",
+          id: "ZoKk6zA6U64ZEkufNAVWK",
+          properties: {
+            tileSize: {
+              value: 1,
+              type: "number",
+            },
+          },
+        },
+        {
+          name: "WorldGridBehavior",
+          id: "ZMdEnJgmuXktxenJU1xC_",
+          properties: {},
+        },
+      ],
+      children: [],
+    },
+    {
+      name: "RedRectangle",
+      id: "Zwj-VWd0ei85tWL40Czit",
+      behaviors: [
+        {
+          name: "Transform",
+          id: "ZIcgRpyGjToPsXfZAEoHT",
+          properties: {
+            position: {
+              value: {
+                x: 0,
+                y: 0,
+              },
+              type: "vector2",
+            },
+            scale: {
+              value: {
+                x: 3,
+                y: 3,
+              },
+              type: "vector2",
+            },
+            origin: {
+              value: {
+                x: 1.5,
+                y: 1.5,
+              },
+              type: "vector2",
+            },
+            rotation: {
+              value: 0,
+              type: "number",
+            },
+          },
+        },
+        {
+          name: "Rectangle",
+          id: "yl89icaP-tyNZlVG7QoS2",
+          properties: {
+            color: {
+              value: "#ff0000",
+              type: "color",
+            },
+          },
+        },
+        {
+          name: "RedRectangleBehavior",
+          id: "LzZVLoZl7CpiPkR0gWHUb",
+          properties: {},
+        },
+      ],
+      children: [
+        {
+          name: "Blue Rectangle",
+          id: "7avpcC3TQDGI29k47NG0j",
+          behaviors: [
+            {
+              name: "Transform",
+              id: "RrHcbeirJrXLfNEuse-EO",
+              properties: {
+                position: {
+                  value: {
+                    x: 0,
+                    y: 0,
+                  },
+                  type: "vector2",
+                },
+                scale: {
+                  value: {
+                    x: 1,
+                    y: 1,
+                  },
+                  type: "vector2",
+                },
+                origin: {
+                  value: {
+                    x: 0.5,
+                    y: 0.5,
+                  },
+                  type: "vector2",
+                },
+                rotation: {
+                  value: 0,
+                  type: "number",
+                },
+              },
+            },
+            {
+              name: "Rectangle",
+              id: "NNdxli8rh5PJnrmSKAkQQ",
+              properties: {
+                color: {
+                  value: "#0000ff",
+                  type: "color",
+                },
+              },
+            },
+          ],
+          children: [],
+        },
+      ],
+    },
+    {
+      name: "PlayerCamera",
+      id: "qZW97B5k9moC1OW69-kmq",
+      behaviors: [
+        {
+          name: "Transform",
+          id: "HBDsS2wCV5FfkYHQ-cQ1U",
+          properties: {
+            position: {
+              value: {
+                x: 0,
+                y: 0,
+              },
+              type: "vector2",
+            },
+            scale: {
+              value: {
+                x: 0,
+                y: 0,
+              },
+              type: "vector2",
+            },
+            origin: {
+              value: {
+                x: 0,
+                y: 0,
+              },
+              type: "vector2",
+            },
+            rotation: {
+              value: 0,
+              type: "number",
+            },
+          },
+        },
+        {
+          name: "Camera",
+          id: "M0dxtBs1yFVJ2_g83NWL7",
+          properties: {},
+        },
+        {
+          name: "CameraController",
+          id: "zSpeqiImKiJ9w1xSPFwwg",
+          properties: {
+            acceleration: {
+              value: 2,
+              type: "number",
+            },
+            maxSpeed: {
+              value: 5,
+              type: "number",
+            },
+            friction: {
+              value: 0.9,
+              type: "number",
+            },
+          },
+        },
+      ],
+      children: [],
+    },
+  ],
+};
+
+const yaml = stringify(result);
+console.log("YAML", yaml);
 
 export default game;

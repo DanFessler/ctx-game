@@ -1,25 +1,24 @@
 import { useState } from "react";
 import GameObject from "../../engine/GameObject";
-import colors from "../colors";
 import styles from "./HierarchyList.module.css";
 import { PiBoundingBoxFill } from "react-icons/pi";
 
 function HierarchyList({
-  gameObjects,
+  gameObject,
   setSelectedGameObject,
   selectedGameObject,
 }: {
-  gameObjects: GameObject[];
+  gameObject: GameObject;
   setSelectedGameObject: (gameObject: GameObject) => void;
   selectedGameObject: GameObject | null;
 }) {
   return (
     <ul className={styles.list}>
-      {gameObjects.map((gameObject) => {
+      {gameObject.children.map((child) => {
         return (
           <HierarchyItem
-            key={gameObject.name}
-            gameObject={gameObject}
+            key={child.name}
+            gameObject={child}
             setSelectedGameObject={setSelectedGameObject}
             selectedGameObject={selectedGameObject}
           />
@@ -74,7 +73,7 @@ function HierarchyItem({
       {isOpen && hasChildren ? (
         <div className={styles.children}>
           <HierarchyList
-            gameObjects={gameObject.children}
+            gameObject={gameObject}
             setSelectedGameObject={setSelectedGameObject}
             selectedGameObject={selectedGameObject}
           />

@@ -8,6 +8,7 @@ import type { FieldMeta } from "./serializable";
 import NumberInput from "../editor/components/inspector/Number";
 import Vector2Input from "../editor/components/inspector/Vector2";
 import ColorInput from "../editor/components/inspector/Color";
+import { nanoid } from "nanoid";
 
 type Vector2 = {
   x: number;
@@ -20,6 +21,11 @@ abstract class Behavior {
   ctx: CanvasRenderingContext2D | undefined;
   active = true;
   canDisable = true;
+  id: string;
+
+  constructor() {
+    this.id = nanoid();
+  }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any;
@@ -28,6 +34,17 @@ abstract class Behavior {
   update?(deltaTime: number): void;
   draw?(ctx: CanvasRenderingContext2D, renderPass?: string): void;
   drawEditor?(ctx: CanvasRenderingContext2D): void;
+
+  serialize() {
+    return {
+      name: this.constructor.name,
+      id: nanoid(),
+      properties: getSerializableFields(this).reduce((acc, [key, meta]) => {
+        acc[key as string] = { value: this[key as keyof this], ...meta };
+        return acc;
+      }, {} as Record<string, any>),
+    };
+  }
 
   inspector = ({ refresh }: { refresh: () => void }) => {
     const fields = getSerializableFields(this);

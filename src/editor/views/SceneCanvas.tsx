@@ -2,7 +2,6 @@ import { useEffect, useRef } from "react";
 import { FaPlay, FaStop } from "react-icons/fa";
 
 import game from "../../game";
-import colors from "../colors";
 import styles from "./SceneCanvas.module.css";
 function SceneCanvas() {
   const canvasContainer = useRef<HTMLDivElement>(null);

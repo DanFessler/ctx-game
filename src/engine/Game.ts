@@ -7,7 +7,8 @@ class Game {
 
   canvas: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
-  gameObjects: GameObject[] = [];
+  // gameObjects: GameObject[] = [];
+  scene: GameObject;
   turnIndex = 0;
   camera: GameObject | undefined;
   lastTime: number = 0;
@@ -24,6 +25,8 @@ class Game {
     if (Game.instance) {
       throw new Error("Game already exists");
     }
+
+    this.scene = new GameObject({ name: "Scene" });
 
     this.scale = scale;
     this.canvas = document.createElement("canvas");
@@ -47,12 +50,14 @@ class Game {
 
   init() {}
 
+  serialize() {
+    return this.scene?.serialize();
+  }
+
   start() {
     // this.isPlaying = true;
     this.init();
-    this.gameObjects.forEach((gameObject) => {
-      gameObject.start();
-    });
+    this.scene.start();
     this.lastTime = performance.now();
     this.tick();
   }
@@ -85,15 +90,11 @@ class Game {
       console.log("Camera set to", gameObject);
     }
 
-    this.gameObjects.push(gameObject);
+    this.scene.addChild(gameObject);
   }
 
   update(deltaTime: number) {
-    this.gameObjects.forEach((gameObject) => {
-      if (gameObject.isActive) {
-        gameObject.update(deltaTime);
-      }
-    });
+    this.scene.update(deltaTime);
   }
 
   draw() {
@@ -131,16 +132,8 @@ class Game {
         -cameraTransform.position.y + this.canvas.height / this.PPU / 2
       );
     }
-    this.gameObjects.forEach((gameObject) => {
-      if (gameObject.isActive) {
-        gameObject.draw("default");
-      }
-    });
-    this.gameObjects.forEach((gameObject) => {
-      if (gameObject.isActive) {
-        gameObject.draw("Editor");
-      }
-    });
+    this.scene.draw("default");
+    this.scene.draw("editor");
     this.ctx.restore();
   }
 

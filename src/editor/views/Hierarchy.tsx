@@ -4,13 +4,13 @@ import HierarchyList from "../components/HierarchyList";
 import GameObject from "../../engine/GameObject";
 
 type SceneHierarchyProps = {
-  gameObjects: GameObject[];
+  gameObject: GameObject;
   setSelectedGameObject: (gameObject: GameObject) => void;
   selectedGameObject: GameObject | null;
 };
 
 function SceneHierarchy({
-  gameObjects,
+  gameObject,
   setSelectedGameObject,
   selectedGameObject,
 }: SceneHierarchyProps) {
@@ -28,7 +28,7 @@ function SceneHierarchy({
       </div>
       <div className={styles.content}>
         <HierarchyList
-          gameObjects={gameObjects}
+          gameObject={gameObject}
           setSelectedGameObject={setSelectedGameObject}
           selectedGameObject={selectedGameObject}
         />
