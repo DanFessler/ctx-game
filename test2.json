@@ -1,0 +1,255 @@
+{
+  "name": "Scene",
+  "id": "vnCs_ljQGGwbl8MwHTDTP",
+  "behaviors": [
+    {
+      "name": "Transform",
+      "id": "zBgw6eWqAEKXbpr5_CQsh",
+      "properties": {
+        "position": {
+          "value": {
+            "x": 0,
+            "y": 0
+          },
+          "type": "vector2"
+        },
+        "scale": {
+          "value": {
+            "x": 0,
+            "y": 0
+          },
+          "type": "vector2"
+        },
+        "origin": {
+          "value": {
+            "x": 0,
+            "y": 0
+          },
+          "type": "vector2"
+        },
+        "rotation": {
+          "value": 0,
+          "type": "number"
+        }
+      }
+    }
+  ],
+  "children": [
+    {
+      "name": "TileMap",
+      "id": "YkejQdtuUmmFx08YiewMo",
+      "behaviors": [
+        {
+          "name": "Transform",
+          "id": "DLYGNKgNeXgzlgvIIaQv2",
+          "properties": {
+            "position": {
+              "value": {
+                "x": 0,
+                "y": 0
+              },
+              "type": "vector2"
+            },
+            "scale": {
+              "value": {
+                "x": 0,
+                "y": 0
+              },
+              "type": "vector2"
+            },
+            "origin": {
+              "value": {
+                "x": 0,
+                "y": 0
+              },
+              "type": "vector2"
+            },
+            "rotation": {
+              "value": 0,
+              "type": "number"
+            }
+          }
+        },
+        {
+          "name": "TileMapBehavior",
+          "id": "WQGuKuye9WeUEES6juVFt",
+          "properties": {
+            "tileSize": {
+              "value": 1,
+              "type": "number"
+            }
+          }
+        },
+        {
+          "name": "WorldGridBehavior",
+          "id": "oBnDdjp4rYTLrp8gDnrwP",
+          "properties": {}
+        }
+      ],
+      "children": []
+    },
+    {
+      "name": "RedRectangle",
+      "id": "RwRjLeq9MXM4mOKTJt_pc",
+      "behaviors": [
+        {
+          "name": "Transform",
+          "id": "mKtOQaAN_hzGIMMvnOgEw",
+          "properties": {
+            "position": {
+              "value": {
+                "x": 0,
+                "y": 0
+              },
+              "type": "vector2"
+            },
+            "scale": {
+              "value": {
+                "x": 3,
+                "y": 3
+              },
+              "type": "vector2"
+            },
+            "origin": {
+              "value": {
+                "x": 1.5,
+                "y": 1.5
+              },
+              "type": "vector2"
+            },
+            "rotation": {
+              "value": 0,
+              "type": "number"
+            }
+          }
+        },
+        {
+          "name": "Rectangle",
+          "id": "-vQYNnoDV02umt27v0wlD",
+          "properties": {
+            "color": {
+              "value": "#ff0000",
+              "type": "color"
+            }
+          }
+        },
+        {
+          "name": "RedRectangleBehavior",
+          "id": "KWRK6oNud7cvAqCXqLXfm",
+          "properties": {}
+        }
+      ],
+      "children": [
+        {
+          "name": "Blue Rectangle",
+          "id": "iLZ4IsBppmUzQBFWFEeBG",
+          "behaviors": [
+            {
+              "name": "Transform",
+              "id": "UCSAXsumqFBYMyRSM5g9b",
+              "properties": {
+                "position": {
+                  "value": {
+                    "x": 0,
+                    "y": 0
+                  },
+                  "type": "vector2"
+                },
+                "scale": {
+                  "value": {
+                    "x": 1,
+                    "y": 1
+                  },
+                  "type": "vector2"
+                },
+                "origin": {
+                  "value": {
+                    "x": 0.5,
+                    "y": 0.5
+                  },
+                  "type": "vector2"
+                },
+                "rotation": {
+                  "value": 0,
+                  "type": "number"
+                }
+              }
+            },
+            {
+              "name": "Rectangle",
+              "id": "hrChwooanOhTm3PdfmyGw",
+              "properties": {
+                "color": {
+                  "value": "#0000ff",
+                  "type": "color"
+                }
+              }
+            }
+          ],
+          "children": []
+        }
+      ]
+    },
+    {
+      "name": "PlayerCamera",
+      "id": "pPghVFajI1fMZEtr9rrx7",
+      "behaviors": [
+        {
+          "name": "Transform",
+          "id": "MNz123lOjp18pWA48kPEx",
+          "properties": {
+            "position": {
+              "value": {
+                "x": 0,
+                "y": 0
+              },
+              "type": "vector2"
+            },
+            "scale": {
+              "value": {
+                "x": 0,
+                "y": 0
+              },
+              "type": "vector2"
+            },
+            "origin": {
+              "value": {
+                "x": 0,
+                "y": 0
+              },
+              "type": "vector2"
+            },
+            "rotation": {
+              "value": 0,
+              "type": "number"
+            }
+          }
+        },
+        {
+          "name": "Camera",
+          "id": "8YHtKkoc_Dt3hjfEoHmj9",
+          "properties": {}
+        },
+        {
+          "name": "CameraController",
+          "id": "xQZVJ6zSWcC0qJBPZ--Ee",
+          "properties": {
+            "acceleration": {
+              "value": 2,
+              "type": "number"
+            },
+            "maxSpeed": {
+              "value": 5,
+              "type": "number"
+            },
+            "friction": {
+              "value": 0.9,
+              "type": "number"
+            }
+          }
+        }
+      ],
+      "children": []
+    }
+  ]
+}

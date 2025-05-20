@@ -10,6 +10,7 @@ import SceneCanvas from "./views/SceneCanvas";
 import Inspector from "./views/Inspector";
 
 import "./App.css";
+import AssetBrowser from "./views/AssetBrowser";
 
 function App() {
   const [selectedGameObject, setSelectedGameObject] =
@@ -38,7 +39,7 @@ function App() {
           <SceneCanvas />
         </Dockable.Tab>
         <Dockable.Tab id="assets" name="Assets">
-          <div></div>
+          <AssetBrowser />
         </Dockable.Tab>
       </Dockable.Panel>
       <Dockable.Tab id="inspector" name="Inspector">
