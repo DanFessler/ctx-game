@@ -1,3 +1,5 @@
+import Behavior from "./Behavior";
+
 export type FieldMeta = {
   type?: string;
   min?: number;
@@ -20,7 +22,6 @@ export function inspect(meta: FieldMeta = {}): PropertyDecorator {
     // Try to infer type if none provided
     if (!meta.type) {
       const reflected = Reflect.getMetadata("design:type", target, propertyKey);
-
       if (reflected) {
         meta.type = reflected.name.toLowerCase(); // e.g. "number", "string"
       }
@@ -30,12 +31,12 @@ export function inspect(meta: FieldMeta = {}): PropertyDecorator {
   };
 }
 
-export function getSerializableFields<T>(
-  instance: T
-): Record<keyof T, FieldMeta> {
-  const ctor = (instance as any).constructor;
-  const entries = fieldMetadata.get(ctor)?.entries() ?? [];
-  return Object.fromEntries(entries) as Record<keyof T, FieldMeta>;
+export function getSerializableFields<T>(instance: T): [keyof T, FieldMeta][] {
+  const ctor = (instance as Behavior).constructor;
+  return [...(fieldMetadata.get(ctor)?.entries() ?? [])] as [
+    keyof T,
+    FieldMeta
+  ][];
 }
 
 export type SerializedFields<T> = {

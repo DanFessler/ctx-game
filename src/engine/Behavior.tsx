@@ -22,14 +22,14 @@ abstract class Behavior {
   active = true;
   canDisable = true;
   id: string;
-  initialFields?: Record<string, any> = undefined;
+  initialFields?: Record<string, unknown> = undefined;
 
-  constructor(properties?: Record<string, any>) {
+  constructor(properties?: Record<string, unknown>) {
     this.id = nanoid();
     this.initialFields = properties;
   }
 
-  init(properties?: Record<string, any>) {
+  init(properties?: Record<string, unknown>) {
     if (!properties || Object.keys(properties).length === 0) {
       if (this.initialFields) {
         properties = this.initialFields;
@@ -38,7 +38,7 @@ abstract class Behavior {
       }
     }
 
-    const serializedFields = getSerializableFields(this);
+    const serializedFields = Object.fromEntries(getSerializableFields(this));
 
     for (const [key, value] of Object.entries(properties)) {
       if (serializedFields[key]) {
@@ -61,7 +61,10 @@ abstract class Behavior {
     return {
       name: this.constructor.name,
       id: nanoid(),
-      properties: getSerializableFields(this),
+      properties: getSerializableFields(this).reduce((acc, [key, meta]) => {
+        acc[key as string] = { value: this[key as keyof this], ...meta };
+        return acc;
+      }, {} as Record<string, any>),
     };
   }
 
@@ -124,7 +127,7 @@ abstract class Behavior {
           alignItems: "center",
         }}
       >
-        {Object.entries(fields).map(([key, meta]) => {
+        {fields.map(([key, meta]) => {
           const keyString = String(key);
           return (
             <Fragment key={keyString}>

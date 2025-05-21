@@ -1,7 +1,7 @@
 import GameObject from "./GameObject";
 import { Transform } from "./behaviors/Transform";
 import Input from "./Input";
-
+import Behavior from "./Behavior";
 class Game {
   static instance: Game | undefined;
 
@@ -15,7 +15,7 @@ class Game {
   PPU: number = 1;
   scale: number = 4;
   isPlaying = false;
-  behaviors: Record<string, any> = {};
+  behaviors: Record<string, Behavior> = {};
 
   constructor(
     width: number,
@@ -84,8 +84,10 @@ class Game {
     requestAnimationFrame(() => this.tick());
   };
 
-  registerBehaviors(behaviors: Record<string, any>) {
-    for (const behavior of Object.values(behaviors)) {
+  registerBehaviors(behaviors: Record<string, unknown>) {
+    for (const path in behaviors) {
+      const module = behaviors[path] as { default: Behavior };
+      const behavior = module.default;
       this.behaviors[behavior.name] = behavior;
     }
   }

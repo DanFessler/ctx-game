@@ -18,7 +18,7 @@ type SerializedGameObject = {
 
 type SerializedBehavior = {
   name: string;
-  properties: Record<string, any>;
+  properties: Record<string, unknown>;
 };
 
 export class GameObject {
@@ -54,7 +54,7 @@ export class GameObject {
       // make sure it's the first behavior
       if (!this.behaviors.Transform) {
         this.behaviors = {
-          Transform: new Transform(0, 0, 0, 0),
+          Transform: new Transform(),
           ...this.behaviors,
         };
       }
@@ -66,7 +66,7 @@ export class GameObject {
       });
     } else {
       this.behaviors = {
-        Transform: new Transform(0, 0, 0, 0),
+        Transform: new Transform(),
       };
     }
 
