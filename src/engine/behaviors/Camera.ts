@@ -1,9 +1,5 @@
 import Behavior from "../Behavior";
 
-export class Camera extends Behavior {
-  constructor() {
-    super();
-  }
-}
+export class Camera extends Behavior {}
 
 export default Camera;

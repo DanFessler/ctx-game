@@ -37,3 +37,10 @@ export function getSerializableFields<T>(instance: T): [keyof T, FieldMeta][] {
     FieldMeta
   ][];
 }
+
+export type SerializedFields<T> = {
+  [K in keyof T]: {
+    value: T[K];
+    meta: FieldMeta;
+  };
+};

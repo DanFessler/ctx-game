@@ -6,12 +6,7 @@ export class Rectangle extends Behavior {
   transform: Transform | undefined;
 
   @inspect({ type: "color" })
-  color: string = "black";
-
-  constructor(color: string = "black") {
-    super();
-    this.color = color;
-  }
+  color: string = "red";
 
   draw(ctx: CanvasRenderingContext2D, renderPass?: string) {
     const transform = this.gameObject!.behaviors.Transform as Transform;

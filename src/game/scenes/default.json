@@ -1,0 +1,94 @@
+{
+  "name": "Scene",
+  "id": "ZtCMrXQFLpB2GEjDzaX2-",
+  "behaviors": [
+    {
+      "name": "Transform",
+      "id": "7BaYa4LcqBAjKQRMDirf-",
+      "properties": {
+        "position": {
+          "value": {
+            "x": 0,
+            "y": 0
+          },
+          "type": "vector2"
+        },
+        "scale": {
+          "value": {
+            "x": 1,
+            "y": 1
+          },
+          "type": "vector2"
+        },
+        "origin": {
+          "value": {
+            "x": 0,
+            "y": 0
+          },
+          "type": "vector2"
+        },
+        "rotation": {
+          "value": 0,
+          "type": "number"
+        }
+      }
+    }
+  ],
+  "children": [
+    {
+      "name": "TestObject",
+      "id": "OBdPr_RhOzmaGcFwXouCc",
+      "behaviors": [
+        {
+          "name": "Transform",
+          "id": "-DqfwVKNRrj8Uc3_nJJJQ",
+          "properties": {
+            "position": {
+              "value": {
+                "x": 0,
+                "y": 0
+              },
+              "type": "vector2"
+            },
+            "scale": {
+              "value": {
+                "x": 1,
+                "y": 1
+              },
+              "type": "vector2"
+            },
+            "origin": {
+              "value": {
+                "x": 0,
+                "y": 0
+              },
+              "type": "vector2"
+            },
+            "rotation": {
+              "value": 0,
+              "type": "number"
+            }
+          }
+        },
+        {
+          "name": "Camera",
+          "id": "u0heseqXVp3zn_FtjIqQ1",
+          "properties": {}
+        },
+        {
+          "name": "WorldGridBehavior",
+          "id": "EpKUFlOlYD69nnuF5zARF",
+          "properties": {
+            "spacing": {
+              "value": 1,
+              "type": "number",
+              "min": 1,
+              "max": 100
+            }
+          }
+        }
+      ],
+      "children": []
+    }
+  ]
+}

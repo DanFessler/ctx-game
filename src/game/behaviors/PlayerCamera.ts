@@ -1,6 +1,4 @@
-import Camera from "../../engine/behaviors/Camera";
 import { Transform } from "../../engine/behaviors/Transform";
-import GameObject from "../../engine/GameObject";
 import Behavior from "../../engine/Behavior";
 import Input from "../../engine/Input";
 import Vector2 from "../../engine/Vector2";
@@ -18,10 +16,6 @@ class CameraController extends Behavior {
   friction: number = 0.9;
 
   velocity: Vector2 = new Vector2(0, 0);
-
-  constructor() {
-    super();
-  }
 
   update(deltaTime: number) {
     // Get input
@@ -72,12 +66,4 @@ class CameraController extends Behavior {
   }
 }
 
-class PlayerCamera extends GameObject {
-  constructor() {
-    super({
-      behaviors: [new Camera(), new CameraController()],
-    });
-  }
-}
-
-export default PlayerCamera;
+export default CameraController;

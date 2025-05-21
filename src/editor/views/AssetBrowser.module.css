@@ -1,0 +1,126 @@
+.container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.pathBar {
+  display: flex;
+  flex-direction: row;
+  padding: 8px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+  width: 100%;
+  /* align-items: center center; */
+  justify-content: center;
+  font-size: 13px;
+}
+
+.pathBarItem {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pathSeparator {
+  padding: 0 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.25;
+}
+
+.pathSpacer {
+  flex: 1;
+}
+
+.gridContainer {
+  display: grid;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 8px;
+  flex: 1;
+  overflow: auto;
+}
+
+.fileContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.fileIcon {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+}
+
+.fileName {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+  /* height: 24px; */
+  text-align: center;
+}
+
+.pathBarInputContainer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+  /* justify-content: center; */
+  /* align-self: center; */
+}
+
+.pathBarInputContainer > span {
+  margin: 0 4px;
+}
+
+input.pathBarInput {
+  width: 100px;
+  padding: 0;
+  margin: 0;
+  appearance: none;
+  background: transparent;
+  box-shadow: none;
+}
+
+/* active selection */
+input[type="range"]:active,
+input[type="range"]:focus {
+  /* background: var(--dockable-colors-selected); */
+  outline: none;
+  border: none;
+  box-shadow: none;
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+  /* border: 2px solid white; */
+  background: var(--dockable-colors-border);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) inset;
+  height: 6px;
+  border-radius: 4px;
+}
+
+input[type="range"]::-webkit-range-track {
+  border: 2px solid white;
+  background: var(--dockable-colors-background-light);
+  height: 4px;
+  border-radius: 2px;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  border: none;
+  height: 12px;
+  width: 12px;
+  border-radius: 50%;
+  background: var(--dockable-colors-text);
+  margin-top: -3px;
+}

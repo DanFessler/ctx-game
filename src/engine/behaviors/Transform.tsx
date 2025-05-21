@@ -7,34 +7,18 @@ const DEBUG = false;
 
 export class Transform extends Behavior {
   @inspect()
-  position: Vector2;
+  position: Vector2 = new Vector2(0, 0);
 
   @inspect()
-  scale: Vector2;
+  scale: Vector2 = new Vector2(1, 1);
 
   @inspect()
-  origin: Vector2;
+  origin: Vector2 = new Vector2(0, 0);
 
   @inspect()
-  rotation: number;
+  rotation: number = 0;
 
   canDisable: boolean = false;
-
-  constructor(
-    x: number,
-    y: number,
-    w: number,
-    h: number,
-    originX: number = 0,
-    originY: number = 0,
-    rotation: number = 0
-  ) {
-    super();
-    this.position = new Vector2(x, y);
-    this.scale = new Vector2(w, h);
-    this.origin = new Vector2(originX, originY);
-    this.rotation = rotation;
-  }
 
   draw() {
     if (!DEBUG) return;

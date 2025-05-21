@@ -23,8 +23,15 @@ abstract class Behavior {
   canDisable = true;
   id: string;
 
-  constructor() {
+  constructor(properties?: Record<string, any>) {
     this.id = nanoid();
+  }
+
+  initialize(properties?: Record<string, any>) {
+    if (!properties || Object.keys(properties).length === 0) return;
+    for (const [key, value] of Object.entries(properties)) {
+      this[key] = value;
+    }
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

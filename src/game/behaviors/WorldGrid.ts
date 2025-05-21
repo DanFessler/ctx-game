@@ -2,14 +2,10 @@
 import Behavior from "../../engine/Behavior";
 import { Transform } from "../../engine/behaviors/Transform";
 import Game from "../../engine/Game";
-
+import { inspect } from "../../engine/serializable";
 class WorldGridBehavior extends Behavior {
-  spacing: number;
-
-  constructor(spacing: number) {
-    super();
-    this.spacing = spacing;
-  }
+  @inspect({ type: "number", min: 1, max: 100 })
+  spacing: number = 1;
 
   draw() {
     const ctx = Game.instance?.ctx;

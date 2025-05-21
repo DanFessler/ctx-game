@@ -15,6 +15,7 @@ class Game {
   PPU: number = 1;
   scale: number = 4;
   isPlaying = false;
+  behaviors: Record<string, any> = {};
 
   constructor(
     width: number,
@@ -82,6 +83,12 @@ class Game {
     this.draw();
     requestAnimationFrame(() => this.tick());
   };
+
+  registerBehaviors(behaviors: Record<string, any>) {
+    for (const behavior of Object.values(behaviors)) {
+      this.behaviors[behavior.name] = behavior;
+    }
+  }
 
   addGameObject(gameObject: GameObject) {
     console.log("Adding game object", gameObject);

@@ -1,5 +1,4 @@
 import Behavior from "../../engine/Behavior";
-import { Rectangle } from "../../engine/behaviors/Rectangle";
 import { Transform } from "../../engine/behaviors/Transform";
 import Game from "../../engine/Game";
 import GameObject from "../../engine/GameObject";
@@ -7,9 +6,11 @@ import Vector2 from "../../engine/Vector2";
 
 class RedRectangleBehavior extends Behavior {
   camera: GameObject | undefined;
+
   start() {
     this.camera = Game.Camera;
   }
+
   update() {
     const transform = this.gameObject!.behaviors.Transform as Transform;
     const cameraTransform = this.camera?.behaviors.Transform as Transform;
@@ -27,25 +28,4 @@ class RedRectangleBehavior extends Behavior {
   }
 }
 
-class RedRectangle extends GameObject {
-  constructor() {
-    super({
-      behaviors: [
-        new Transform(0, 0, 3, 3, 1.5, 1.5),
-        new Rectangle("#ff0000"),
-        new RedRectangleBehavior(),
-      ],
-      children: [
-        new GameObject({
-          behaviors: [
-            new Transform(0, 0, 1, 1, 0.5, 0.5),
-            new Rectangle("#0000ff"),
-          ],
-          name: "Blue Rectangle",
-        }),
-      ],
-    });
-  }
-}
-
-export default RedRectangle;
+export default RedRectangleBehavior;

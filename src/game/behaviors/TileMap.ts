@@ -1,8 +1,6 @@
-import GameObject from "../../engine/GameObject";
 import Behavior from "../../engine/Behavior";
 import Game from "../../engine/Game";
 import tile from "../images/seashell.png";
-import WorldGridBehavior from "../behaviors/WorldGrid";
 import { inspect } from "../../engine/serializable";
 
 class TileMapBehavior extends Behavior {
@@ -24,12 +22,7 @@ class TileMapBehavior extends Behavior {
   @inspect({ type: "number" })
   tileSize: number = 1;
 
-  tileImage: HTMLImageElement;
-  buffer: HTMLCanvasElement;
-  bufferCtx: CanvasRenderingContext2D;
-
-  constructor() {
-    super();
+  start() {
     this.tileImage = new Image();
     this.tileImage.src = tile;
     this.buffer = document.createElement("canvas");
@@ -67,12 +60,4 @@ class TileMapBehavior extends Behavior {
   }
 }
 
-class TileMap extends GameObject {
-  constructor() {
-    super({
-      behaviors: [new TileMapBehavior(), new WorldGridBehavior(1)],
-    });
-  }
-}
-
-export default TileMap;
+export default TileMapBehavior;
