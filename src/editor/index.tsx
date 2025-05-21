@@ -17,7 +17,6 @@ function App() {
     useState<GameObject | null>(game.scene);
 
   const { layout, setLayout } = useDockableLocalStorage(3);
-  // console.log("layout", JSON.stringify(layout, null, 2));
 
   return (
     <Dockable.Root

@@ -91,12 +91,9 @@ class Game {
   }
 
   addGameObject(gameObject: GameObject) {
-    console.log("Adding game object", gameObject);
     if (gameObject.behaviors.Camera) {
       this.camera = gameObject;
-      console.log("Camera set to", gameObject);
     }
-
     this.scene.addChild(gameObject);
   }
 
@@ -121,7 +118,6 @@ class Game {
 
     this.ctx.save();
     const cameraTransform = Game.Camera.behaviors.Transform as Transform;
-    // console.log(cameraTransform);
 
     const snapToPixel = true;
     if (snapToPixel) {

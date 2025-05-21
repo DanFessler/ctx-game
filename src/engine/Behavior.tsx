@@ -22,15 +22,30 @@ abstract class Behavior {
   active = true;
   canDisable = true;
   id: string;
+  initialFields?: Record<string, any> = undefined;
 
   constructor(properties?: Record<string, any>) {
     this.id = nanoid();
+    this.initialFields = properties;
   }
 
-  initialize(properties?: Record<string, any>) {
-    if (!properties || Object.keys(properties).length === 0) return;
+  init(properties?: Record<string, any>) {
+    if (!properties || Object.keys(properties).length === 0) {
+      if (this.initialFields) {
+        properties = this.initialFields;
+      } else {
+        return;
+      }
+    }
+
+    const serializedFields = getSerializableFields(this);
+
     for (const [key, value] of Object.entries(properties)) {
-      this[key] = value;
+      if (serializedFields[key]) {
+        this[key] = value;
+      } else {
+        throw new Error(`Property ${key} is not a serialized field`);
+      }
     }
   }
 
@@ -46,10 +61,7 @@ abstract class Behavior {
     return {
       name: this.constructor.name,
       id: nanoid(),
-      properties: getSerializableFields(this).reduce((acc, [key, meta]) => {
-        acc[key as string] = { value: this[key as keyof this], ...meta };
-        return acc;
-      }, {} as Record<string, any>),
+      properties: getSerializableFields(this),
     };
   }
 
@@ -96,7 +108,7 @@ abstract class Behavior {
       }
     };
 
-    if (!fields.length) {
+    if (Object.keys(fields).length === 0) {
       return (
         <div style={{ textAlign: "center", color: "gray" }}>No Inspector</div>
       );
@@ -112,7 +124,7 @@ abstract class Behavior {
           alignItems: "center",
         }}
       >
-        {fields.map(([key, meta]) => {
+        {Object.entries(fields).map(([key, meta]) => {
           const keyString = String(key);
           return (
             <Fragment key={keyString}>

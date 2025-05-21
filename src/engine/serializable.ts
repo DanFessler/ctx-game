@@ -30,12 +30,12 @@ export function inspect(meta: FieldMeta = {}): PropertyDecorator {
   };
 }
 
-export function getSerializableFields<T>(instance: T): [keyof T, FieldMeta][] {
+export function getSerializableFields<T>(
+  instance: T
+): Record<keyof T, FieldMeta> {
   const ctor = (instance as any).constructor;
-  return [...(fieldMetadata.get(ctor)?.entries() ?? [])] as [
-    keyof T,
-    FieldMeta
-  ][];
+  const entries = fieldMetadata.get(ctor)?.entries() ?? [];
+  return Object.fromEntries(entries) as Record<keyof T, FieldMeta>;
 }
 
 export type SerializedFields<T> = {

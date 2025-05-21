@@ -19,7 +19,6 @@ function AssetBrowser() {
 
   useEffect(() => {
     native.listDir(path.join("/")).then((assets) => {
-      console.log(assets);
       setAssets(assets);
     });
   }, [path]);
@@ -132,8 +131,7 @@ function File({
       onDoubleClick={() => {
         if (asset.isDirectory) setPath([...path, asset.name]);
         else {
-          const file = native.openFile(asset.path);
-          console.log(file);
+          native.openFile(asset.path);
         }
       }}
       className={styles.fileContainer}

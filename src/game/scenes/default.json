@@ -1,34 +1,21 @@
 {
   "name": "Scene",
-  "id": "ZtCMrXQFLpB2GEjDzaX2-",
+  "id": "pE-bUCDg8rL8BNkAEWwhn",
   "behaviors": [
     {
       "name": "Transform",
-      "id": "7BaYa4LcqBAjKQRMDirf-",
+      "id": "MjeZRpQAPK6zsT1ptToYV",
       "properties": {
         "position": {
-          "value": {
-            "x": 0,
-            "y": 0
-          },
           "type": "vector2"
         },
         "scale": {
-          "value": {
-            "x": 1,
-            "y": 1
-          },
           "type": "vector2"
         },
         "origin": {
-          "value": {
-            "x": 0,
-            "y": 0
-          },
           "type": "vector2"
         },
         "rotation": {
-          "value": 0,
           "type": "number"
         }
       }
@@ -36,54 +23,163 @@
   ],
   "children": [
     {
-      "name": "TestObject",
-      "id": "OBdPr_RhOzmaGcFwXouCc",
+      "name": "TileMap",
+      "id": "aUnQ3l9dPw9oK23Z7o_RR",
       "behaviors": [
         {
           "name": "Transform",
-          "id": "-DqfwVKNRrj8Uc3_nJJJQ",
+          "id": "9meGpmdtwj3rvN7nycYNK",
           "properties": {
             "position": {
-              "value": {
-                "x": 0,
-                "y": 0
-              },
               "type": "vector2"
             },
             "scale": {
-              "value": {
-                "x": 1,
-                "y": 1
-              },
               "type": "vector2"
             },
             "origin": {
-              "value": {
-                "x": 0,
-                "y": 0
-              },
               "type": "vector2"
             },
             "rotation": {
-              "value": 0,
+              "type": "number"
+            }
+          }
+        },
+        {
+          "name": "TileMapBehavior",
+          "id": "ZTJrVmrZKkJFlNQ-T9A5B",
+          "properties": {
+            "tileSize": {
+              "type": "number"
+            }
+          }
+        },
+        {
+          "name": "WorldGridBehavior",
+          "id": "1FCdV-1aywocgrDCN-FFX",
+          "properties": {
+            "spacing": {
+              "type": "number",
+              "min": 1,
+              "max": 100
+            }
+          }
+        }
+      ],
+      "children": []
+    },
+    {
+      "name": "RedRectangle",
+      "id": "kuw9cpIImhjlZqS84yqjX",
+      "behaviors": [
+        {
+          "name": "Transform",
+          "id": "lxWtMhdN9bXsDnBTj2rVB",
+          "properties": {
+            "position": {
+              "type": "vector2"
+            },
+            "scale": {
+              "type": "vector2"
+            },
+            "origin": {
+              "type": "vector2"
+            },
+            "rotation": {
+              "type": "number"
+            }
+          }
+        },
+        {
+          "name": "Rectangle",
+          "id": "83AXWUCBxfFOeqQsg15Us",
+          "properties": {
+            "color": {
+              "type": "color"
+            }
+          }
+        },
+        {
+          "name": "RedRectangleBehavior",
+          "id": "9EVkblupGTA-pK_yJYSIo",
+          "properties": {}
+        }
+      ],
+      "children": [
+        {
+          "name": "Blue Rectangle",
+          "id": "bFTSabcx4iUM3VzZQ8I7F",
+          "behaviors": [
+            {
+              "name": "Transform",
+              "id": "jbTVn81Yw1ESon567pnP3",
+              "properties": {
+                "position": {
+                  "type": "vector2"
+                },
+                "scale": {
+                  "type": "vector2"
+                },
+                "origin": {
+                  "type": "vector2"
+                },
+                "rotation": {
+                  "type": "number"
+                }
+              }
+            },
+            {
+              "name": "Rectangle",
+              "id": "TBOhYJ828qWZJVTSQID8k",
+              "properties": {
+                "color": {
+                  "type": "color"
+                }
+              }
+            }
+          ],
+          "children": []
+        }
+      ]
+    },
+    {
+      "name": "PlayerCamera",
+      "id": "WSf4jgIdSv8icdhbWUtSL",
+      "behaviors": [
+        {
+          "name": "Transform",
+          "id": "K1PdRRxGPIvqh6rw3wqZT",
+          "properties": {
+            "position": {
+              "type": "vector2"
+            },
+            "scale": {
+              "type": "vector2"
+            },
+            "origin": {
+              "type": "vector2"
+            },
+            "rotation": {
               "type": "number"
             }
           }
         },
         {
           "name": "Camera",
-          "id": "u0heseqXVp3zn_FtjIqQ1",
+          "id": "iYk3jGQss68hhn3okgwkD",
           "properties": {}
         },
         {
-          "name": "WorldGridBehavior",
-          "id": "EpKUFlOlYD69nnuF5zARF",
+          "name": "CameraController",
+          "id": "xKm73-cB0QYYHKU_4wjGF",
           "properties": {
-            "spacing": {
-              "value": 1,
-              "type": "number",
-              "min": 1,
-              "max": 100
+            "acceleration": {
+              "type": "number"
+            },
+            "maxSpeed": {
+              "type": "number"
+            },
+            "friction": {
+              "type": "number"
             }
           }
         }

@@ -12,14 +12,12 @@ function SceneCanvas() {
 
     container.appendChild(game.canvas);
     game.canvas.style.display = "block";
-    console.log("appending canvas");
 
     return () => {
       if (container.contains(game.canvas)) {
         container.removeChild(game.canvas);
       }
       game.canvas.style.display = "none";
-      console.log("removing canvas");
     };
   }, []);
 

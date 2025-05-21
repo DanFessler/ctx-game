@@ -34,10 +34,8 @@ export class GameObject {
 
   subscribe = (callback: () => void): (() => void) => {
     this.subscribers.add(callback);
-    // console.log("subscribed to", this.name, callback);
     return () => {
       this.subscribers.delete(callback);
-      // console.log("unsubscribed from", this.name, callback);
     };
   };
 
@@ -55,7 +53,6 @@ export class GameObject {
       // add default transform if not present
       // make sure it's the first behavior
       if (!this.behaviors.Transform) {
-        console.log("ADDING TRANSFORM");
         this.behaviors = {
           Transform: new Transform(0, 0, 0, 0),
           ...this.behaviors,
@@ -65,6 +62,7 @@ export class GameObject {
       // Set the gameObject and game properties for each behavior
       Object.values(this.behaviors).forEach((behavior) => {
         behavior.gameObject = this;
+        behavior.init();
       });
     } else {
       this.behaviors = {
