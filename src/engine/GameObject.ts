@@ -1,7 +1,7 @@
 import Game from "./Game";
 import Behavior from "./Behavior";
-import { Transform } from "./behaviors/Transform";
 import { nanoid } from "nanoid";
+import Transform from "./behaviors/Transform";
 
 type GameObjectProps = {
   behaviors?: Behavior[];
@@ -9,14 +9,14 @@ type GameObjectProps = {
   name?: string;
 };
 
-type SerializedGameObject = {
+export type SerializedGameObject = {
   name: string;
   id: string;
   behaviors: SerializedBehavior[];
   children: SerializedGameObject[];
 };
 
-type SerializedBehavior = {
+export type SerializedBehavior = {
   name: string;
   properties: Record<string, unknown>;
 };
@@ -87,6 +87,30 @@ export class GameObject {
       ),
       children: this.children.map((child) => child.serialize()),
     };
+  }
+
+  static deserialize(data: SerializedGameObject) {
+    const gameObject = new GameObject({ name: data.name });
+    gameObject.id = data.id;
+    gameObject.behaviors = data.behaviors.reduce((acc, behavior) => {
+      acc[behavior.name] = deserializeBehavior(behavior);
+      return acc;
+    }, {} as Record<string, Behavior>);
+    gameObject.children = data.children.map((child) =>
+      GameObject.deserialize(child)
+    );
+    return gameObject;
+
+    function deserializeBehavior(data: SerializedBehavior) {
+      const behaviorClass = Game.instance?.behaviors[data.name];
+      if (!behaviorClass) {
+        throw new Error(`Behavior ${data.name} not found`);
+      }
+      const behavior = new behaviorClass();
+      behavior.gameObject = gameObject;
+      behavior.init(data.properties);
+      return behavior;
+    }
   }
 
   start() {

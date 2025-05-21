@@ -1,8 +1,8 @@
-import { Transform } from "./Transform";
+import Transform from "./Transform";
 import Behavior from "../Behavior";
 import { inspect } from "../serializable";
 
-export class Rectangle extends Behavior {
+class Rectangle extends Behavior {
   transform: Transform | undefined;
 
   @inspect({ type: "color" })
@@ -30,3 +30,5 @@ export class Rectangle extends Behavior {
     // transform.position.y += 1;
   }
 }
+
+export default Rectangle;

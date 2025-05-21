@@ -61,10 +61,10 @@ abstract class Behavior {
     return {
       name: this.constructor.name,
       id: nanoid(),
-      properties: getSerializableFields(this).reduce((acc, [key, meta]) => {
-        acc[key as string] = { value: this[key as keyof this], ...meta };
+      properties: getSerializableFields(this).reduce((acc, [key]) => {
+        acc[key as string] = this[key as keyof this];
         return acc;
-      }, {} as Record<string, any>),
+      }, {} as Record<string, Behavior>),
     };
   }
 

@@ -1,5 +1,5 @@
 import Behavior from "../../engine/Behavior";
-import { Transform } from "../../engine/behaviors/Transform";
+import Transform from "../../engine/behaviors/Transform";
 import Game from "../../engine/Game";
 import GameObject from "../../engine/GameObject";
 import Vector2 from "../../engine/Vector2";
@@ -7,13 +7,10 @@ import Vector2 from "../../engine/Vector2";
 class RedRectangleBehavior extends Behavior {
   camera: GameObject | undefined;
 
-  start() {
-    this.camera = Game.Camera;
-  }
-
   update() {
+    if (!Game.Camera) return;
     const transform = this.gameObject!.behaviors.Transform as Transform;
-    const cameraTransform = this.camera?.behaviors.Transform as Transform;
+    const cameraTransform = Game.Camera?.behaviors.Transform as Transform;
     if (cameraTransform) {
       const direction = new Vector2(
         cameraTransform.position.x - transform.position.x,

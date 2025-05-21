@@ -1,7 +1,10 @@
-import GameObject from "./GameObject";
-import { Transform } from "./behaviors/Transform";
+import GameObject, { SerializedGameObject } from "./GameObject";
+import Transform from "./behaviors/Transform";
 import Input from "./Input";
 import Behavior from "./Behavior";
+const behaviors = import.meta.glob("./behaviors/*.{ts,tsx}", { eager: true });
+// console.log("base behaviors", behaviors);
+
 class Game {
   static instance: Game | undefined;
 
@@ -15,7 +18,7 @@ class Game {
   PPU: number = 1;
   scale: number = 4;
   isPlaying = false;
-  behaviors: Record<string, Behavior> = {};
+  behaviors: Record<string, new () => Behavior> = {};
 
   constructor(
     width: number,
@@ -47,9 +50,15 @@ class Game {
 
     Input.getInstance();
     Game.instance = this;
+    this.registerBehaviors(behaviors);
   }
 
   init() {}
+
+  loadScene(scene: SerializedGameObject) {
+    this.scene = GameObject.deserialize(scene);
+    console.log("loaded scene", this.scene);
+  }
 
   serialize() {
     return this.scene?.serialize();
@@ -86,7 +95,7 @@ class Game {
 
   registerBehaviors(behaviors: Record<string, unknown>) {
     for (const path in behaviors) {
-      const module = behaviors[path] as { default: Behavior };
+      const module = behaviors[path] as { default: new () => Behavior };
       const behavior = module.default;
       this.behaviors[behavior.name] = behavior;
     }

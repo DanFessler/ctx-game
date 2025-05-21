@@ -5,7 +5,7 @@ import Vector2 from "../Vector2";
 
 const DEBUG = false;
 
-export class Transform extends Behavior {
+class Transform extends Behavior {
   @inspect()
   position: Vector2 = new Vector2(0, 0);
 
@@ -31,3 +31,5 @@ export class Transform extends Behavior {
     ctx.fillText(`x: ${this.position.x}, y: ${this.position.y}`, 0, 10);
   }
 }
+
+export default Transform;
