@@ -7,9 +7,8 @@ class WorldGridBehavior extends Behavior {
   @inspect({ type: "number", min: 1, max: 100 })
   spacing: number = 1;
 
-  draw() {
-    const ctx = Game.instance?.ctx;
-    if (!ctx) return;
+  draw(ctx: CanvasRenderingContext2D, renderPass?: string) {
+    if (renderPass !== "editor") return;
 
     const transform = this.gameObject!.behaviors.Transform as Transform;
     const halfPixelOffset = 1 / Game.instance!.PPU / 2;

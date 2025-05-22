@@ -34,7 +34,9 @@ class TileMapBehavior extends Behavior {
     this.bufferCtx.imageSmoothingEnabled = false;
   }
 
-  draw(ctx: CanvasRenderingContext2D) {
+  draw(ctx: CanvasRenderingContext2D, renderPass?: string) {
+    if (renderPass !== "editor") return;
+
     this.bufferCtx.clearRect(0, 0, this.buffer.width, this.buffer.height);
     // this.bufferCtx.drawImage(this.tileImage, 0, 0);
     for (let y = 0; y < this.mapData.length; y++) {

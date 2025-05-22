@@ -52,9 +52,8 @@ class CameraController extends Behavior {
     transform.position.y += this.velocity.y;
   }
 
-  draw() {
-    const ctx = Game.instance?.ctx;
-    if (!ctx) return;
+  draw(ctx: CanvasRenderingContext2D, renderPass?: string) {
+    if (renderPass !== "editor") return;
 
     ctx.strokeStyle = "black";
     ctx.beginPath();

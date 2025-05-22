@@ -22,7 +22,6 @@ class Rectangle extends Behavior {
         break;
     }
   }
-
   update() {
     // super.update();
     // const transform = this.gameObject!.behaviors.Transform as Transform;

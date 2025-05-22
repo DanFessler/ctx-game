@@ -1,5 +1,4 @@
 import Behavior from "../Behavior";
-import Game from "../Game";
 import { inspect } from "../serializable";
 import Vector2 from "../Vector2";
 
@@ -20,11 +19,9 @@ class Transform extends Behavior {
 
   canDisable: boolean = false;
 
-  draw() {
+  draw(ctx: CanvasRenderingContext2D, renderPass?: string) {
     if (!DEBUG) return;
-
-    const ctx = Game.instance?.ctx;
-    if (!ctx) return;
+    if (renderPass !== "editor") return;
 
     ctx.fillStyle = "black";
     ctx.font = "12px Arial";
