@@ -26,6 +26,7 @@ import { FaCode } from "react-icons/fa";
 import SortableItem from "../components/SortableItem";
 import styles from "./Inspector.module.css";
 import useGameObject from "../hooks/useGameObject";
+import Game from "../../engine/Game";
 
 function Inspector({ gameObject }: { gameObject: GameObject }) {
   useGameObject(gameObject);
@@ -70,7 +71,39 @@ function Inspector({ gameObject }: { gameObject: GameObject }) {
           }}
         />
       </div>
+      <BehaviorButtons gameObject={gameObject} />
       {/* </DndContext> */}
+    </div>
+  );
+}
+
+function BehaviorButtons({ gameObject }: { gameObject: GameObject }) {
+  const behaviors = Game.instance?.behaviors;
+  if (!behaviors) return null;
+
+  function handleAddBehavior(key: string) {
+    return () => {
+      const behaviorClass = behaviors![key];
+      if (!behaviorClass) return;
+      const behavior = new behaviorClass();
+      behavior.gameObject = gameObject;
+      gameObject.behaviors[key] = behavior;
+      gameObject.updateSubscribers();
+      console.log("adding behavior", behavior);
+    };
+  }
+
+  return (
+    <div
+      style={{ display: "flex", flexDirection: "column", gap: 4, padding: 4 }}
+    >
+      {Object.keys(behaviors).map((key) => {
+        return (
+          <button key={key} onClick={handleAddBehavior(key)}>
+            Add {key}
+          </button>
+        );
+      })}
     </div>
   );
 }

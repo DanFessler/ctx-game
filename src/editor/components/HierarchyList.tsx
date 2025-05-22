@@ -14,16 +14,11 @@ function HierarchyList({
 }) {
   return (
     <ul className={styles.list}>
-      {gameObject.children.map((child) => {
-        return (
-          <HierarchyItem
-            key={child.name}
-            gameObject={child}
-            setSelectedGameObject={setSelectedGameObject}
-            selectedGameObject={selectedGameObject}
-          />
-        );
-      })}
+      <HierarchyItem
+        gameObject={gameObject}
+        setSelectedGameObject={setSelectedGameObject}
+        selectedGameObject={selectedGameObject}
+      />
     </ul>
   );
 }
@@ -72,11 +67,15 @@ function HierarchyItem({
       </div>
       {isOpen && hasChildren ? (
         <div className={styles.children}>
-          <HierarchyList
-            gameObject={gameObject}
-            setSelectedGameObject={setSelectedGameObject}
-            selectedGameObject={selectedGameObject}
-          />
+          {gameObject.children.map((child) => {
+            return (
+              <HierarchyList
+                gameObject={child}
+                setSelectedGameObject={setSelectedGameObject}
+                selectedGameObject={selectedGameObject}
+              />
+            );
+          })}
         </div>
       ) : null}
     </li>

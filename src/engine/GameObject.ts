@@ -124,6 +124,7 @@ export class GameObject {
   }
 
   update(deltaTime: number) {
+    if (!this.isActive) return;
     Object.values(this.behaviors).forEach((behavior) => {
       if (behavior.active) {
         behavior.update?.(deltaTime);
@@ -140,6 +141,7 @@ export class GameObject {
   }
 
   draw(renderPass?: string) {
+    if (!this.isActive) return;
     const ctx = Game.instance?.ctx;
     if (!ctx) return;
 
