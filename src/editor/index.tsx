@@ -18,6 +18,14 @@ function App() {
 
   const { layout, setLayout } = useDockableLocalStorage(3);
 
+  function handleSelectGameObject(gameObject: GameObject) {
+    if (selectedGameObject) {
+      selectedGameObject.isSelected = false;
+    }
+    gameObject.isSelected = true;
+    setSelectedGameObject(gameObject);
+  }
+
   return (
     <Dockable.Root
       layout={layout}
@@ -29,7 +37,7 @@ function App() {
       <Dockable.Tab id="hierarchy" name="Hierarchy">
         <SceneHierarchy
           gameObject={game.scene}
-          setSelectedGameObject={setSelectedGameObject}
+          setSelectedGameObject={handleSelectGameObject}
           selectedGameObject={selectedGameObject}
         />
       </Dockable.Tab>

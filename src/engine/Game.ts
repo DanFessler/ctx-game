@@ -90,6 +90,9 @@ class Game {
     if (this.isPlaying) {
       this.update(deltaTime);
     }
+    if (!this.isPlaying) {
+      this.scene.updateEditor(deltaTime);
+    }
 
     this.draw();
     requestAnimationFrame(() => this.tick());

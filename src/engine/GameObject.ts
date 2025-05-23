@@ -29,6 +29,7 @@ export class GameObject {
   name: string;
   isActive: boolean = true;
   id: string;
+  isSelected = false;
 
   private subscribers = new Set<() => void>();
 
@@ -132,6 +133,19 @@ export class GameObject {
     });
     this.children.forEach((child) => {
       child.update(deltaTime);
+    });
+    this.updateSubscribers();
+  }
+
+  updateEditor(deltaTime: number) {
+    if (!this.isActive) return;
+    Object.values(this.behaviors).forEach((behavior) => {
+      if (behavior.active) {
+        behavior.updateEditor?.(deltaTime);
+      }
+    });
+    this.children.forEach((child) => {
+      child.updateEditor(deltaTime);
     });
     this.updateSubscribers();
   }
