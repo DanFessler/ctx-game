@@ -55,6 +55,7 @@ abstract class Behavior {
   start?(): void;
   update?(deltaTime: number): void;
   draw?(ctx: CanvasRenderingContext2D, renderPass?: string): void;
+  drawWorldSpace?(ctx: CanvasRenderingContext2D): void;
 
   serialize() {
     return {

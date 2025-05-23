@@ -49,26 +49,22 @@ export class GameObject {
         acc[behavior.constructor.name] = behavior;
         return acc;
       }, {} as Record<string, Behavior>);
+    }
 
-      // add default transform if not present
-      // make sure it's the first behavior
-      if (!this.behaviors.Transform) {
-        this.behaviors = {
-          Transform: new Transform(),
-          ...this.behaviors,
-        };
-      }
-
-      // Set the gameObject and game properties for each behavior
-      Object.values(this.behaviors).forEach((behavior) => {
-        behavior.gameObject = this;
-        behavior.init();
-      });
-    } else {
+    // add default transform if not present
+    // make sure it's the first behavior
+    if (!this.behaviors.Transform) {
       this.behaviors = {
         Transform: new Transform(),
+        ...this.behaviors,
       };
     }
+
+    // Set the gameObject and game properties for each behavior
+    Object.values(this.behaviors).forEach((behavior) => {
+      behavior.gameObject = this;
+      behavior.init();
+    });
 
     if (children) {
       this.children = children;
@@ -159,18 +155,29 @@ export class GameObject {
       ctx.translate(transform.position.x, transform.position.y);
     }
     ctx.rotate(transform.rotation);
-    ctx.save();
-    ctx.translate(-transform.origin.x, -transform.origin.y);
     Object.values(this.behaviors).forEach((behavior) => {
       if (behavior.active) {
         behavior.draw?.(ctx, renderPass);
       }
     });
-    ctx.restore();
     this.children.forEach((child) => {
       child.draw(renderPass);
     });
     ctx.restore();
+  }
+
+  drawWorldSpace() {
+    if (!this.isActive) return;
+    const ctx = Game.instance?.ctx;
+    if (!ctx) return;
+    Object.values(this.behaviors).forEach((behavior) => {
+      if (behavior.active) {
+        behavior.drawWorldSpace?.(ctx);
+      }
+    });
+    this.children.forEach((child) => {
+      child.drawWorldSpace();
+    });
   }
 
   addChild(child: GameObject) {

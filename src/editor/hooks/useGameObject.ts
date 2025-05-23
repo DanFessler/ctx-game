@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import GameObject from "../../engine/GameObject";
 
 function useGameObject(gameObject: GameObject) {
+  if (!gameObject) return;
   const [count, setCount] = useState(0);
   useEffect(() => {
     const unsubscribe = gameObject.subscribe(() => {

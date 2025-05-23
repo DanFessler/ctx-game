@@ -148,7 +148,9 @@ class Game {
     }
     this.scene.draw("default");
     this.scene.draw("editor");
+    this.scene.drawWorldSpace();
     this.ctx.restore();
+    // this.scene.drawScreenSpace(); // not implemented
   }
 
   static get Camera(): GameObject {

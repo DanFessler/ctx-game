@@ -4,7 +4,7 @@
   "behaviors": [
     {
       "name": "Transform",
-      "id": "h0jAkjrV8lqOqrerqKCo2",
+      "id": "uS70rJ8FxF3RCy0oJXMKi",
       "properties": {
         "position": {
           "x": 0,
@@ -13,10 +13,6 @@
         "scale": {
           "x": 1,
           "y": 1
-        },
-        "origin": {
-          "x": 0,
-          "y": 0
         },
         "rotation": 0
       }
@@ -29,7 +25,7 @@
       "behaviors": [
         {
           "name": "Transform",
-          "id": "7gmsI8lBi_NBAdUGM_9Le",
+          "id": "FdzBZ66J1qseHfadP7WeM",
           "properties": {
             "position": {
               "x": 0,
@@ -39,23 +35,19 @@
               "x": 1,
               "y": 1
             },
-            "origin": {
-              "x": 0,
-              "y": 0
-            },
             "rotation": 0
           }
         },
         {
           "name": "TileMapBehavior",
-          "id": "H-4hX2kiw_QYnbkVaQj5K",
+          "id": "E1_tiH-rQ_L-CbSnTxOIl",
           "properties": {
             "tileSize": 1
           }
         },
         {
           "name": "WorldGridBehavior",
-          "id": "CJ9qzjgZOAn9KndwItLPc",
+          "id": "yZoR-4r1Ck2EfMMTmJFoT",
           "properties": {
             "spacing": 1
           }
@@ -69,33 +61,29 @@
       "behaviors": [
         {
           "name": "Transform",
-          "id": "ruq9Ix800yUs0hCTsJmSY",
+          "id": "khn-mkdNTrh5Kvx_TPKdn",
           "properties": {
             "position": {
-              "x": 0,
-              "y": 0
+              "x": 0.5996576816991519,
+              "y": 3.022777706751068
             },
             "scale": {
               "x": 3,
               "y": 3
             },
-            "origin": {
-              "x": 1.5,
-              "y": 1.5
-            },
-            "rotation": 0
+            "rotation": 17.98000000000001
           }
         },
         {
           "name": "Rectangle",
-          "id": "kSWLoRxhVPyBo49O6EY-7",
+          "id": "iLTSvuwFUcpxU5A_unZa-",
           "properties": {
             "color": "#ff0000"
           }
         },
         {
           "name": "RedRectangleBehavior",
-          "id": "mV7doTzXy4aMuRpOIK2HX",
+          "id": "l3Fv9sVfjlMAwg9mcYbqA",
           "properties": {}
         }
       ],
@@ -106,7 +94,7 @@
           "behaviors": [
             {
               "name": "Transform",
-              "id": "TBbkrn_4DARc708p4i-yj",
+              "id": "_XxMZ_sktmDzWVrIJhHBd",
               "properties": {
                 "position": {
                   "x": 0,
@@ -116,16 +104,12 @@
                   "x": 1,
                   "y": 1
                 },
-                "origin": {
-                  "x": 0.5,
-                  "y": 0.5
-                },
                 "rotation": 0
               }
             },
             {
               "name": "Rectangle",
-              "id": "iUAo5batW8V-6KbueNLxZ",
+              "id": "D7wDt08GBdQbjkEwOUKYU",
               "properties": {
                 "color": "#0000ff"
               }
@@ -141,35 +125,60 @@
       "behaviors": [
         {
           "name": "Transform",
-          "id": "vdDJcCu3rysosionkOJrP",
+          "id": "vcCk_SxmyHf2OcZtRmuM7",
           "properties": {
             "position": {
-              "x": 0,
-              "y": 0
+              "x": 0.5996576816991509,
+              "y": 3.0227777067510635
             },
             "scale": {
               "x": 1,
               "y": 1
-            },
-            "origin": {
-              "x": 0,
-              "y": 0
             },
             "rotation": 0
           }
         },
         {
           "name": "Camera",
-          "id": "Z6ndeeS2ff6qqhZVlWUHz",
+          "id": "dftnXphmKdCaNPGVXi1ZC",
           "properties": {}
         },
         {
           "name": "CameraController",
-          "id": "Pf9DNovGPuuQBTugfyB6p",
+          "id": "k3Jd0rpr4KK8yXIJTogGW",
           "properties": {
             "acceleration": 2,
             "maxSpeed": 5,
             "friction": 0.9
+          }
+        }
+      ],
+      "children": []
+    },
+    {
+      "name": "Pink Square",
+      "id": "76Atvl9DNyFwpuk0BCill",
+      "behaviors": [
+        {
+          "name": "Transform",
+          "id": "R5-VTSkMg6w1PgmPoQwJV",
+          "properties": {
+            "position": {
+              "x": -4,
+              "y": 0
+            },
+            "scale": {
+              "x": 3,
+              "y": 3
+            },
+            "rotation": "-6"
+          }
+        },
+        {
+          "name": "Rectangle",
+          "id": "jqxuErJQpQmT-1euM_3FV",
+          "properties": {
+            "color": "#ff00d0"
           }
         }
       ],

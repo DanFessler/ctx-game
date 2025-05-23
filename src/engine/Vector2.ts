@@ -14,6 +14,10 @@ export class Vector2 {
     return new Vector2(this.x * scalar, this.y * scalar);
   }
 
+  multiplyVec2(other: Vector2): Vector2 {
+    return new Vector2(this.x * other.x, this.y * other.y);
+  }
+
   divide(scalar: number): Vector2 {
     if (scalar === 0) throw new Error("Division by zero");
     return new Vector2(this.x / scalar, this.y / scalar);
