@@ -169,9 +169,12 @@ class Transform extends Behavior implements TransformData {
   }
 
   drawWorldSpace(ctx: CanvasRenderingContext2D) {
-    if (this.gameObject?.isSelected) {
-      drawGizmo(ctx, this, this.gizmoScale);
-    }
+    drawGizmo(
+      ctx,
+      this,
+      this.gizmoScale,
+      this.gameObject?.isSelected ? true : false
+    );
   }
 
   updateEditor() {
@@ -193,7 +196,8 @@ class Transform extends Behavior implements TransformData {
 function drawGizmo(
   ctx: CanvasRenderingContext2D,
   transform: Transform,
-  gizmoScale: number
+  gizmoScale: number,
+  isSelected: boolean
 ) {
   const { position, rotation } = transform.getWorldTransform(transform);
   const scalar = (1 / Game.instance!.PPU) * gizmoScale;
@@ -217,45 +221,72 @@ function drawGizmo(
   ctx.strokeStyle = `rgba(0,0,0,0.25)`;
   ctx.lineWidth = 1 / Game.instance!.PPU / scalar;
 
-  // X arrow
-  ctx.beginPath();
-  ctx.moveTo(gizmoSize, 0);
-  ctx.lineTo(gizmoSize - arrowLength, -arrowSize / 2);
-  ctx.lineTo(gizmoSize - arrowLength, arrowSize / 2);
-  ctx.fillStyle = `rgba(${xColor},1)`;
-  ctx.closePath();
-  ctx.stroke();
-  ctx.fill();
+  if (isSelected) {
+    // X arrow
+    ctx.beginPath();
+    ctx.moveTo(gizmoSize, 0);
+    ctx.lineTo(gizmoSize - arrowLength, -arrowSize / 2);
+    ctx.lineTo(gizmoSize - arrowLength, arrowSize / 2);
+    ctx.fillStyle = `rgba(${xColor},1)`;
+    ctx.closePath();
+    ctx.stroke();
+    ctx.fill();
 
-  // X arrow (opposite)
-  ctx.beginPath();
-  ctx.moveTo(-gizmoSize, 0);
-  ctx.lineTo(-gizmoSize + arrowLength, -arrowSize / 2);
-  ctx.lineTo(-gizmoSize + arrowLength, arrowSize / 2);
-  ctx.fillStyle = `rgba(${lineColor},0.5)`;
-  ctx.closePath();
-  ctx.stroke();
-  ctx.fill();
+    // X arrow (opposite)
+    ctx.beginPath();
+    ctx.moveTo(-gizmoSize, 0);
+    ctx.lineTo(-gizmoSize + arrowLength, -arrowSize / 2);
+    ctx.lineTo(-gizmoSize + arrowLength, arrowSize / 2);
+    ctx.fillStyle = `rgba(${lineColor},0.5)`;
+    ctx.closePath();
+    ctx.stroke();
+    ctx.fill();
 
-  // Y arrow
-  ctx.beginPath();
-  ctx.moveTo(0, gizmoSize);
-  ctx.lineTo(-arrowSize / 2, gizmoSize - arrowLength);
-  ctx.lineTo(arrowSize / 2, gizmoSize - arrowLength);
-  ctx.fillStyle = `rgba(${yColor},1)`;
-  ctx.closePath();
-  ctx.stroke();
-  ctx.fill();
+    // Y arrow
+    ctx.beginPath();
+    ctx.moveTo(0, gizmoSize);
+    ctx.lineTo(-arrowSize / 2, gizmoSize - arrowLength);
+    ctx.lineTo(arrowSize / 2, gizmoSize - arrowLength);
+    ctx.fillStyle = `rgba(${yColor},1)`;
+    ctx.closePath();
+    ctx.stroke();
+    ctx.fill();
 
-  // Y arrow (opposite)
-  ctx.beginPath();
-  ctx.moveTo(0, -gizmoSize);
-  ctx.lineTo(-arrowSize / 2, -gizmoSize + arrowLength);
-  ctx.lineTo(arrowSize / 2, -gizmoSize + arrowLength);
-  ctx.fillStyle = `rgba(${lineColor},0.5)`;
-  ctx.closePath();
-  ctx.stroke();
-  ctx.fill();
+    // Y arrow (opposite)
+    ctx.beginPath();
+    ctx.moveTo(0, -gizmoSize);
+    ctx.lineTo(-arrowSize / 2, -gizmoSize + arrowLength);
+    ctx.lineTo(arrowSize / 2, -gizmoSize + arrowLength);
+    ctx.fillStyle = `rgba(${lineColor},0.5)`;
+    ctx.closePath();
+    ctx.stroke();
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.arc(
+      0,
+      0,
+      gizmoSize - (arrowLength + 6) + lineWidth / 2,
+      0,
+      Math.PI * 2
+    );
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(
+      0,
+      0,
+      gizmoSize - (arrowLength + 6) - lineWidth / 2,
+      0,
+      Math.PI * 2
+    );
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.lineWidth = lineWidth;
+    ctx.strokeStyle = `rgba(${lineColor},0.5)`;
+    ctx.arc(0, 0, gizmoSize - (arrowLength + 6), 0, Math.PI * 2);
+    ctx.stroke();
+  }
 
   // Center point
   ctx.beginPath();
@@ -263,19 +294,6 @@ function drawGizmo(
   ctx.fillStyle = `rgba(${lineColor},1)`;
   ctx.stroke();
   ctx.fill();
-
-  ctx.beginPath();
-  ctx.arc(0, 0, gizmoSize - (arrowLength + 6) + lineWidth / 2, 0, Math.PI * 2);
-  ctx.stroke();
-  ctx.beginPath();
-  ctx.arc(0, 0, gizmoSize - (arrowLength + 6) - lineWidth / 2, 0, Math.PI * 2);
-  ctx.stroke();
-
-  ctx.beginPath();
-  ctx.lineWidth = lineWidth;
-  ctx.strokeStyle = `rgba(${lineColor},0.5)`;
-  ctx.arc(0, 0, gizmoSize - (arrowLength + 6), 0, Math.PI * 2);
-  ctx.stroke();
 
   ctx.restore();
 }
