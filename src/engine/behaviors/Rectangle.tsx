@@ -1,24 +1,29 @@
 import Transform from "./Transform";
 import Behavior from "../Behavior";
 import { inspect } from "../serializable";
+import Vector2 from "../Vector2";
 
 class Rectangle extends Behavior {
   transform: Transform | undefined;
+
+  @inspect()
+  size: Vector2 = new Vector2(1, 1);
+
+  @inspect()
+  offset: Vector2 = new Vector2(0, 0);
 
   @inspect({ type: "color" })
   color: string = "red";
 
   draw(ctx: CanvasRenderingContext2D, renderPass?: string) {
-    const transform = this.gameObject!.behaviors.Transform as Transform;
-
     switch (renderPass) {
       case "editor":
         ctx.strokeStyle = "rgb(0,255,0)";
-        ctx.strokeRect(0, 0, transform.scale.x, transform.scale.y);
+        ctx.strokeRect(this.offset.x, this.offset.y, this.size.x, this.size.y);
         break;
       default:
         ctx.fillStyle = this.color;
-        ctx.fillRect(0, 0, transform.scale.x, transform.scale.y);
+        ctx.fillRect(this.offset.x, this.offset.y, this.size.x, this.size.y);
         break;
     }
   }

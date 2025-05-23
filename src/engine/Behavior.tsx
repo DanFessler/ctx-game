@@ -9,8 +9,9 @@ import NumberInput from "../editor/components/inspector/Number";
 import Vector2Input from "../editor/components/inspector/Vector2";
 import ColorInput from "../editor/components/inspector/Color";
 import { nanoid } from "nanoid";
+import Vector2 from "./Vector2";
 
-type Vector2 = {
+type _Vector2 = {
   x: number;
   y: number;
 };
@@ -42,7 +43,14 @@ abstract class Behavior {
 
     for (const [key, value] of Object.entries(properties)) {
       if (serializedFields[key]) {
-        this[key] = value;
+        const type = serializedFields[key].type;
+        if (type === "number") {
+          this[key] = Number(value);
+        } else if (type === "vector2") {
+          this[key] = Vector2.fromObject(value as { x: number; y: number });
+        } else if (type === "color") {
+          this[key] = value;
+        }
       } else {
         throw new Error(`Property ${key} is not a serialized field`);
       }
@@ -56,6 +64,7 @@ abstract class Behavior {
   update?(deltaTime: number): void;
   draw?(ctx: CanvasRenderingContext2D, renderPass?: string): void;
   drawWorldSpace?(ctx: CanvasRenderingContext2D): void;
+  drawScreenSpace?(ctx: CanvasRenderingContext2D): void;
 
   serialize() {
     return {
@@ -89,7 +98,7 @@ abstract class Behavior {
             <Vector2Input
               label={key}
               value={this[key]}
-              onChange={(value: Vector2) => {
+              onChange={(value: _Vector2) => {
                 this[key] = value;
                 refresh();
               }}

@@ -62,6 +62,9 @@ if (!Game.instance) {
   game = Game.instance;
 }
 
+// @ts-expect-error - window.game is a global variable
+window.game = game;
+
 // save the scene
 // const serialized = game.serialize();
 // native.saveFile(

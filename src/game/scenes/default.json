@@ -4,7 +4,7 @@
   "behaviors": [
     {
       "name": "Transform",
-      "id": "uS70rJ8FxF3RCy0oJXMKi",
+      "id": "mg4lgirE2O8YwZ1FIbZrz",
       "properties": {
         "position": {
           "x": 0,
@@ -25,7 +25,7 @@
       "behaviors": [
         {
           "name": "Transform",
-          "id": "FdzBZ66J1qseHfadP7WeM",
+          "id": "gGQ9qoRLorhsnw0Xhbi1e",
           "properties": {
             "position": {
               "x": 0,
@@ -40,14 +40,14 @@
         },
         {
           "name": "TileMapBehavior",
-          "id": "E1_tiH-rQ_L-CbSnTxOIl",
+          "id": "n9oN3tLzldKrQvvQXQ8wp",
           "properties": {
             "tileSize": 1
           }
         },
         {
           "name": "WorldGridBehavior",
-          "id": "yZoR-4r1Ck2EfMMTmJFoT",
+          "id": "2AVHu8Nb9Fl-X6XWEVguo",
           "properties": {
             "spacing": 1
           }
@@ -61,29 +61,37 @@
       "behaviors": [
         {
           "name": "Transform",
-          "id": "khn-mkdNTrh5Kvx_TPKdn",
+          "id": "Gx3RRR2ibQQRNCh-6kuyp",
           "properties": {
             "position": {
-              "x": 0.5996576816991519,
-              "y": 3.022777706751068
+              "x": -0.3363423268852195,
+              "y": 3.037177705793577
             },
             "scale": {
-              "x": 3,
-              "y": 3
+              "x": 1,
+              "y": 1
             },
-            "rotation": 17.98000000000001
+            "rotation": 32.540000000002095
           }
         },
         {
           "name": "Rectangle",
-          "id": "iLTSvuwFUcpxU5A_unZa-",
+          "id": "TbtKWaPModyQwfpVCB_05",
           "properties": {
+            "size": {
+              "x": 3,
+              "y": 3
+            },
+            "offset": {
+              "x": -1.5,
+              "y": -1.5
+            },
             "color": "#ff0000"
           }
         },
         {
           "name": "RedRectangleBehavior",
-          "id": "l3Fv9sVfjlMAwg9mcYbqA",
+          "id": "oF6XYW5uq1tTJUVpmQ5LW",
           "properties": {}
         }
       ],
@@ -94,7 +102,7 @@
           "behaviors": [
             {
               "name": "Transform",
-              "id": "_XxMZ_sktmDzWVrIJhHBd",
+              "id": "F1q0NE1-t1BZe83HDYOyb",
               "properties": {
                 "position": {
                   "x": 0,
@@ -109,8 +117,16 @@
             },
             {
               "name": "Rectangle",
-              "id": "D7wDt08GBdQbjkEwOUKYU",
+              "id": "e0b1nemxhhDF6RBx5O7ON",
               "properties": {
+                "size": {
+                  "x": 2,
+                  "y": 2
+                },
+                "offset": {
+                  "x": -1,
+                  "y": -1
+                },
                 "color": "#0000ff"
               }
             }
@@ -125,11 +141,11 @@
       "behaviors": [
         {
           "name": "Transform",
-          "id": "vcCk_SxmyHf2OcZtRmuM7",
+          "id": "3p8GA1aB1SHjOYD0dJRdd",
           "properties": {
             "position": {
-              "x": 0.5996576816991509,
-              "y": 3.0227777067510635
+              "x": -0.33634232688391874,
+              "y": 3.037177710184298
             },
             "scale": {
               "x": 1,
@@ -140,12 +156,12 @@
         },
         {
           "name": "Camera",
-          "id": "dftnXphmKdCaNPGVXi1ZC",
+          "id": "Q3Qf1BUXYDc1wcn8LwDPO",
           "properties": {}
         },
         {
           "name": "CameraController",
-          "id": "k3Jd0rpr4KK8yXIJTogGW",
+          "id": "uhr2gpgwDqQnL-fsuAnSA",
           "properties": {
             "acceleration": 2,
             "maxSpeed": 5,
@@ -161,23 +177,31 @@
       "behaviors": [
         {
           "name": "Transform",
-          "id": "R5-VTSkMg6w1PgmPoQwJV",
+          "id": "9rZxlFU6tXXz0YrbqVMoi",
           "properties": {
             "position": {
               "x": -4,
               "y": 0
             },
             "scale": {
-              "x": 3,
-              "y": 3
+              "x": 1,
+              "y": 1
             },
-            "rotation": "-6"
+            "rotation": -6
           }
         },
         {
           "name": "Rectangle",
-          "id": "jqxuErJQpQmT-1euM_3FV",
+          "id": "Uge1koSy40X7Tg83fpyEO",
           "properties": {
+            "size": {
+              "x": 2,
+              "y": 2
+            },
+            "offset": {
+              "x": -1,
+              "y": -1
+            },
             "color": "#ff00d0"
           }
         }

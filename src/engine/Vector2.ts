@@ -1,6 +1,10 @@
 export class Vector2 {
   constructor(public x: number = 0, public y: number = 0) {}
 
+  static fromObject(obj: { x: number; y: number }): Vector2 {
+    return new Vector2(obj.x, obj.y);
+  }
+
   // Basic vector operations
   add(other: Vector2): Vector2 {
     return new Vector2(this.x + other.x, this.y + other.y);
@@ -21,6 +25,15 @@ export class Vector2 {
   divide(scalar: number): Vector2 {
     if (scalar === 0) throw new Error("Division by zero");
     return new Vector2(this.x / scalar, this.y / scalar);
+  }
+
+  rotate(angle: number): Vector2 {
+    const cos = Math.cos(angle);
+    const sin = Math.sin(angle);
+    return new Vector2(
+      this.x * cos - this.y * sin,
+      this.x * sin + this.y * cos
+    );
   }
 
   // Vector properties

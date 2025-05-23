@@ -1,7 +1,4 @@
-type Vector2 = {
-  x: number;
-  y: number;
-};
+import Vector2 from "../../../engine/Vector2";
 
 type Vector2InputProps = {
   label: string;
@@ -35,9 +32,17 @@ function Vector2Input({ label, value, onChange }: Vector2InputProps) {
     axis: "x" | "y"
   ) {
     if (axis === "x") {
-      onChange({ x: Number(e.target.value), y: (value as Vector2).y });
+      const newVector = new Vector2(
+        Number(e.target.value),
+        (value as Vector2).y
+      );
+      onChange(newVector);
     } else {
-      onChange({ x: (value as Vector2).x, y: Number(e.target.value) });
+      const newVector = new Vector2(
+        (value as Vector2).x,
+        Number(e.target.value)
+      );
+      onChange(newVector);
     }
   }
 

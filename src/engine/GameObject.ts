@@ -85,15 +85,19 @@ export class GameObject {
     };
   }
 
-  static deserialize(data: SerializedGameObject) {
+  static deserialize(
+    data: SerializedGameObject,
+    parent?: GameObject
+  ): GameObject {
     const gameObject = new GameObject({ name: data.name });
     gameObject.id = data.id;
+    gameObject.parent = parent;
     gameObject.behaviors = data.behaviors.reduce((acc, behavior) => {
       acc[behavior.name] = deserializeBehavior(behavior);
       return acc;
     }, {} as Record<string, Behavior>);
     gameObject.children = data.children.map((child) =>
-      GameObject.deserialize(child)
+      GameObject.deserialize(child, gameObject)
     );
     return gameObject;
 
@@ -155,9 +159,11 @@ export class GameObject {
       ctx.translate(transform.position.x, transform.position.y);
     }
     ctx.rotate(transform.rotation);
+    ctx.scale(transform.scale.x, transform.scale.y);
     Object.values(this.behaviors).forEach((behavior) => {
       if (behavior.active) {
-        behavior.draw?.(ctx, renderPass);
+        if (!behavior.draw) return;
+        behavior.draw(ctx, renderPass);
       }
     });
     this.children.forEach((child) => {
@@ -177,6 +183,18 @@ export class GameObject {
     });
     this.children.forEach((child) => {
       child.drawWorldSpace();
+    });
+  }
+
+  drawScreenSpace() {
+    if (!this.isActive) return;
+    const ctx = Game.instance?.ctx;
+    if (!ctx) return;
+    Object.values(this.behaviors).forEach((behavior) => {
+      behavior.drawScreenSpace?.(ctx);
+    });
+    this.children.forEach((child) => {
+      child.drawScreenSpace();
     });
   }
 

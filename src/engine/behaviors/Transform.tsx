@@ -5,24 +5,25 @@ import Vector2 from "../Vector2";
 
 const DEBUG = false;
 
-class Transform extends Behavior {
-  @inspect()
-  position: Vector2 = new Vector2(0, 0);
+interface TransformData {
+  position: Vector2;
+  scale: Vector2;
+  rotation: number;
+}
 
-  @inspect()
-  scale: Vector2 = new Vector2(1, 1);
-
-  @inspect()
-  rotation: number = 0;
-
+class Transform extends Behavior implements TransformData {
+  @inspect() position: Vector2 = new Vector2(0, 0);
+  @inspect() scale: Vector2 = new Vector2(1, 1);
+  @inspect() rotation: number = 0;
   canDisable: boolean = false;
-
   gizmoScale: number = 1;
+  mousePosition: Vector2 = new Vector2(0, 0);
 
-  constructor(args) {
+  constructor(args: Partial<Transform> = {}) {
     super(args);
 
     // event listeners for + and - to scale gizmo
+    // TODO we need a cleanup function to avoid memory leaks
     window.addEventListener("keydown", (e) => {
       if (e.key === "+" || e.key === "=") {
         this.gizmoScale *= 1.5;
@@ -30,6 +31,15 @@ class Transform extends Behavior {
       if (e.key === "-") {
         this.gizmoScale /= 1.5;
       }
+      if (e.key === "0") {
+        this.gizmoScale = 1;
+      }
+    });
+
+    window.addEventListener("mousemove", (e) => {
+      const rect = Game.instance!.canvas.getBoundingClientRect();
+      const relPos = new Vector2(e.clientX - rect.left, e.clientY - rect.top);
+      this.mousePosition = relPos.divide(Game.instance!.PPU); // returns in scaled canvas units, not pixels
     });
   }
 
@@ -42,18 +52,66 @@ class Transform extends Behavior {
     ctx.fillText(`x: ${this.position.x}, y: ${this.position.y}`, 0, 10);
   }
 
-  // getWorldPosition() {
-  //   const parent = this.gameObject?.parent;
-  //   if (!parent) return this.position;
-  //   const parentTransform = parent.behaviors.Transform as Transform;
-  //   return parentTransform.position.add(this.position);
-  // }
+  getWorldTransform(transform: Transform): {
+    position: Vector2;
+    rotation: number;
+    scale: Vector2;
+  } {
+    if (!transform.gameObject?.parent) {
+      return {
+        position: transform.position,
+        rotation: transform.rotation,
+        scale: transform.scale,
+      };
+    }
 
-  getWorldTransform(): Transform {
-    const parent = this.gameObject?.parent;
-    if (!parent) return this;
-    const parentTransform = parent.behaviors.Transform as Transform;
-    return parentTransform.getWorldTransform().multiply(this);
+    const parentWorld = this.getWorldTransform(
+      transform.gameObject.parent.behaviors.Transform as Transform
+    );
+
+    return this.applyTransform(transform, parentWorld);
+  }
+
+  applyTransform(transform: Transform, parent: TransformData): TransformData {
+    // 1. Scale local position by parent's scale
+    const scaled = new Vector2(
+      transform.position.x * parent.scale.x,
+      transform.position.y * parent.scale.y
+    );
+
+    // 2. Rotate it by parent's rotation
+    const rotated = scaled.rotate(parent.rotation);
+
+    // 3. Add to parent's position
+    const position = new Vector2(
+      parent.position.x + rotated.x,
+      parent.position.y + rotated.y
+    );
+
+    // 4. Compose rotation and scale
+    const rotation = parent.rotation + transform.rotation;
+    const scale = new Vector2(
+      parent.scale.x * transform.scale.x,
+      parent.scale.y * transform.scale.y
+    );
+
+    return { position, rotation, scale };
+  }
+
+  screenToWorld(position: Vector2): Vector2 {
+    const canvas = Game.instance!.canvas;
+
+    const canvasSize = new Vector2(canvas.width, canvas.height).divide(
+      Game.instance!.highResolution ? 2 : 1
+    );
+
+    const relCenter = position
+      .multiply(Game.instance!.PPU)
+      .subtract(new Vector2(canvasSize.x / 2, canvasSize.y / 2));
+
+    const camTransform = Game.Camera.behaviors.Transform as Transform;
+    const scaledPosition = relCenter.divide(Game.instance!.PPU);
+    return scaledPosition.add(camTransform.position);
   }
 
   multiply(other: Transform) {
@@ -67,57 +125,100 @@ class Transform extends Behavior {
   drawWorldSpace(ctx: CanvasRenderingContext2D) {
     ctx.fillStyle = "purple";
 
-    const worldTransform = this.getWorldTransform();
+    const { position, rotation } = this.getWorldTransform(this);
 
     const scalar = (1 / Game.instance!.PPU) * this.gizmoScale;
     ctx.save();
-    ctx.translate(worldTransform.position.x, worldTransform.position.y);
-    // ctx.rotate(worldTransform.rotation); // this toggles localspace gizmo
-    ctx.scale(scalar, scalar);
 
-    const gizmoSize = 40;
-    const arrowSize = 16;
+    ctx.translate(position.x, position.y); // translate to local position
+    ctx.rotate(rotation);
+    ctx.scale(scalar, scalar); // inverse the PPU scaling to get back to pixel space (and scale the gizmo)
+
+    // gizmo size params
+    const gizmoSize = 30;
+    const arrowSize = 12;
+    const arrowLength = 8;
     const lineWidth = 3;
-    const dotSize = 6;
+    const dotSize = 8;
 
-    // X-axis (red)
-    ctx.beginPath();
-    ctx.strokeStyle = "red";
-    ctx.lineWidth = lineWidth;
-    ctx.moveTo(0, 0);
-    ctx.lineTo(gizmoSize - arrowSize, 0);
-    ctx.stroke();
+    const xColor = "255,0,0";
+    const yColor = "0,200,0";
+    const lineColor = "255,255,255";
+
+    ctx.strokeStyle = `rgba(0,0,0,0.25)`;
+    ctx.lineWidth = 1 / Game.instance!.PPU / scalar;
 
     // X arrow
     ctx.beginPath();
     ctx.moveTo(gizmoSize, 0);
-    ctx.lineTo(gizmoSize - arrowSize, -arrowSize / 2);
-    ctx.lineTo(gizmoSize - arrowSize, arrowSize / 2);
+    ctx.lineTo(gizmoSize - arrowLength, -arrowSize / 2);
+    ctx.lineTo(gizmoSize - arrowLength, arrowSize / 2);
+    ctx.fillStyle = `rgba(${xColor},1)`;
     ctx.closePath();
-    ctx.fillStyle = "red";
+    ctx.stroke();
     ctx.fill();
 
-    // Y-axis (green)
+    // X arrow (opposite)
     ctx.beginPath();
-    ctx.strokeStyle = "green";
-    ctx.moveTo(0, 0);
-    ctx.lineTo(0, -gizmoSize + arrowSize);
+    ctx.moveTo(-gizmoSize, 0);
+    ctx.lineTo(-gizmoSize + arrowLength, -arrowSize / 2);
+    ctx.lineTo(-gizmoSize + arrowLength, arrowSize / 2);
+    ctx.fillStyle = `rgba(${lineColor},0.5)`;
+    ctx.closePath();
     ctx.stroke();
+    ctx.fill();
 
     // Y arrow
     ctx.beginPath();
-    ctx.moveTo(0, -gizmoSize);
-    ctx.lineTo(-arrowSize / 2, -gizmoSize + arrowSize);
-    ctx.lineTo(arrowSize / 2, -gizmoSize + arrowSize);
+    ctx.moveTo(0, gizmoSize);
+    ctx.lineTo(-arrowSize / 2, gizmoSize - arrowLength);
+    ctx.lineTo(arrowSize / 2, gizmoSize - arrowLength);
+    ctx.fillStyle = `rgba(${yColor},1)`;
     ctx.closePath();
-    ctx.fillStyle = "green";
+    ctx.stroke();
+    ctx.fill();
+
+    // Y arrow (opposite)
+    ctx.beginPath();
+    ctx.moveTo(0, -gizmoSize);
+    ctx.lineTo(-arrowSize / 2, -gizmoSize + arrowLength);
+    ctx.lineTo(arrowSize / 2, -gizmoSize + arrowLength);
+    ctx.fillStyle = `rgba(${lineColor},0.5)`;
+    ctx.closePath();
+    ctx.stroke();
     ctx.fill();
 
     // Center point
     ctx.beginPath();
     ctx.arc(0, 0, dotSize, 0, Math.PI * 2);
-    ctx.fillStyle = "white";
+    ctx.fillStyle = `rgba(${lineColor},1)`;
+    ctx.stroke();
     ctx.fill();
+
+    ctx.beginPath();
+    ctx.arc(
+      0,
+      0,
+      gizmoSize - (arrowLength + 6) + lineWidth / 2,
+      0,
+      Math.PI * 2
+    );
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(
+      0,
+      0,
+      gizmoSize - (arrowLength + 6) - lineWidth / 2,
+      0,
+      Math.PI * 2
+    );
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.lineWidth = lineWidth;
+    ctx.strokeStyle = `rgba(${lineColor},0.5)`;
+    ctx.arc(0, 0, gizmoSize - (arrowLength + 6), 0, Math.PI * 2);
+    ctx.stroke();
 
     ctx.restore();
   }

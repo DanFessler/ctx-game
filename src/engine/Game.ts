@@ -19,6 +19,7 @@ class Game {
   scale: number = 4;
   isPlaying = false;
   behaviors: Record<string, new () => Behavior> = {};
+  highResolution: boolean = false;
 
   constructor(
     width: number,
@@ -32,20 +33,21 @@ class Game {
 
     this.scene = new GameObject({ name: "Scene" });
 
+    this.highResolution = window.devicePixelRatio > 1;
     this.scale = scale;
     this.canvas = document.createElement("canvas");
-    this.canvas.width = width;
-    this.canvas.height = height;
+    this.canvas.width = width * (this.highResolution ? 2 : 1);
+    this.canvas.height = height * (this.highResolution ? 2 : 1);
     this.canvas.style.backgroundColor = "black";
     this.canvas.style.imageRendering = "pixelated";
     this.canvas.style.width = `${width * this.scale}px`;
     this.canvas.style.height = `${height * this.scale}px`;
-
     this.PPU = PPU;
+
     this.ctx = this.canvas.getContext("2d")!;
-    this.ctx.scale(this.PPU, this.PPU);
-    this.ctx.lineWidth = 1 / this.PPU;
-    this.ctx.font = `${12 / this.PPU}px Arial`;
+    this.ctx.scale(PPU, PPU);
+    this.ctx.lineWidth = 1 / PPU;
+    this.ctx.font = `${12 / PPU}px Arial`;
     this.ctx.imageSmoothingEnabled = false;
 
     Input.getInstance();
@@ -128,27 +130,36 @@ class Game {
     }
 
     this.ctx.save();
-    const cameraTransform = Game.Camera.behaviors.Transform as Transform;
+    {
+      if (this.highResolution) this.ctx.scale(2, 2);
+      this.ctx.save();
+      {
+        const PPU = this.PPU * (this.highResolution ? 2 : 1);
+        const cameraTransform = Game.Camera.behaviors.Transform as Transform;
 
-    const snapToPixel = true;
-    if (snapToPixel) {
-      this.ctx.translate(
-        Math.round(
-          -cameraTransform.position.x * this.PPU + this.canvas.width / 2
-        ) / this.PPU,
-        Math.round(
-          -cameraTransform.position.y * this.PPU + this.canvas.height / 2
-        ) / this.PPU
-      );
-    } else {
-      this.ctx.translate(
-        -cameraTransform.position.x + this.canvas.width / this.PPU / 2,
-        -cameraTransform.position.y + this.canvas.height / this.PPU / 2
-      );
+        const snapToPixel = true;
+        if (snapToPixel) {
+          this.ctx.translate(
+            Math.round(
+              -cameraTransform.position.x * PPU + this.canvas.width / 2
+            ) / PPU,
+            Math.round(
+              -cameraTransform.position.y * PPU + this.canvas.height / 2
+            ) / PPU
+          );
+        } else {
+          this.ctx.translate(
+            -cameraTransform.position.x + this.canvas.width / PPU / 2,
+            -cameraTransform.position.y + this.canvas.height / PPU / 2
+          );
+        }
+        this.scene.draw("default");
+        this.scene.draw("editor");
+        this.scene.drawWorldSpace();
+      }
+      this.ctx.restore();
     }
-    this.scene.draw("default");
-    this.scene.draw("editor");
-    this.scene.drawWorldSpace();
+    this.scene.drawScreenSpace();
     this.ctx.restore();
     // this.scene.drawScreenSpace(); // not implemented
   }

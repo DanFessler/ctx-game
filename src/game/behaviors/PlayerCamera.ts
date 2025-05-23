@@ -1,8 +1,7 @@
-import { Transform } from "../../engine/behaviors/Transform";
+import Transform from "../../engine/behaviors/Transform";
 import Behavior from "../../engine/Behavior";
 import Input from "../../engine/Input";
 import Vector2 from "../../engine/Vector2";
-import Game from "../../engine/Game";
 import { inspect } from "../../engine/serializable";
 
 class CameraController extends Behavior {
@@ -50,18 +49,6 @@ class CameraController extends Behavior {
     const transform = this.gameObject!.behaviors.Transform as Transform;
     transform.position.x += this.velocity.x;
     transform.position.y += this.velocity.y;
-  }
-
-  draw(ctx: CanvasRenderingContext2D, renderPass?: string) {
-    if (renderPass !== "editor") return;
-
-    ctx.strokeStyle = "black";
-    ctx.beginPath();
-    ctx.moveTo(0, -0.5);
-    ctx.lineTo(0, 0.5);
-    ctx.moveTo(-0.5, 0);
-    ctx.lineTo(0.5, 0);
-    ctx.stroke();
   }
 }
 
