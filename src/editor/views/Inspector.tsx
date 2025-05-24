@@ -27,10 +27,17 @@ import SortableItem from "../components/SortableItem";
 import styles from "./Inspector.module.css";
 import useGameObject from "../hooks/useGameObject";
 import Game from "../../engine/Game";
+import useGameObjectSelector from "../hooks/useGameObjectSelector";
+import game from "../../game";
 
-function Inspector({ gameObject }: { gameObject: GameObject }) {
-  useGameObject(gameObject);
+function Inspector() {
+  const gameObject = useGameObjectSelector(
+    game,
+    (go) => (go as Game).selectedGameObject
+  );
+  useGameObject(gameObject!);
 
+  if (!gameObject) return null;
   const behaviors = gameObject.behaviors;
 
   return (
@@ -41,6 +48,7 @@ function Inspector({ gameObject }: { gameObject: GameObject }) {
           checked={gameObject.isActive}
           onChange={() => {
             gameObject.isActive = !gameObject.isActive;
+            gameObject.updateSubscribers();
           }}
           onClick={(e) => {
             e.stopPropagation();
@@ -52,6 +60,7 @@ function Inspector({ gameObject }: { gameObject: GameObject }) {
           value={gameObject.name}
           onChange={(e) => {
             gameObject.name = e.target.value;
+            gameObject.updateSubscribers();
           }}
           className={styles.nameInput}
         />

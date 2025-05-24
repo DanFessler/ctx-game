@@ -3,18 +3,25 @@ import { FaSearch } from "react-icons/fa";
 import HierarchyList from "../components/HierarchyList";
 import GameObject from "../../engine/GameObject";
 import native from "../callNative";
+import game from "../../game";
+import useGameObjectSelector from "../hooks/useGameObjectSelector";
+import Game from "../../engine/Game";
 
 type SceneHierarchyProps = {
   gameObject: GameObject;
-  setSelectedGameObject: (gameObject: GameObject) => void;
-  selectedGameObject: GameObject | null;
+  // setSelectedGameObject: (gameObject: GameObject) => void;
+  // selectedGameObject: GameObject | null;
 };
 
 function SceneHierarchy({
   gameObject,
-  setSelectedGameObject,
-  selectedGameObject,
-}: SceneHierarchyProps) {
+}: // setSelectedGameObject,
+// selectedGameObject,
+SceneHierarchyProps) {
+  const selected = useGameObjectSelector(
+    game,
+    (go) => (go as Game).selectedGameObject
+  );
   return (
     <div className={styles.container}>
       <div className={styles.header}>
@@ -30,8 +37,11 @@ function SceneHierarchy({
       <div className={styles.content}>
         <HierarchyList
           gameObject={gameObject}
-          setSelectedGameObject={setSelectedGameObject}
-          selectedGameObject={selectedGameObject}
+          setSelectedGameObject={(gameObject) => {
+            game.selectedGameObject = gameObject;
+            game.updateSubscribers();
+          }}
+          selectedGameObject={selected}
         />
       </div>
       <div

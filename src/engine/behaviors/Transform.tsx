@@ -2,6 +2,7 @@ import Behavior from "../Behavior";
 import Game from "../Game";
 import { inspect } from "../serializable";
 import Vector2 from "../Vector2";
+import Input from "../Input";
 
 const DEBUG = false;
 
@@ -19,7 +20,7 @@ class Transform extends Behavior implements TransformData {
   gizmoScale: number = 1;
   mousePosition: Vector2 = new Vector2(0, 0);
   mouseDown: boolean = false;
-  draggingGizmo: boolean = false;
+  static dragging: boolean = false;
 
   constructor(args: Partial<Transform> = {}) {
     super(args);
@@ -35,27 +36,6 @@ class Transform extends Behavior implements TransformData {
       }
       if (e.key === "0") {
         this.gizmoScale = 1;
-      }
-    });
-
-    if (!Game.instance) return;
-    const canvas = Game.instance!.canvas;
-    window.addEventListener("mousemove", (e) => {
-      const rect = Game.instance!.canvas.getBoundingClientRect();
-      const relPos = new Vector2(e.clientX - rect.left, e.clientY - rect.top);
-      this.mousePosition = relPos.divide(Game.instance!.PPU); // returns in scaled canvas units, not pixels
-    });
-
-    canvas.addEventListener("mousedown", (e) => {
-      if (e.button === 0) {
-        this.mouseDown = true;
-      }
-    });
-
-    window.addEventListener("mouseup", (e) => {
-      if (e.button === 0) {
-        this.mouseDown = false;
-        this.draggingGizmo = false;
       }
     });
   }
@@ -173,22 +153,39 @@ class Transform extends Behavior implements TransformData {
       ctx,
       this,
       this.gizmoScale,
-      this.gameObject?.isSelected ? true : false
+      Game.instance?.selectedGameObject === this.gameObject ? true : false
     );
   }
 
   updateEditor() {
-    if (!this.gameObject?.isSelected) return;
-    if (this.mouseDown) {
-      const localPosition = this.screenToLocal(this.mousePosition);
+    const isSelected = this.gameObject === Game.instance?.selectedGameObject;
+    const localPosition = this.screenToLocal(Input.getMousePosition());
+    const isOverGizmo =
+      localPosition.distanceTo(this.position) < 8 / Game.instance!.PPU;
+    if (!Game.instance) return;
 
-      if (localPosition.distanceTo(this.position) < 8 / Game.instance!.PPU) {
-        this.draggingGizmo = true;
+    if (!isSelected) {
+      if (Input.isMouseDown(0) && isOverGizmo && !Transform.dragging) {
+        Game.instance!.selectedGameObject = this.gameObject;
+        Game.instance!.updateSubscribers();
+        Transform.dragging = true;
       }
-      if (this.draggingGizmo) {
+    }
+
+    if (isSelected) {
+      if (Input.isMouseDown(0) && !Transform.dragging) {
+        if (!Transform.dragging && isOverGizmo) {
+          Transform.dragging = true;
+        }
+      }
+      if (Transform.dragging) {
         this.position.x = localPosition.x;
         this.position.y = localPosition.y;
+        // this.gameObject?.updateSubscribers();
       }
+    }
+    if (!Input.isMouseDown(0)) {
+      Transform.dragging = false;
     }
   }
 }
@@ -217,9 +214,18 @@ function drawGizmo(
   const xColor = "255,0,0";
   const yColor = "0,200,0";
   const lineColor = "255,255,255";
+  const outlineColor = `rgba(0,0,0,0.25)`;
 
-  ctx.strokeStyle = `rgba(0,0,0,0.25)`;
+  ctx.strokeStyle = outlineColor;
   ctx.lineWidth = 1 / Game.instance!.PPU / scalar;
+
+  // Center point
+  ctx.beginPath();
+  ctx.arc(0, 0, dotSize, 0, Math.PI * 2);
+  ctx.fillStyle = `rgba(${lineColor},1)`;
+  ctx.strokeStyle = outlineColor;
+  ctx.stroke();
+  ctx.fill();
 
   if (isSelected) {
     // X arrow
@@ -287,13 +293,6 @@ function drawGizmo(
     ctx.arc(0, 0, gizmoSize - (arrowLength + 6), 0, Math.PI * 2);
     ctx.stroke();
   }
-
-  // Center point
-  ctx.beginPath();
-  ctx.arc(0, 0, dotSize, 0, Math.PI * 2);
-  ctx.fillStyle = `rgba(${lineColor},1)`;
-  ctx.stroke();
-  ctx.fill();
 
   ctx.restore();
 }

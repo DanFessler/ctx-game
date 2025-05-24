@@ -2,6 +2,7 @@ import { useState } from "react";
 import GameObject from "../../engine/GameObject";
 import styles from "./HierarchyList.module.css";
 import { PiBoundingBoxFill } from "react-icons/pi";
+import useGameObjectSelector from "../hooks/useGameObjectSelector";
 
 function HierarchyList({
   gameObject,
@@ -10,7 +11,7 @@ function HierarchyList({
 }: {
   gameObject: GameObject;
   setSelectedGameObject: (gameObject: GameObject) => void;
-  selectedGameObject: GameObject | null;
+  selectedGameObject: GameObject | undefined;
 }) {
   return (
     <ul className={styles.list}>
@@ -30,10 +31,13 @@ function HierarchyItem({
 }: {
   gameObject: GameObject;
   setSelectedGameObject: (gameObject: GameObject) => void;
-  selectedGameObject: GameObject | null;
+  selectedGameObject: GameObject | undefined;
 }) {
   const [isOpen, setIsOpen] = useState(true);
   const hasChildren = gameObject.children.length > 0;
+  const name = useGameObjectSelector(gameObject, (go) => go.name);
+
+  console.log("rendering HierarchyItem", gameObject.name, name);
 
   function renderArrow() {
     return (

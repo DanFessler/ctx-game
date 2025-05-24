@@ -20,6 +20,9 @@ class Game {
   isPlaying = false;
   behaviors: Record<string, new () => Behavior> = {};
   highResolution: boolean = false;
+  selectedGameObject: GameObject | undefined;
+
+  private subscribers = new Set<() => void>();
 
   constructor(
     width: number,
@@ -50,9 +53,20 @@ class Game {
     this.ctx.font = `${12 / PPU}px Arial`;
     this.ctx.imageSmoothingEnabled = false;
 
-    Input.getInstance();
+    Input.getInstance().registerCanvas(this.canvas);
     Game.instance = this;
     this.registerBehaviors(behaviors);
+  }
+
+  subscribe = (callback: () => void): (() => void) => {
+    this.subscribers.add(callback);
+    return () => {
+      this.subscribers.delete(callback);
+    };
+  };
+
+  updateSubscribers() {
+    this.subscribers.forEach((callback) => callback());
   }
 
   init() {}
