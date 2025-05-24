@@ -1,9 +1,7 @@
-// import { useState } from "react";
 import { Dockable, useDockableLocalStorage } from "@danfessler/react-dockable";
 import "@danfessler/react-dockable/style.css";
 
 // Game engine related imports
-// import GameObject from "../engine/GameObject";
 import game from "../game";
 import SceneHierarchy from "./views/Hierarchy";
 import SceneCanvas from "./views/SceneCanvas";
@@ -11,19 +9,9 @@ import Inspector from "./views/Inspector";
 
 import "./App.css";
 import AssetBrowser from "./views/AssetBrowser";
-// import useGameObjectSelector from "./hooks/useGameObjectSelector";
 
 function App() {
-  // const [selectedGameObject, setSelectedGameObject] =
-  //   useState<GameObject | null>(game.scene);
-
-  // const selected = useGameObjectSelector(game, (go) => go.isSelected);
-
   const { layout, setLayout } = useDockableLocalStorage(3);
-
-  // function handleSelectGameObject(gameObject: GameObject) {
-  //   game.selectedGameObject = gameObject;
-  // }
 
   return (
     <Dockable.Root

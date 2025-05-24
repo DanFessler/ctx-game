@@ -21,6 +21,7 @@ class Transform extends Behavior implements TransformData {
   mousePosition: Vector2 = new Vector2(0, 0);
   mouseDown: boolean = false;
   static dragging: boolean = false;
+  currentState: "deselected" | "selected" | "dragging" = "deselected";
 
   constructor(args: Partial<Transform> = {}) {
     super(args);
@@ -158,34 +159,63 @@ class Transform extends Behavior implements TransformData {
   }
 
   updateEditor() {
-    const isSelected = this.gameObject === Game.instance?.selectedGameObject;
-    const localPosition = this.screenToLocal(Input.getMousePosition());
-    const isOverGizmo =
-      localPosition.distanceTo(this.position) < 8 / Game.instance!.PPU;
-    if (!Game.instance) return;
+    const isOverGizmo = (position: Vector2) => {
+      return position.distanceTo(this.position) < 8 / Game.instance!.PPU;
+    };
 
-    if (!isSelected) {
-      if (Input.isMouseDown(0) && isOverGizmo && !Transform.dragging) {
-        Game.instance!.selectedGameObject = this.gameObject;
-        Game.instance!.updateSubscribers();
-        Transform.dragging = true;
-      }
-    }
-
-    if (isSelected) {
-      if (Input.isMouseDown(0) && !Transform.dragging) {
-        if (!Transform.dragging && isOverGizmo) {
-          Transform.dragging = true;
+    switch (this.currentState) {
+      case "deselected": {
+        const localPosition = this.screenToLocal(Input.getMousePosition());
+        const selectedObject = Game.instance?.selectedGameObject;
+        if (
+          !selectedObject &&
+          isOverGizmo(localPosition) &&
+          Input.isMouseDown(0)
+        ) {
+          Game.instance!.selectedGameObject = this.gameObject;
+          Game.instance!.updateSubscribers();
+          this.currentState = "selected";
         }
+
+        // we have to consider the case where the selected object changes from outside the state machine
+        if (selectedObject === this.gameObject) {
+          this.currentState = "selected";
+        }
+
+        break;
       }
-      if (Transform.dragging) {
+
+      case "selected": {
+        const localPosition = this.screenToLocal(Input.getMousePosition());
+        const selectedObject = Game.instance?.selectedGameObject;
+
+        if (Input.isMouseDown(0)) {
+          if (isOverGizmo(localPosition)) {
+            this.currentState = "dragging";
+          } else {
+            this.currentState = "deselected";
+            Game.instance!.selectedGameObject = undefined;
+            Game.instance!.updateSubscribers();
+          }
+        }
+
+        // we have to consider the case where the selected object changes from outside the state machine
+        if (selectedObject !== this.gameObject) {
+          this.currentState = "deselected";
+        }
+        break;
+      }
+
+      case "dragging": {
+        const localPosition = this.screenToLocal(Input.getMousePosition());
         this.position.x = localPosition.x;
         this.position.y = localPosition.y;
-        // this.gameObject?.updateSubscribers();
+
+        if (!Input.isMouseDown(0)) {
+          this.currentState = "selected";
+        }
+        break;
       }
-    }
-    if (!Input.isMouseDown(0)) {
-      Transform.dragging = false;
     }
   }
 }

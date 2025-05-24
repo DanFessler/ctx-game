@@ -35,9 +35,10 @@ function HierarchyItem({
 }) {
   const [isOpen, setIsOpen] = useState(true);
   const hasChildren = gameObject.children.length > 0;
-  const name = useGameObjectSelector(gameObject, (go) => go.name);
-
-  console.log("rendering HierarchyItem", gameObject.name, name);
+  const name = useGameObjectSelector<GameObject, string>(
+    gameObject,
+    (go) => go.name
+  );
 
   function renderArrow() {
     return (
@@ -67,7 +68,7 @@ function HierarchyItem({
       >
         {hasChildren ? renderArrow() : null}
         <PiBoundingBoxFill />
-        {gameObject.name}
+        {name}
       </div>
       {isOpen && hasChildren ? (
         <div className={styles.children}>

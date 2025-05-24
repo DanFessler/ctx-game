@@ -37,7 +37,17 @@ export class Input {
   }
 
   private handleMouseDown(event: MouseEvent): void {
-    this.mouseStates.set(event.button, true);
+    // check if it's within the canvas
+    const rect = this.canvas!.getBoundingClientRect();
+    if (
+      event.clientX >= rect.left &&
+      event.clientX <= rect.right &&
+      event.clientY >= rect.top &&
+      event.clientY <= rect.bottom
+    ) {
+      console.log("mouse down", event.button, this.canvas);
+      this.mouseStates.set(event.button, true);
+    }
   }
 
   private handleMouseUp(event: MouseEvent): void {

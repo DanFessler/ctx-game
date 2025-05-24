@@ -18,9 +18,9 @@ function SceneHierarchy({
 }: // setSelectedGameObject,
 // selectedGameObject,
 SceneHierarchyProps) {
-  const selected = useGameObjectSelector(
+  const selected = useGameObjectSelector<Game, GameObject | undefined>(
     game,
-    (go) => (go as Game).selectedGameObject
+    (go) => go.selectedGameObject
   );
   return (
     <div className={styles.container}>

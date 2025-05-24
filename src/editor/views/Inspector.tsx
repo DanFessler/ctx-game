@@ -31,9 +31,9 @@ import useGameObjectSelector from "../hooks/useGameObjectSelector";
 import game from "../../game";
 
 function Inspector() {
-  const gameObject = useGameObjectSelector(
+  const gameObject = useGameObjectSelector<Game, GameObject | undefined>(
     game,
-    (go) => (go as Game).selectedGameObject
+    (go) => go.selectedGameObject
   );
   useGameObject(gameObject!);
 

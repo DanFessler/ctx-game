@@ -6,9 +6,9 @@ interface Subscribeable {
   subscribe: (callback: () => void) => () => void;
 }
 
-function useGameObjectSelector<T>(
-  gameObject: Subscribeable,
-  selector: (go: Subscribeable) => T,
+function useGameObjectSelector<ObjectType extends Subscribeable, T>(
+  gameObject: ObjectType,
+  selector: (go: ObjectType) => T,
   equalityFn: (a: T, b: T) => boolean = Object.is
 ): T {
   const [selected, setSelected] = useState(() => selector(gameObject));
