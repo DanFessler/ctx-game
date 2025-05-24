@@ -21,7 +21,13 @@ class Transform extends Behavior implements TransformData {
   mousePosition: Vector2 = new Vector2(0, 0);
   mouseDown: boolean = false;
   static dragging: boolean = false;
-  currentState: "deselected" | "selected" | "dragging" = "deselected";
+  private currentState:
+    | "deselected"
+    | "selected"
+    | "dragging"
+    | "draggingY"
+    | "draggingX" = "deselected";
+  private offset: Vector2 = new Vector2(0, 0);
 
   constructor(args: Partial<Transform> = {}) {
     super(args);
@@ -163,6 +169,20 @@ class Transform extends Behavior implements TransformData {
       return position.distanceTo(this.position) < 8 / Game.instance!.PPU;
     };
 
+    const isOverArrow = (position: Vector2, axis: "x" | "y") => {
+      return (
+        position.distanceTo(
+          this.position.add(
+            (axis === "y"
+              ? new Vector2(0, 30 / Game.instance!.PPU)
+              : new Vector2(30 / Game.instance!.PPU, 0)
+            ).rotate(this.rotation)
+          )
+        ) <
+        8 / Game.instance!.PPU
+      );
+    };
+
     switch (this.currentState) {
       case "deselected": {
         const localPosition = this.screenToLocal(Input.getMousePosition());
@@ -192,6 +212,13 @@ class Transform extends Behavior implements TransformData {
         if (Input.isMouseDown(0)) {
           if (isOverGizmo(localPosition)) {
             this.currentState = "dragging";
+            this.offset = localPosition.subtract(this.position);
+          } else if (isOverArrow(localPosition, "y")) {
+            this.currentState = "draggingY";
+            this.offset = localPosition.subtract(this.position);
+          } else if (isOverArrow(localPosition, "x")) {
+            this.currentState = "draggingX";
+            this.offset = localPosition.subtract(this.position);
           } else {
             this.currentState = "deselected";
             Game.instance!.selectedGameObject = undefined;
@@ -207,9 +234,71 @@ class Transform extends Behavior implements TransformData {
       }
 
       case "dragging": {
-        const localPosition = this.screenToLocal(Input.getMousePosition());
+        const localPosition = this.screenToLocal(
+          Input.getMousePosition()
+        ).subtract(this.offset);
         this.position.x = localPosition.x;
         this.position.y = localPosition.y;
+
+        if (!Input.isMouseDown(0)) {
+          this.currentState = "selected";
+        }
+        break;
+      }
+
+      case "draggingY": {
+        const localPosition = this.screenToLocal(
+          Input.getMousePosition()
+        ).subtract(this.offset);
+
+        // Calculate movement vector
+        const movement = localPosition.subtract(this.position);
+
+        // Get the local Y axis direction vector (rotated by the object's rotation)
+        const localYAxis = new Vector2(
+          Math.sin(-this.rotation),
+          Math.cos(-this.rotation)
+        );
+
+        // Project movement onto local Y axis
+        const dotProduct =
+          movement.x * localYAxis.x + movement.y * localYAxis.y;
+        const projectedMovement = new Vector2(
+          localYAxis.x * dotProduct,
+          localYAxis.y * dotProduct
+        );
+
+        this.position = this.position.add(projectedMovement);
+
+        if (!Input.isMouseDown(0)) {
+          this.currentState = "selected";
+        }
+        break;
+      }
+
+      case "draggingX": {
+        const localPosition = this.screenToLocal(
+          Input.getMousePosition()
+        ).subtract(this.offset);
+
+        // Calculate movement vector
+        const movement = localPosition.subtract(this.position);
+
+        // Get the local X axis direction vector (rotated by the object's rotation)
+        const localXAxis = new Vector2(
+          Math.cos(this.rotation),
+          Math.sin(this.rotation)
+        );
+
+        // Project movement onto local X axis
+        const dotProduct =
+          movement.x * localXAxis.x + movement.y * localXAxis.y;
+        const projectedMovement = new Vector2(
+          localXAxis.x * dotProduct,
+          localXAxis.y * dotProduct
+        );
+
+        this.position = this.position.add(projectedMovement);
 
         if (!Input.isMouseDown(0)) {
           this.currentState = "selected";
@@ -268,16 +357,6 @@ function drawGizmo(
     ctx.stroke();
     ctx.fill();
 
-    // X arrow (opposite)
-    ctx.beginPath();
-    ctx.moveTo(-gizmoSize, 0);
-    ctx.lineTo(-gizmoSize + arrowLength, -arrowSize / 2);
-    ctx.lineTo(-gizmoSize + arrowLength, arrowSize / 2);
-    ctx.fillStyle = `rgba(${lineColor},0.5)`;
-    ctx.closePath();
-    ctx.stroke();
-    ctx.fill();
-
     // Y arrow
     ctx.beginPath();
     ctx.moveTo(0, gizmoSize);
@@ -288,16 +367,32 @@ function drawGizmo(
     ctx.stroke();
     ctx.fill();
 
-    // Y arrow (opposite)
-    ctx.beginPath();
-    ctx.moveTo(0, -gizmoSize);
-    ctx.lineTo(-arrowSize / 2, -gizmoSize + arrowLength);
-    ctx.lineTo(arrowSize / 2, -gizmoSize + arrowLength);
-    ctx.fillStyle = `rgba(${lineColor},0.5)`;
-    ctx.closePath();
-    ctx.stroke();
-    ctx.fill();
+    // X arrow (opposite)
+    // ctx.beginPath();
+    // ctx.moveTo(-gizmoSize, 0);
+    // ctx.lineTo(-gizmoSize + arrowLength, -arrowSize / 2);
+    // ctx.lineTo(-gizmoSize + arrowLength, arrowSize / 2);
+    // ctx.fillStyle = `rgba(${lineColor},0.5)`;
+    // ctx.closePath();
+    // ctx.stroke();
+    // ctx.fill();
 
+    // Y arrow (opposite)
+    // ctx.beginPath();
+    // ctx.moveTo(0, -gizmoSize);
+    // ctx.lineTo(-arrowSize / 2, -gizmoSize + arrowLength);
+    // ctx.lineTo(arrowSize / 2, -gizmoSize + arrowLength);
+    // ctx.fillStyle = `rgba(${lineColor},0.5)`;
+    // ctx.closePath();
+    // ctx.stroke();
+    // ctx.fill();
+
+    // visualize click area of an arrow
+    // ctx.moveTo(0, gizmoSize);
+    // ctx.arc(0, gizmoSize, 10, 0, Math.PI * 2);
+    // ctx.stroke();
+
+    // rotation ring subtle outline
     ctx.beginPath();
     ctx.arc(
       0,
@@ -317,6 +412,7 @@ function drawGizmo(
     );
     ctx.stroke();
 
+    // rotation ring
     ctx.beginPath();
     ctx.lineWidth = lineWidth;
     ctx.strokeStyle = `rgba(${lineColor},0.5)`;
