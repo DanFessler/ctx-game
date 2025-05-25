@@ -68,6 +68,18 @@ export class Vector2 {
     return `Vector2(${this.x}, ${this.y})`;
   }
 
+  angle(): number {
+    return Math.atan2(this.y, this.x);
+  }
+
+  angleTo(other: Vector2): number {
+    return Math.atan2(other.y - this.y, other.x - this.x);
+  }
+
+  static angleBetween(a: Vector2, b: Vector2): number {
+    return b.angle() - a.angle();
+  }
+
   // Static utility methods
   static zero(): Vector2 {
     return new Vector2(0, 0);
@@ -91,6 +103,13 @@ export class Vector2 {
 
   static right(): Vector2 {
     return new Vector2(1, 0);
+  }
+
+  static fromAngle(angle: number, magnitude: number = 1): Vector2 {
+    return new Vector2(
+      Math.cos(angle) * magnitude,
+      Math.sin(angle) * magnitude
+    );
   }
 }
 

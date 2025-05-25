@@ -6,6 +6,17 @@ import Input from "../Input";
 
 const DEBUG = false;
 
+// gizmo size params
+const gizmoSize = 30;
+const arrowSize = 12;
+const arrowLength = 8;
+const lineWidth = 4;
+const dotSize = 8;
+const xColor = "255,0,0";
+const yColor = "0,200,0";
+const lineColor = "255,255,255";
+const outlineColor = `rgba(0,0,0,0.25)`;
+
 interface TransformData {
   position: Vector2;
   scale: Vector2;
@@ -21,13 +32,14 @@ class Transform extends Behavior implements TransformData {
   mousePosition: Vector2 = new Vector2(0, 0);
   mouseDown: boolean = false;
   static dragging: boolean = false;
-  private currentState:
+  public currentState:
     | "deselected"
     | "selected"
     | "dragging"
     | "draggingY"
-    | "draggingX" = "deselected";
-  private offset: Vector2 = new Vector2(0, 0);
+    | "draggingX"
+    | "draggingRotation" = "deselected";
+  public offset: Vector2 = new Vector2(0, 0);
 
   constructor(args: Partial<Transform> = {}) {
     super(args);
@@ -166,20 +178,46 @@ class Transform extends Behavior implements TransformData {
 
   updateEditor() {
     const isOverGizmo = (position: Vector2) => {
-      return position.distanceTo(this.position) < 8 / Game.instance!.PPU;
+      return (
+        position.distanceTo(this.position) <
+        (dotSize / Game.instance!.PPU) * this.gizmoScale
+      );
     };
 
     const isOverArrow = (position: Vector2, axis: "x" | "y") => {
-      return (
+      const positive =
         position.distanceTo(
           this.position.add(
             (axis === "y"
-              ? new Vector2(0, 30 / Game.instance!.PPU)
-              : new Vector2(30 / Game.instance!.PPU, 0)
+              ? new Vector2(0, (30 / Game.instance!.PPU) * this.gizmoScale)
+              : new Vector2((30 / Game.instance!.PPU) * this.gizmoScale, 0)
             ).rotate(this.rotation)
           )
         ) <
-        8 / Game.instance!.PPU
+        (arrowLength / Game.instance!.PPU) * this.gizmoScale;
+      const negative =
+        position.distanceTo(
+          this.position.add(
+            (axis === "y"
+              ? new Vector2(0, (-30 / Game.instance!.PPU) * this.gizmoScale)
+              : new Vector2((-30 / Game.instance!.PPU) * this.gizmoScale, 0)
+            ).rotate(this.rotation)
+          )
+        ) <
+        (arrowLength / Game.instance!.PPU) * this.gizmoScale;
+      return positive || negative;
+    };
+
+    const isOverRotationRing = (position: Vector2) => {
+      const minRadius =
+        ((gizmoSize - (arrowLength + 6) - 3) / Game.instance!.PPU) *
+        this.gizmoScale;
+      const maxRadius =
+        ((gizmoSize - (arrowLength + 6) + 3) / Game.instance!.PPU) *
+        this.gizmoScale;
+      return (
+        position.distanceTo(this.position) > minRadius &&
+        position.distanceTo(this.position) < maxRadius
       );
     };
 
@@ -219,6 +257,10 @@ class Transform extends Behavior implements TransformData {
           } else if (isOverArrow(localPosition, "x")) {
             this.currentState = "draggingX";
             this.offset = localPosition.subtract(this.position);
+          } else if (isOverRotationRing(localPosition)) {
+            this.currentState = "draggingRotation";
+            this.startRotation = this.rotation;
+            this.offset = localPosition.subtract(this.position);
           } else {
             this.currentState = "deselected";
             Game.instance!.selectedGameObject = undefined;
@@ -250,23 +292,10 @@ class Transform extends Behavior implements TransformData {
         const localPosition = this.screenToLocal(
           Input.getMousePosition()
         ).subtract(this.offset);
-
-        // Calculate movement vector
         const movement = localPosition.subtract(this.position);
-
-        // Get the local Y axis direction vector (rotated by the object's rotation)
-        const localYAxis = new Vector2(
-          Math.sin(-this.rotation),
-          Math.cos(-this.rotation)
-        );
-
-        // Project movement onto local Y axis
-        const dotProduct =
-          movement.x * localYAxis.x + movement.y * localYAxis.y;
-        const projectedMovement = new Vector2(
-          localYAxis.x * dotProduct,
-          localYAxis.y * dotProduct
-        );
+        const localYAxis = Vector2.fromAngle(this.rotation + Math.PI / 2);
+        const dotProduct = movement.dot(localYAxis);
+        const projectedMovement = localYAxis.multiply(dotProduct);
 
         this.position = this.position.add(projectedMovement);
 
@@ -280,23 +309,10 @@ class Transform extends Behavior implements TransformData {
         const localPosition = this.screenToLocal(
           Input.getMousePosition()
         ).subtract(this.offset);
-
-        // Calculate movement vector
         const movement = localPosition.subtract(this.position);
-
-        // Get the local X axis direction vector (rotated by the object's rotation)
-        const localXAxis = new Vector2(
-          Math.cos(this.rotation),
-          Math.sin(this.rotation)
-        );
-
-        // Project movement onto local X axis
-        const dotProduct =
-          movement.x * localXAxis.x + movement.y * localXAxis.y;
-        const projectedMovement = new Vector2(
-          localXAxis.x * dotProduct,
-          localXAxis.y * dotProduct
-        );
+        const localXAxis = Vector2.fromAngle(this.rotation);
+        const dotProduct = movement.dot(localXAxis);
+        const projectedMovement = localXAxis.multiply(dotProduct);
 
         this.position = this.position.add(projectedMovement);
 
@@ -304,6 +320,19 @@ class Transform extends Behavior implements TransformData {
           this.currentState = "selected";
         }
         break;
+      }
+
+      case "draggingRotation": {
+        const startingPosition = this.offset;
+        const currentPosition = this.screenToLocal(
+          Input.getMousePosition()
+        ).subtract(this.position);
+        const angle = Vector2.angleBetween(startingPosition, currentPosition);
+        this.rotation = this.startRotation + angle;
+
+        if (!Input.isMouseDown(0)) {
+          this.currentState = "selected";
+        }
       }
     }
   }
@@ -318,108 +347,126 @@ function drawGizmo(
   const { position, rotation } = transform.getWorldTransform(transform);
   const scalar = (1 / Game.instance!.PPU) * gizmoScale;
   ctx.save();
+  {
+    ctx.translate(position.x, position.y); // translate to local position
+    ctx.rotate(rotation); // toggle for local or world space
+    ctx.scale(scalar, scalar); // inverse the PPU scaling to get back to pixel space (and scale the gizmo)
 
-  ctx.translate(position.x, position.y); // translate to local position
-  ctx.rotate(rotation); // toggle for local or world space
-  ctx.scale(scalar, scalar); // inverse the PPU scaling to get back to pixel space (and scale the gizmo)
+    ctx.strokeStyle = outlineColor;
+    ctx.lineWidth = 1 / Game.instance!.PPU / scalar;
 
-  // gizmo size params
-  const gizmoSize = 30;
-  const arrowSize = 12;
-  const arrowLength = 8;
-  const lineWidth = 3;
-  const dotSize = 8;
-
-  const xColor = "255,0,0";
-  const yColor = "0,200,0";
-  const lineColor = "255,255,255";
-  const outlineColor = `rgba(0,0,0,0.25)`;
-
-  ctx.strokeStyle = outlineColor;
-  ctx.lineWidth = 1 / Game.instance!.PPU / scalar;
-
-  // Center point
-  ctx.beginPath();
-  ctx.arc(0, 0, dotSize, 0, Math.PI * 2);
-  ctx.fillStyle = `rgba(${lineColor},1)`;
-  ctx.strokeStyle = outlineColor;
-  ctx.stroke();
-  ctx.fill();
-
-  if (isSelected) {
-    // X arrow
+    // Center point
     ctx.beginPath();
-    ctx.moveTo(gizmoSize, 0);
-    ctx.lineTo(gizmoSize - arrowLength, -arrowSize / 2);
-    ctx.lineTo(gizmoSize - arrowLength, arrowSize / 2);
-    ctx.fillStyle = `rgba(${xColor},1)`;
-    ctx.closePath();
+    ctx.arc(0, 0, dotSize, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(${lineColor},1)`;
+    ctx.strokeStyle = outlineColor;
     ctx.stroke();
     ctx.fill();
 
-    // Y arrow
-    ctx.beginPath();
-    ctx.moveTo(0, gizmoSize);
-    ctx.lineTo(-arrowSize / 2, gizmoSize - arrowLength);
-    ctx.lineTo(arrowSize / 2, gizmoSize - arrowLength);
-    ctx.fillStyle = `rgba(${yColor},1)`;
-    ctx.closePath();
-    ctx.stroke();
-    ctx.fill();
+    if (isSelected) {
+      // X arrow
+      ctx.beginPath();
+      ctx.moveTo(gizmoSize, 0);
+      ctx.lineTo(gizmoSize - arrowLength, -arrowSize / 2);
+      ctx.lineTo(gizmoSize - arrowLength, arrowSize / 2);
+      ctx.fillStyle = `rgba(${xColor},1)`;
+      ctx.closePath();
+      ctx.stroke();
+      ctx.fill();
 
-    // X arrow (opposite)
-    // ctx.beginPath();
-    // ctx.moveTo(-gizmoSize, 0);
-    // ctx.lineTo(-gizmoSize + arrowLength, -arrowSize / 2);
-    // ctx.lineTo(-gizmoSize + arrowLength, arrowSize / 2);
-    // ctx.fillStyle = `rgba(${lineColor},0.5)`;
-    // ctx.closePath();
-    // ctx.stroke();
-    // ctx.fill();
+      // Y arrow
+      ctx.beginPath();
+      ctx.moveTo(0, gizmoSize);
+      ctx.lineTo(-arrowSize / 2, gizmoSize - arrowLength);
+      ctx.lineTo(arrowSize / 2, gizmoSize - arrowLength);
+      ctx.fillStyle = `rgba(${yColor},1)`;
+      ctx.closePath();
+      ctx.stroke();
+      ctx.fill();
 
-    // Y arrow (opposite)
-    // ctx.beginPath();
-    // ctx.moveTo(0, -gizmoSize);
-    // ctx.lineTo(-arrowSize / 2, -gizmoSize + arrowLength);
-    // ctx.lineTo(arrowSize / 2, -gizmoSize + arrowLength);
-    // ctx.fillStyle = `rgba(${lineColor},0.5)`;
-    // ctx.closePath();
-    // ctx.stroke();
-    // ctx.fill();
+      // X arrow (opposite)
+      ctx.beginPath();
+      ctx.moveTo(-gizmoSize, 0);
+      ctx.lineTo(-gizmoSize + arrowLength, -arrowSize / 2);
+      ctx.lineTo(-gizmoSize + arrowLength, arrowSize / 2);
+      ctx.fillStyle = `rgba(${lineColor},0.5)`;
+      ctx.closePath();
+      ctx.stroke();
+      ctx.fill();
 
-    // visualize click area of an arrow
-    // ctx.moveTo(0, gizmoSize);
-    // ctx.arc(0, gizmoSize, 10, 0, Math.PI * 2);
-    // ctx.stroke();
+      // Y arrow (opposite)
+      ctx.beginPath();
+      ctx.moveTo(0, -gizmoSize);
+      ctx.lineTo(-arrowSize / 2, -gizmoSize + arrowLength);
+      ctx.lineTo(arrowSize / 2, -gizmoSize + arrowLength);
+      ctx.fillStyle = `rgba(${lineColor},0.5)`;
+      ctx.closePath();
+      ctx.stroke();
+      ctx.fill();
 
-    // rotation ring subtle outline
-    ctx.beginPath();
-    ctx.arc(
-      0,
-      0,
-      gizmoSize - (arrowLength + 6) + lineWidth / 2,
-      0,
-      Math.PI * 2
-    );
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.arc(
-      0,
-      0,
-      gizmoSize - (arrowLength + 6) - lineWidth / 2,
-      0,
-      Math.PI * 2
-    );
-    ctx.stroke();
+      // visualize click area of an arrow
+      // ctx.moveTo(0, gizmoSize);
+      // ctx.arc(0, gizmoSize, 10, 0, Math.PI * 2);
+      // ctx.stroke();
 
-    // rotation ring
-    ctx.beginPath();
-    ctx.lineWidth = lineWidth;
-    ctx.strokeStyle = `rgba(${lineColor},0.5)`;
-    ctx.arc(0, 0, gizmoSize - (arrowLength + 6), 0, Math.PI * 2);
-    ctx.stroke();
+      // rotation ring subtle outline
+      ctx.beginPath();
+      ctx.arc(
+        0,
+        0,
+        gizmoSize - (arrowLength + 6) + lineWidth / 2,
+        0,
+        Math.PI * 2
+      );
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(
+        0,
+        0,
+        gizmoSize - (arrowLength + 6) - lineWidth / 2,
+        0,
+        Math.PI * 2
+      );
+      ctx.stroke();
+
+      // rotation ring
+      ctx.beginPath();
+      ctx.lineWidth = lineWidth;
+      ctx.strokeStyle = `rgba(${lineColor},0.5)`;
+      ctx.arc(0, 0, gizmoSize - (arrowLength + 6), 0, Math.PI * 2);
+      ctx.stroke();
+    }
   }
+  ctx.restore();
 
+  // arc fill
+  // TODO: this breaks when a child of a rotated parent
+  ctx.save();
+  {
+    ctx.translate(position.x, position.y);
+    ctx.scale(scalar, scalar);
+
+    const delta = transform.rotation - transform.startRotation;
+    // console.log(transform.rotation, transform.startRotation, delta);
+
+    const [start, end] = [
+      transform.offset.angle(),
+      delta + transform.offset.angle(),
+    ];
+
+    // switch order if delta is negative
+    // if (delta < 0) {
+    //   [start, end] = [end, start];
+    // }
+
+    if (transform.currentState === "draggingRotation") {
+      ctx.beginPath();
+      ctx.lineWidth = lineWidth;
+      ctx.strokeStyle = `white`;
+      ctx.arc(0, 0, gizmoSize - (arrowLength + 6), start, end);
+      ctx.stroke();
+    }
+  }
   ctx.restore();
 }
 
