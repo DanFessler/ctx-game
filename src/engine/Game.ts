@@ -10,7 +10,7 @@ class Game {
 
   canvas: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
-  // gameObjects: GameObject[] = [];
+  gameObjects: Map<string, GameObject> = new Map();
   scene: GameObject;
   turnIndex = 0;
   camera: GameObject | undefined;
@@ -125,6 +125,7 @@ class Game {
       this.camera = gameObject;
     }
     this.scene.addChild(gameObject);
+    this.gameObjects.set(gameObject.id, gameObject);
   }
 
   update(deltaTime: number) {

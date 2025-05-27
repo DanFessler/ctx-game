@@ -58,7 +58,7 @@ abstract class Behavior {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  [key: string]: any;
+  [key: string]: any; // TODO: this fucks with my intellisense
 
   start?(): void;
   update?(deltaTime: number): void;

@@ -86,20 +86,18 @@ export class GameObject {
     };
   }
 
-  static deserialize(
-    data: SerializedGameObject,
-    parent?: GameObject
-  ): GameObject {
+  static deserialize(data: SerializedGameObject): GameObject {
     const gameObject = new GameObject({ name: data.name });
     gameObject.id = data.id;
-    gameObject.parent = parent;
     gameObject.behaviors = data.behaviors.reduce((acc, behavior) => {
       acc[behavior.name] = deserializeBehavior(behavior);
       return acc;
     }, {} as Record<string, Behavior>);
-    gameObject.children = data.children.map((child) =>
-      GameObject.deserialize(child, gameObject)
-    );
+
+    data.children.forEach((child) => {
+      gameObject.addChild(GameObject.deserialize(child));
+    });
+
     return gameObject;
 
     function deserializeBehavior(data: SerializedBehavior) {
@@ -212,14 +210,20 @@ export class GameObject {
     });
   }
 
-  addChild(child: GameObject) {
-    this.children.push(child);
+  addChild(child: GameObject, index?: number) {
+    if (index !== undefined) {
+      this.children.splice(index, 0, child);
+    } else {
+      this.children.push(child);
+    }
     child.parent = this;
+    Game.instance?.gameObjects.set(child.id, child);
   }
 
   removeChild(child: GameObject) {
     this.children = this.children.filter((c) => c !== child);
     child.parent = undefined;
+    Game.instance?.gameObjects.delete(child.id);
   }
 }
 

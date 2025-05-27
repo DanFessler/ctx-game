@@ -7,7 +7,7 @@ import Input from "../Input";
 const DEBUG = false;
 
 // gizmo size params
-const gizmoSize = 30;
+const gizmoSize = 48;
 const arrowSize = 12;
 const arrowLength = 8;
 const lineWidth = 4;
@@ -88,6 +88,33 @@ class Transform extends Behavior implements TransformData {
     return this.applyTransform(transform, parentWorld);
   }
 
+  setWorldTransform(transform: TransformData) {
+    if (!this.gameObject?.parent) {
+      // If no parent, directly set the values
+      this.position = transform.position;
+      this.rotation = transform.rotation;
+      this.scale = transform.scale;
+      return;
+    }
+
+    // Get parent's world transform
+    const parentWorld = this.getWorldTransform(
+      this.gameObject.parent.behaviors.Transform as Transform
+    );
+
+    // Convert world position to local position
+    this.position = this.worldToLocalPosition(transform.position);
+
+    // Calculate local rotation by subtracting parent's rotation
+    this.rotation = transform.rotation - parentWorld.rotation;
+
+    // Calculate local scale by dividing by parent's scale
+    this.scale = new Vector2(
+      transform.scale.x / parentWorld.scale.x,
+      transform.scale.y / parentWorld.scale.y
+    );
+  }
+
   applyTransform(transform: Transform, parent: TransformData): TransformData {
     // 1. Scale local position by parent's scale
     const scaled = new Vector2(
@@ -130,7 +157,7 @@ class Transform extends Behavior implements TransformData {
     return scaledPosition.add(camTransform.position);
   }
 
-  worldToLocal(position: Vector2): Vector2 {
+  worldToLocalPosition(position: Vector2): Vector2 {
     if (!this.gameObject?.parent) {
       return position;
     }
@@ -154,9 +181,9 @@ class Transform extends Behavior implements TransformData {
     return localPos;
   }
 
-  screenToLocal(position: Vector2): Vector2 {
+  screenToLocalPosition(position: Vector2): Vector2 {
     const worldPosition = this.screenToWorld(position);
-    return this.worldToLocal(worldPosition);
+    return this.worldToLocalPosition(worldPosition);
   }
 
   multiply(other: Transform) {
@@ -189,8 +216,14 @@ class Transform extends Behavior implements TransformData {
         position.distanceTo(
           this.position.add(
             (axis === "y"
-              ? new Vector2(0, (30 / Game.instance!.PPU) * this.gizmoScale)
-              : new Vector2((30 / Game.instance!.PPU) * this.gizmoScale, 0)
+              ? new Vector2(
+                  0,
+                  (gizmoSize / Game.instance!.PPU) * this.gizmoScale
+                )
+              : new Vector2(
+                  (gizmoSize / Game.instance!.PPU) * this.gizmoScale,
+                  0
+                )
             ).rotate(this.rotation)
           )
         ) <
@@ -199,8 +232,14 @@ class Transform extends Behavior implements TransformData {
         position.distanceTo(
           this.position.add(
             (axis === "y"
-              ? new Vector2(0, (-30 / Game.instance!.PPU) * this.gizmoScale)
-              : new Vector2((-30 / Game.instance!.PPU) * this.gizmoScale, 0)
+              ? new Vector2(
+                  0,
+                  (-gizmoSize / Game.instance!.PPU) * this.gizmoScale
+                )
+              : new Vector2(
+                  (-gizmoSize / Game.instance!.PPU) * this.gizmoScale,
+                  0
+                )
             ).rotate(this.rotation)
           )
         ) <
@@ -223,7 +262,9 @@ class Transform extends Behavior implements TransformData {
 
     switch (this.currentState) {
       case "deselected": {
-        const localPosition = this.screenToLocal(Input.getMousePosition());
+        const localPosition = this.screenToLocalPosition(
+          Input.getMousePosition()
+        );
         const selectedObject = Game.instance?.selectedGameObject;
         if (
           !selectedObject &&
@@ -244,7 +285,9 @@ class Transform extends Behavior implements TransformData {
       }
 
       case "selected": {
-        const localPosition = this.screenToLocal(Input.getMousePosition());
+        const localPosition = this.screenToLocalPosition(
+          Input.getMousePosition()
+        );
         const selectedObject = Game.instance?.selectedGameObject;
 
         if (Input.isMouseDown(0)) {
@@ -276,7 +319,7 @@ class Transform extends Behavior implements TransformData {
       }
 
       case "dragging": {
-        const localPosition = this.screenToLocal(
+        const localPosition = this.screenToLocalPosition(
           Input.getMousePosition()
         ).subtract(this.offset);
         this.position.x = localPosition.x;
@@ -289,7 +332,7 @@ class Transform extends Behavior implements TransformData {
       }
 
       case "draggingY": {
-        const localPosition = this.screenToLocal(
+        const localPosition = this.screenToLocalPosition(
           Input.getMousePosition()
         ).subtract(this.offset);
         const movement = localPosition.subtract(this.position);
@@ -306,7 +349,7 @@ class Transform extends Behavior implements TransformData {
       }
 
       case "draggingX": {
-        const localPosition = this.screenToLocal(
+        const localPosition = this.screenToLocalPosition(
           Input.getMousePosition()
         ).subtract(this.offset);
         const movement = localPosition.subtract(this.position);
@@ -324,7 +367,7 @@ class Transform extends Behavior implements TransformData {
 
       case "draggingRotation": {
         const startingPosition = this.offset;
-        const currentPosition = this.screenToLocal(
+        const currentPosition = this.screenToLocalPosition(
           Input.getMousePosition()
         ).subtract(this.position);
         const angle = Vector2.angleBetween(startingPosition, currentPosition);
@@ -358,7 +401,9 @@ function drawGizmo(
     // Center point
     ctx.beginPath();
     ctx.arc(0, 0, dotSize, 0, Math.PI * 2);
-    ctx.fillStyle = `rgba(${lineColor},1)`;
+    ctx.fillStyle = isSelected
+      ? `rgba(${lineColor},1)`
+      : `rgba(${lineColor},0.5)`;
     ctx.strokeStyle = outlineColor;
     ctx.stroke();
     ctx.fill();
@@ -436,30 +481,18 @@ function drawGizmo(
       ctx.arc(0, 0, gizmoSize - (arrowLength + 6), 0, Math.PI * 2);
       ctx.stroke();
     }
-  }
-  ctx.restore();
-
-  // arc fill
-  // TODO: this breaks when a child of a rotated parent
-  ctx.save();
-  {
-    ctx.translate(position.x, position.y);
-    ctx.scale(scalar, scalar);
-
-    const delta = transform.rotation - transform.startRotation;
-    // console.log(transform.rotation, transform.startRotation, delta);
-
-    const [start, end] = [
-      transform.offset.angle(),
-      delta + transform.offset.angle(),
-    ];
-
-    // switch order if delta is negative
-    // if (delta < 0) {
-    //   [start, end] = [end, start];
-    // }
 
     if (transform.currentState === "draggingRotation") {
+      // we want the world space rotation, but not including this transform's rotation, so we rotate the opposite way
+      ctx.rotate(-transform.rotation);
+
+      // calculate the start and end angles of the arc
+      const start = (transform.offset.angle() + Math.PI * 2) % (Math.PI * 2);
+      const end = transform.rotation - transform.startRotation + start;
+      // if (transform.rotation < transform.startRotation) {
+      // [start, end] = [end, start];
+      // }
+
       ctx.beginPath();
       ctx.lineWidth = lineWidth;
       ctx.strokeStyle = `white`;

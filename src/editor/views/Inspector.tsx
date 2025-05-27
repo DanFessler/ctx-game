@@ -4,7 +4,6 @@ import {
   DndContext,
   // closestCenter,
   closestCorners,
-  KeyboardSensor,
   PointerSensor,
   useSensor,
   useSensors,
@@ -14,7 +13,6 @@ import {
 import {
   arrayMove,
   SortableContext,
-  sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
@@ -180,9 +178,6 @@ function SortableBehaviors({
       activationConstraint: {
         distance: 10,
       },
-    }),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
     })
   );
 
