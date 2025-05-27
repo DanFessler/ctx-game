@@ -16,6 +16,13 @@
         },
         "rotation": 0
       }
+    },
+    {
+      "name": "WorldGridBehavior",
+      "id": "iSJxLRcs5K2qc4Z41We_j",
+      "properties": {
+        "spacing": 1
+      }
     }
   ],
   "children": [
@@ -43,13 +50,6 @@
           "id": "761l7v7pJrs4Yz4KRLj4_",
           "properties": {
             "tileSize": 1
-          }
-        },
-        {
-          "name": "WorldGridBehavior",
-          "id": "iSJxLRcs5K2qc4Z41We_j",
-          "properties": {
-            "spacing": 1
           }
         }
       ],
