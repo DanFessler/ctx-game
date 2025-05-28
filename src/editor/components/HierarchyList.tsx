@@ -4,6 +4,7 @@ import styles from "./HierarchyList.module.css";
 import { PiBoundingBoxFill } from "react-icons/pi";
 import useGameObjectSelector from "../hooks/useGameObjectSelector";
 import { useDraggable, useDroppable } from "@dnd-kit/core";
+import { Dockable } from "@danfessler/react-dockable";
 
 function HierarchyList({
   gameObject,
@@ -110,33 +111,51 @@ function HierarchyItem({
 
   return (
     <li>
-      <div
-        className={`${styles.item} ${
-          selectedGameObject === gameObject || isOver ? styles.selected : ""
-        }`}
-        onClick={() => setSelectedGameObject(gameObject)}
+      <Dockable.Menu
+        id={gameObject.id}
+        mode="context"
+        customItems={[
+          {
+            items: [
+              {
+                label: "Delete",
+                onClick: () => {
+                  gameObject.parent?.removeChild(gameObject);
+                  gameObject.updateSubscribers();
+                },
+              },
+            ],
+          },
+        ]}
       >
-        {hasChildren ? renderArrow() : null}
-        <PiBoundingBoxFill />
-        {name}
-        {!isDragging && canDrop && (
-          <>
-            <DroppableDivider side="top" id={gameObject.id} />
-            <div
-              ref={setNodeRef}
-              style={{
-                position: "absolute",
-                left: 0,
-                width: "calc(100% - 24px)",
-                height: 4,
-                top: "50%",
-                marginLeft: 24,
-                // backgroundColor: "red",
-              }}
-            />
-          </>
-        )}
-      </div>
+        <div
+          className={`${styles.item} ${
+            selectedGameObject === gameObject || isOver ? styles.selected : ""
+          }`}
+          onClick={() => setSelectedGameObject(gameObject)}
+        >
+          {hasChildren ? renderArrow() : null}
+          <PiBoundingBoxFill />
+          {name}
+          {!isDragging && canDrop && (
+            <>
+              <DroppableDivider side="top" id={gameObject.id} />
+              <div
+                ref={setNodeRef}
+                style={{
+                  position: "absolute",
+                  left: 0,
+                  width: "calc(100% - 24px)",
+                  height: 4,
+                  top: "50%",
+                  marginLeft: 24,
+                  // backgroundColor: "red",
+                }}
+              />
+            </>
+          )}
+        </div>
+      </Dockable.Menu>
       {isOpen && hasChildren ? (
         <div className={styles.children}>
           {gameObject.children.map((child) => {

@@ -16,10 +16,10 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
-
 import GameObject from "../../engine/GameObject";
 import Behavior from "../../engine/Behavior";
 import { PiBoundingBoxFill } from "react-icons/pi";
+import { HiDotsVertical } from "react-icons/hi";
 import { FaCode } from "react-icons/fa";
 import SortableItem from "../components/SortableItem";
 import styles from "./Inspector.module.css";
@@ -78,39 +78,7 @@ function Inspector() {
           }}
         />
       </div>
-      <BehaviorButtons gameObject={gameObject} />
       {/* </DndContext> */}
-    </div>
-  );
-}
-
-function BehaviorButtons({ gameObject }: { gameObject: GameObject }) {
-  const behaviors = Game.instance?.behaviors;
-  if (!behaviors) return null;
-
-  function handleAddBehavior(key: string) {
-    return () => {
-      const behaviorClass = behaviors![key];
-      if (!behaviorClass) return;
-      const behavior = new behaviorClass();
-      behavior.gameObject = gameObject;
-      gameObject.behaviors[key] = behavior;
-      gameObject.updateSubscribers();
-      console.log("adding behavior", behavior);
-    };
-  }
-
-  return (
-    <div
-      style={{ display: "flex", flexDirection: "column", gap: 4, padding: 4 }}
-    >
-      {Object.keys(behaviors).map((key) => {
-        return (
-          <button key={key} onClick={handleAddBehavior(key)}>
-            Add {key}
-          </button>
-        );
-      })}
     </div>
   );
 }
@@ -287,7 +255,7 @@ function InspectorBehavior({
         <div>{name}</div>
         <div className={styles.spacer} />
         <div className={styles.arrowContainer}>{isCollapsed ? "▶" : "▼"}</div>
-        {/* <TiThMenu style={{ minWidth: 14, minHeight: 14 }} /> */}
+        <HiDotsVertical style={{ minWidth: 15, minHeight: 15 }} />
       </div>
       {!isCollapsed ? (
         <div className={styles.behaviorContent}>

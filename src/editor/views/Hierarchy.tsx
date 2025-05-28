@@ -2,7 +2,6 @@ import styles from "./Hierarchy.module.css";
 import { FaSearch } from "react-icons/fa";
 import HierarchyList from "../components/HierarchyList";
 import GameObject from "../../engine/GameObject";
-import native from "../callNative";
 import game from "../../game";
 import useGameObjectSelector from "../hooks/useGameObjectSelector";
 import Game from "../../engine/Game";
@@ -111,36 +110,6 @@ function SceneHierarchy({ gameObject }: SceneHierarchyProps) {
             }}
             selectedGameObject={selected}
           />
-        </div>
-        <div
-          style={{
-            display: "flex",
-            gap: 4,
-            margin: 4,
-            flexDirection: "column",
-          }}
-        >
-          <button
-            onClick={() => {
-              const serialized = gameObject.serialize();
-              native.saveFile(
-                "src/game/scenes/default.json",
-                JSON.stringify(serialized, null, 2)
-              );
-            }}
-          >
-            Save Scene
-          </button>
-          <button
-            onClick={() => {
-              const newGameObject = new GameObject({
-                name: "New GameObject",
-              });
-              gameObject.addChild(newGameObject);
-            }}
-          >
-            New GameObject
-          </button>
         </div>
       </div>
       <DragOverlay

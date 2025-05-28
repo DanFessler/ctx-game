@@ -37,6 +37,17 @@ export class Input {
   }
 
   private handleMouseDown(event: MouseEvent): void {
+    // get the parent rect and make sure we're in bounds
+    const parentRect = this.canvas!.parentElement!.getBoundingClientRect();
+    if (
+      event.clientX < parentRect.left ||
+      event.clientX > parentRect.right ||
+      event.clientY < parentRect.top ||
+      event.clientY > parentRect.bottom
+    ) {
+      return;
+    }
+
     // check if it's within the canvas
     const rect = this.canvas!.getBoundingClientRect();
     if (
