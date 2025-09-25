@@ -267,7 +267,7 @@ class Transform extends Behavior implements TransformData {
         );
         const selectedObject = Game.instance?.selectedGameObject;
         if (
-          !selectedObject &&
+          (!selectedObject || selectedObject.behaviors.Transform.isLocked) &&
           isOverGizmo(localPosition) &&
           Input.isMouseDown(0)
         ) {
