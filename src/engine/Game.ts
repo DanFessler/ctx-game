@@ -66,6 +66,7 @@ class Game {
         new this.behaviors.EditorCameraController(),
       ],
     });
+    this.editorCamera.behaviors.Transform.isLocked = true;
     this.camera = this.editorCamera;
   }
 
@@ -92,6 +93,7 @@ class Game {
 
   loadScene(scene: SerializedGameObject) {
     this.scene = GameObject.deserialize(scene);
+    this.scene.behaviors.Transform.isLocked = true;
     console.log("loaded scene", this.scene);
   }
 

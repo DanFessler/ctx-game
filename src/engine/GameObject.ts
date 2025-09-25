@@ -142,7 +142,7 @@ export class GameObject {
   updateEditor(deltaTime: number) {
     if (!this.isActive) return;
     Object.values(this.behaviors).forEach((behavior) => {
-      if (behavior.active) {
+      if (behavior.active && !behavior.isLocked) {
         behavior.updateEditor?.(deltaTime);
       }
     });

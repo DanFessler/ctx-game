@@ -22,6 +22,7 @@ abstract class Behavior {
   ctx: CanvasRenderingContext2D | undefined;
   active = true;
   canDisable = true;
+  isLocked = false;
   id: string;
   initialFields?: Record<string, unknown> = undefined;
 
@@ -135,6 +136,8 @@ abstract class Behavior {
           gap: "10px",
           textAlign: "right",
           alignItems: "center",
+          opacity: this.isLocked ? 0.5 : 1,
+          pointerEvents: this.isLocked ? "none" : "auto",
         }}
       >
         {fields.map(([key, meta]) => {

@@ -387,6 +387,7 @@ function drawGizmo(
   gizmoScale: number,
   isSelected: boolean
 ) {
+  if (transform.isLocked) return;
   const { position, rotation } = transform.getWorldTransform(transform);
   const scalar = (1 / Game.instance!.PPU) * gizmoScale;
   ctx.save();
