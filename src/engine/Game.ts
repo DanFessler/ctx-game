@@ -14,6 +14,8 @@ class Game {
   scene: GameObject;
   turnIndex = 0;
   camera: GameObject | undefined;
+  mainCamera: GameObject | undefined;
+  editorCamera: GameObject | undefined;
   lastTime: number = 0;
   PPU: number = 1;
   scale: number = 4;
@@ -56,6 +58,15 @@ class Game {
     Input.getInstance().registerCanvas(this.canvas);
     Game.instance = this;
     this.registerBehaviors(behaviors);
+
+    this.editorCamera = new GameObject({
+      name: "EditorCamera",
+      behaviors: [
+        new this.behaviors.Camera(),
+        new this.behaviors.EditorCameraController(),
+      ],
+    });
+    this.camera = this.editorCamera;
   }
 
   subscribe = (callback: () => void): (() => void) => {
@@ -70,7 +81,7 @@ class Game {
   }
 
   init() {
-    if (!this.camera) {
+    if (!this.mainCamera) {
       const camera = new GameObject({
         name: "Camera",
         behaviors: [new this.behaviors.Camera()],
@@ -98,10 +109,12 @@ class Game {
 
   play() {
     this.isPlaying = true;
+    this.camera = this.mainCamera;
   }
 
   stop() {
     this.isPlaying = false;
+    this.camera = this.editorCamera;
   }
 
   tick = () => {
@@ -114,6 +127,7 @@ class Game {
     }
     if (!this.isPlaying) {
       this.scene.updateEditor(deltaTime);
+      this.editorCamera?.updateEditor(deltaTime);
     }
 
     this.draw();
@@ -130,7 +144,7 @@ class Game {
 
   addGameObject(gameObject: GameObject) {
     if (gameObject.behaviors.Camera) {
-      this.camera = gameObject;
+      this.mainCamera = gameObject;
     }
     this.scene.addChild(gameObject);
     this.gameObjects.set(gameObject.id, gameObject);
