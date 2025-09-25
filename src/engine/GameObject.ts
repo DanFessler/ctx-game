@@ -95,7 +95,7 @@ export class GameObject {
     }, {} as Record<string, Behavior>);
 
     if (gameObject.behaviors.Camera) {
-      Game.instance!.camera = gameObject;
+      Game.instance!.mainCamera = gameObject;
     }
 
     data.children.forEach((child) => {
