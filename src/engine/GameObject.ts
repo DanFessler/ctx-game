@@ -94,6 +94,10 @@ export class GameObject {
       return acc;
     }, {} as Record<string, Behavior>);
 
+    if (gameObject.behaviors.Camera) {
+      Game.instance!.camera = gameObject;
+    }
+
     data.children.forEach((child) => {
       gameObject.addChild(GameObject.deserialize(child));
     });

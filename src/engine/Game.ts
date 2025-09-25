@@ -69,7 +69,15 @@ class Game {
     this.subscribers.forEach((callback) => callback());
   }
 
-  init() {}
+  init() {
+    if (!this.camera) {
+      const camera = new GameObject({
+        name: "Camera",
+        behaviors: [new this.behaviors.Camera()],
+      });
+      this.addGameObject(camera);
+    }
+  }
 
   loadScene(scene: SerializedGameObject) {
     this.scene = GameObject.deserialize(scene);
