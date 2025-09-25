@@ -47,7 +47,6 @@ function App() {
                     name: "New GameObject",
                   });
                   game.scene.addChild(newGameObject);
-                  game.updateSubscribers();
                 },
                 shortcut: "⌘+S",
               },

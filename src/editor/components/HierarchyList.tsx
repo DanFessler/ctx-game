@@ -19,6 +19,16 @@ function HierarchyList({
   isDragging?: boolean;
   canDrop?: boolean;
 }) {
+  useGameObjectSelector<GameObject, GameObject[]>(
+    gameObject,
+    (go) => [...go.children],
+    (a, b) => {
+      return (
+        a.length === b.length //&& a.every((child, index) => child === b[index])
+      );
+    }
+  );
+
   const { setNodeRef, attributes, listeners, isDragging } = useDraggable({
     id: gameObject.id,
     data: {
