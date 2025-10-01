@@ -6,6 +6,9 @@ export class Camera extends Behavior {
   @inspect()
   public vfov: number;
 
+  @inspect({ type: "color" })
+  public backgroundColor: string = "#252627";
+
   constructor(args: Partial<Camera> = {}) {
     super(args);
     this.vfov = Game.instance!.canvas.height / Game.instance!.PPU;

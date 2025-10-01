@@ -403,12 +403,12 @@ function drawGizmo(
   if (transform.isLocked) return;
   const { position, rotation } = transform.getWorldTransform(transform);
   const cameraScale = Game.Camera.behaviors.Camera.getCameraScale();
-  const scalar = ((1 / Game.instance!.PPU) * gizmoScale) / cameraScale;
+  const scalar = (1 / Game.instance!.PPU) * gizmoScale;
   ctx.save();
   {
     ctx.translate(position.x, position.y); // translate to local position
     ctx.rotate(rotation); // toggle for local or world space
-    ctx.scale(scalar, scalar); // inverse the PPU scaling to get back to pixel space (and scale the gizmo)
+    ctx.scale(scalar / cameraScale, scalar / cameraScale); // inverse the PPU scaling to get back to pixel space (and scale the gizmo)
 
     ctx.strokeStyle = outlineColor;
     ctx.lineWidth = 1 / Game.instance!.PPU / scalar;

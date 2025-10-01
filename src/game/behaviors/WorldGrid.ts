@@ -25,6 +25,8 @@ class WorldGridBehavior extends Behavior {
 
     ctx.save();
     ctx.translate(-position.x, -position.y);
+    ctx.lineWidth =
+      1 / Game.instance!.PPU / Game.Camera.behaviors.Camera.getCameraScale();
 
     // draw gridlines
     ctx.strokeStyle = "rgba(128, 128, 128, 0.125)";

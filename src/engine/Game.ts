@@ -158,7 +158,9 @@ class Game {
   }
 
   draw() {
-    this.ctx.clearRect(
+    this.ctx.fillStyle =
+      this.camera?.behaviors.Camera?.backgroundColor || "black";
+    this.ctx.fillRect(
       0,
       0,
       this.canvas.width / this.PPU,
