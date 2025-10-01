@@ -2,6 +2,7 @@ import GameObject, { SerializedGameObject } from "./GameObject";
 import Transform from "./behaviors/Transform";
 import Input from "./Input";
 import Behavior from "./Behavior";
+import Camera from "./behaviors/Camera";
 const behaviors = import.meta.glob("./behaviors/*.{ts,tsx}", { eager: true });
 // console.log("base behaviors", behaviors);
 
@@ -177,24 +178,37 @@ class Game {
       this.ctx.save();
       {
         const PPU = this.PPU * (this.highResolution ? 2 : 1);
-        const cameraTransform = Game.Camera.behaviors.Transform as Transform;
+        const camera = Game.Camera as GameObject;
+        const cameraBehavior = camera.behaviors.Camera as Camera;
+        const cameraTransform = camera.behaviors.Transform as Transform;
 
-        const snapToPixel = true;
+        const scale = this.canvas.height / PPU / cameraBehavior.vfov;
+
+        const snapToPixel = false;
         if (snapToPixel) {
           this.ctx.translate(
             Math.round(
-              -cameraTransform.position.x * PPU + this.canvas.width / 2
+              -cameraTransform.position.x * scale * PPU + this.canvas.width / 2
             ) / PPU,
             Math.round(
-              -cameraTransform.position.y * PPU + this.canvas.height / 2
+              -cameraTransform.position.y * scale * PPU + this.canvas.height / 2
             ) / PPU
           );
         } else {
           this.ctx.translate(
-            -cameraTransform.position.x + this.canvas.width / PPU / 2,
-            -cameraTransform.position.y + this.canvas.height / PPU / 2
+            this.canvas.width / PPU / 2,
+            this.canvas.height / PPU / 2
+          );
+          this.ctx.rotate(-cameraTransform.rotation);
+          this.ctx.translate(
+            -cameraTransform.position.x * scale,
+            -cameraTransform.position.y * scale
           );
         }
+
+        this.ctx.scale(scale, scale);
+        // console.log("cameraTransform.rotation", cameraTransform);
+
         this.scene.draw("default");
         this.scene.draw("editor");
         this.scene.drawWorldSpace();

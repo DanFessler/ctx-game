@@ -143,6 +143,7 @@ class Transform extends Behavior implements TransformData {
 
   screenToWorld(position: Vector2): Vector2 {
     const canvas = Game.instance!.canvas;
+    const cameraScale = Game.Camera.behaviors.Camera.getCameraScale();
 
     const canvasSize = new Vector2(canvas.width, canvas.height).divide(
       Game.instance!.highResolution ? 2 : 1
@@ -153,7 +154,9 @@ class Transform extends Behavior implements TransformData {
       .subtract(new Vector2(canvasSize.x / 2, canvasSize.y / 2));
 
     const camTransform = Game.Camera.behaviors.Transform as Transform;
-    const scaledPosition = relCenter.divide(Game.instance!.PPU);
+    const scaledPosition = relCenter
+      .divide(Game.instance!.PPU)
+      .divide(cameraScale);
     return scaledPosition.add(camTransform.position);
   }
 
@@ -204,10 +207,12 @@ class Transform extends Behavior implements TransformData {
   }
 
   updateEditor() {
+    const cameraScale = Game.Camera.behaviors.Camera.getCameraScale();
+
     const isOverGizmo = (position: Vector2) => {
       return (
         position.distanceTo(this.position) <
-        (dotSize / Game.instance!.PPU) * this.gizmoScale
+        (dotSize / Game.instance!.PPU / cameraScale) * this.gizmoScale
       );
     };
 
@@ -218,41 +223,49 @@ class Transform extends Behavior implements TransformData {
             (axis === "y"
               ? new Vector2(
                   0,
-                  (gizmoSize / Game.instance!.PPU) * this.gizmoScale
+                  (gizmoSize / Game.instance!.PPU / cameraScale) *
+                    this.gizmoScale
                 )
               : new Vector2(
-                  (gizmoSize / Game.instance!.PPU) * this.gizmoScale,
+                  (gizmoSize / Game.instance!.PPU / cameraScale) *
+                    this.gizmoScale,
                   0
                 )
             ).rotate(this.rotation)
           )
         ) <
-        (arrowLength / Game.instance!.PPU) * this.gizmoScale;
+        (arrowLength / Game.instance!.PPU / cameraScale) * this.gizmoScale;
       const negative =
         position.distanceTo(
           this.position.add(
             (axis === "y"
               ? new Vector2(
                   0,
-                  (-gizmoSize / Game.instance!.PPU) * this.gizmoScale
+                  (-gizmoSize / Game.instance!.PPU / cameraScale) *
+                    this.gizmoScale
                 )
               : new Vector2(
-                  (-gizmoSize / Game.instance!.PPU) * this.gizmoScale,
+                  (-gizmoSize / Game.instance!.PPU / cameraScale) *
+                    this.gizmoScale,
                   0
                 )
             ).rotate(this.rotation)
           )
         ) <
-        (arrowLength / Game.instance!.PPU) * this.gizmoScale;
+        (arrowLength / Game.instance!.PPU / cameraScale) * this.gizmoScale;
       return positive || negative;
     };
 
     const isOverRotationRing = (position: Vector2) => {
       const minRadius =
-        ((gizmoSize - (arrowLength + 6) - 3) / Game.instance!.PPU) *
+        ((gizmoSize - (arrowLength + 6) - 3) /
+          Game.instance!.PPU /
+          cameraScale) *
         this.gizmoScale;
       const maxRadius =
-        ((gizmoSize - (arrowLength + 6) + 3) / Game.instance!.PPU) *
+        ((gizmoSize - (arrowLength + 6) + 3) /
+          Game.instance!.PPU /
+          cameraScale) *
         this.gizmoScale;
       return (
         position.distanceTo(this.position) > minRadius &&
@@ -389,7 +402,8 @@ function drawGizmo(
 ) {
   if (transform.isLocked) return;
   const { position, rotation } = transform.getWorldTransform(transform);
-  const scalar = (1 / Game.instance!.PPU) * gizmoScale;
+  const cameraScale = Game.Camera.behaviors.Camera.getCameraScale();
+  const scalar = ((1 / Game.instance!.PPU) * gizmoScale) / cameraScale;
   ctx.save();
   {
     ctx.translate(position.x, position.y); // translate to local position

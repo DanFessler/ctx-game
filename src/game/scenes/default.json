@@ -4,7 +4,7 @@
   "behaviors": [
     {
       "name": "Transform",
-      "id": "e8mQYtU-9X3O52-5NzxVT",
+      "id": "yy0LMAvWYk15NTXsio_Tf",
       "properties": {
         "position": {
           "x": 0,
@@ -19,11 +19,50 @@
     },
     {
       "name": "WorldGridBehavior",
-      "id": "rbGdpugPLxhsdtcyxOsW8",
+      "id": "taC6dpaE7_RrEYzkD5tuQ",
       "properties": {
         "spacing": 1
       }
     }
   ],
-  "children": []
+  "children": [
+    {
+      "name": "Camera",
+      "id": "CpXGvsGhuMKjNP03HRpcp",
+      "behaviors": [
+        {
+          "name": "Transform",
+          "id": "4CKUvHOOzJG43Xmx8dOG3",
+          "properties": {
+            "position": {
+              "x": 0,
+              "y": 0
+            },
+            "scale": {
+              "x": 1,
+              "y": 1
+            },
+            "rotation": "0.2"
+          }
+        },
+        {
+          "name": "Camera",
+          "id": "R1tfGliT6KVEcxGH25Ypf",
+          "properties": {
+            "vfov": 10
+          }
+        },
+        {
+          "name": "CameraController",
+          "id": "ZCHt9LqZzZ9h_LBLOpvDA",
+          "properties": {
+            "acceleration": 2,
+            "maxSpeed": 5,
+            "friction": 0.9
+          }
+        }
+      ],
+      "children": []
+    }
+  ]
 }
