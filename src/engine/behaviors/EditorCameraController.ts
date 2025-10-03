@@ -16,7 +16,7 @@ class EditorCameraController extends Behavior {
   friction: number = 0.9;
 
   @inspect()
-  scrollAcceleration: number = 50;
+  scrollAcceleration: number = 10;
 
   @inspect()
   scrollMaxSpeed: number = 200;
@@ -34,16 +34,16 @@ class EditorCameraController extends Behavior {
     const cameraScale = Game.Camera.behaviors.Camera.getCameraScale();
     // Get input
     if (Input.isKeyPressed("ArrowUp")) {
-      this.velocity.y -= this.acceleration * deltaTime;
+      this.velocity.y -= (this.acceleration / cameraScale) * deltaTime;
     }
     if (Input.isKeyPressed("ArrowDown")) {
-      this.velocity.y += this.acceleration * deltaTime;
+      this.velocity.y += (this.acceleration / cameraScale) * deltaTime;
     }
     if (Input.isKeyPressed("ArrowLeft")) {
-      this.velocity.x -= this.acceleration * deltaTime;
+      this.velocity.x -= (this.acceleration / cameraScale) * deltaTime;
     }
     if (Input.isKeyPressed("ArrowRight")) {
-      this.velocity.x += this.acceleration * deltaTime;
+      this.velocity.x += (this.acceleration / cameraScale) * deltaTime;
     }
 
     // drag to move camera
@@ -101,7 +101,7 @@ class EditorCameraController extends Behavior {
     transform.position.y += this.velocity.y;
 
     // Update camera zoom
-    Game.Camera.behaviors.Camera.vfov += this.scrollVelocity * deltaTime;
+    Game.Camera.behaviors.Camera.vfov *= 1 + this.scrollVelocity * deltaTime;
 
     // clamp vfov
     Game.Camera.behaviors.Camera.vfov = Math.max(
