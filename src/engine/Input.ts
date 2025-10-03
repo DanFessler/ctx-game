@@ -58,7 +58,6 @@ export class Input {
       event.clientY >= rect.top &&
       event.clientY <= rect.bottom
     ) {
-      console.log("mouse down", event.button, this.canvas);
       this.mouseStates.set(event.button, true);
     }
   }
@@ -72,8 +71,9 @@ export class Input {
   }
 
   private handleWheel(event: WheelEvent): void {
-    // Prevent default scrolling behavior
-    event.preventDefault();
+    if (event.target !== this.canvas) {
+      return;
+    }
 
     // Accumulate scroll delta
     this.scrollDelta += event.deltaY;
