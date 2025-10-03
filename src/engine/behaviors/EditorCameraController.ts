@@ -4,6 +4,7 @@ import Input from "../Input";
 import Vector2 from "../Vector2";
 import { inspect } from "../serializable";
 import Game from "../Game";
+import CameraBehavior from "./Camera";
 
 class EditorCameraController extends Behavior {
   @inspect()
@@ -101,13 +102,23 @@ class EditorCameraController extends Behavior {
     transform.position.y += this.velocity.y;
 
     // Update camera zoom
-    Game.Camera.behaviors.Camera.vfov *= 1 + this.scrollVelocity * deltaTime;
+    if (Math.abs(this.scrollVelocity) >= 0) {
+      const camera = Game.Camera.behaviors.Camera as CameraBehavior;
+      const camTransform = Game.Camera.behaviors.Transform as Transform;
 
-    // clamp vfov
-    Game.Camera.behaviors.Camera.vfov = Math.max(
-      1,
-      Math.min(100, Game.Camera.behaviors.Camera.vfov)
-    );
+      const mousePosition = Input.getMousePosition();
+      const posBefore = camTransform.screenToWorld(mousePosition);
+
+      camera.vfov *= 1 + this.scrollVelocity * deltaTime;
+      camera.vfov = Math.max(1, Math.min(100, camera.vfov)); // clamp vfov
+
+      const posAfter = camTransform.screenToWorld(mousePosition);
+      const delta = posAfter.subtract(posBefore);
+
+      // move camera by the distance change
+      transform.position.x -= delta.x;
+      transform.position.y -= delta.y;
+    }
   }
 }
 
