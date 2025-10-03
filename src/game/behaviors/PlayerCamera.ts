@@ -47,8 +47,9 @@ class CameraController extends Behavior {
 
     // Update position
     const transform = this.gameObject!.behaviors.Transform as Transform;
-    transform.position.x += this.velocity.x;
-    transform.position.y += this.velocity.y;
+    transform.translate(this.velocity);
+
+    transform.rotation += 0.001;
   }
 }
 
