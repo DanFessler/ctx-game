@@ -394,6 +394,26 @@ class Transform extends Behavior implements TransformData {
       }
     }
   }
+
+  up(): Vector2 {
+    return Vector2.fromAngle(this.rotation + Math.PI / 2);
+  }
+
+  down(): Vector2 {
+    return Vector2.fromAngle(this.rotation + Math.PI / 2 + Math.PI);
+  }
+
+  left(): Vector2 {
+    return Vector2.fromAngle(this.rotation + Math.PI);
+  }
+
+  right(): Vector2 {
+    return Vector2.fromAngle(this.rotation);
+  }
+
+  translate(offset: Vector2): void {
+    this.position = this.position.add(offset.rotate(this.rotation));
+  }
 }
 
 function drawGizmo(
