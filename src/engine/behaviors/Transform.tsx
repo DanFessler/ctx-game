@@ -154,7 +154,9 @@ class Transform extends Behavior implements TransformData {
       .subtract(new Vector2(canvasSize.x / 2, canvasSize.y / 2));
 
     const camTransform = Game.Camera.behaviors.Transform as Transform;
+
     const scaledPosition = relCenter
+      .rotate(camTransform.rotation)
       .divide(Game.instance!.PPU)
       .divide(cameraScale);
     return scaledPosition.add(camTransform.position);
