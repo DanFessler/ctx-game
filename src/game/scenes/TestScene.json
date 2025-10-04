@@ -16,13 +16,6 @@
         },
         "rotation": 0
       }
-    },
-    {
-      "name": "WorldGridBehavior",
-      "id": "rbGdpugPLxhsdtcyxOsW8",
-      "properties": {
-        "spacing": 1
-      }
     }
   ],
   "children": [
