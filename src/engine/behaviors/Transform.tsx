@@ -40,6 +40,25 @@ class Transform extends Behavior implements TransformData {
     | "draggingX"
     | "draggingRotation" = "deselected";
   public offset: Vector2 = new Vector2(0, 0);
+  public hoverOver: {
+    gizmo: boolean;
+    xAxis: boolean;
+    yAxis: boolean;
+    xAxisPos: boolean;
+    xAxisNeg: boolean;
+    yAxisPos: boolean;
+    yAxisNeg: boolean;
+    rotationRing: boolean;
+  } = {
+    gizmo: false,
+    xAxis: false,
+    yAxis: false,
+    xAxisPos: false,
+    xAxisNeg: false,
+    yAxisPos: false,
+    yAxisNeg: false,
+    rotationRing: false,
+  };
 
   constructor(args: Partial<Transform> = {}) {
     super(args);
@@ -200,6 +219,7 @@ class Transform extends Behavior implements TransformData {
   }
 
   drawWorldSpace(ctx: CanvasRenderingContext2D) {
+    if (Game.instance?.isPlaying) return;
     drawGizmo(
       ctx,
       this,
@@ -218,7 +238,11 @@ class Transform extends Behavior implements TransformData {
       );
     };
 
-    const isOverArrow = (position: Vector2, axis: "x" | "y") => {
+    const isOverArrow = (
+      position: Vector2,
+      axis: "x" | "y",
+      sign?: "positive" | "negative"
+    ) => {
       const positive =
         position.distanceTo(
           this.position.add(
@@ -255,6 +279,13 @@ class Transform extends Behavior implements TransformData {
           )
         ) <
         (arrowLength / Game.instance!.PPU / cameraScale) * this.gizmoScale;
+
+      if (sign === "positive") {
+        return positive;
+      } else if (sign === "negative") {
+        return negative;
+      }
+
       return positive || negative;
     };
 
@@ -275,15 +306,25 @@ class Transform extends Behavior implements TransformData {
       );
     };
 
+    const localPosition = this.screenToLocalPosition(Input.getMousePosition());
+
+    this.hoverOver = {
+      gizmo: isOverGizmo(localPosition),
+      xAxis: isOverArrow(localPosition, "x"),
+      yAxis: isOverArrow(localPosition, "y"),
+      xAxisPos: isOverArrow(localPosition, "x", "positive"),
+      xAxisNeg: isOverArrow(localPosition, "x", "negative"),
+      yAxisPos: isOverArrow(localPosition, "y", "positive"),
+      yAxisNeg: isOverArrow(localPosition, "y", "negative"),
+      rotationRing: isOverRotationRing(localPosition),
+    };
+
     switch (this.currentState) {
       case "deselected": {
-        const localPosition = this.screenToLocalPosition(
-          Input.getMousePosition()
-        );
         const selectedObject = Game.instance?.selectedGameObject;
         if (
           (!selectedObject || selectedObject.behaviors.Transform.isLocked) &&
-          isOverGizmo(localPosition) &&
+          this.hoverOver.gizmo &&
           Input.isMouseDown(0)
         ) {
           Game.instance!.selectedGameObject = this.gameObject;
@@ -300,22 +341,19 @@ class Transform extends Behavior implements TransformData {
       }
 
       case "selected": {
-        const localPosition = this.screenToLocalPosition(
-          Input.getMousePosition()
-        );
         const selectedObject = Game.instance?.selectedGameObject;
 
         if (Input.isMouseDown(0)) {
-          if (isOverGizmo(localPosition)) {
+          if (this.hoverOver.gizmo) {
             this.currentState = "dragging";
             this.offset = localPosition.subtract(this.position);
-          } else if (isOverArrow(localPosition, "y")) {
+          } else if (this.hoverOver.yAxis) {
             this.currentState = "draggingY";
             this.offset = localPosition.subtract(this.position);
-          } else if (isOverArrow(localPosition, "x")) {
+          } else if (this.hoverOver.xAxis) {
             this.currentState = "draggingX";
             this.offset = localPosition.subtract(this.position);
-          } else if (isOverRotationRing(localPosition)) {
+          } else if (this.hoverOver.rotationRing) {
             this.currentState = "draggingRotation";
             this.startRotation = this.rotation;
             this.offset = localPosition.subtract(this.position);
@@ -446,41 +484,89 @@ function drawGizmo(
     ctx.fill();
 
     if (isSelected) {
-      // X arrow
+      // determine sizing depending on if mouse is over the arrow or not
+      let xMultiplier = 1.33;
+      let xArrowSize = transform.hoverOver.xAxisPos
+        ? arrowSize * xMultiplier
+        : arrowSize;
+      let xArrowLength = transform.hoverOver.xAxisPos
+        ? arrowLength * xMultiplier
+        : arrowLength;
+      let xGizmoSize = transform.hoverOver.xAxisPos
+        ? gizmoSize + (xArrowLength - arrowLength)
+        : gizmoSize;
+
+      // draw X arrow
       ctx.beginPath();
-      ctx.moveTo(gizmoSize, 0);
-      ctx.lineTo(gizmoSize - arrowLength, -arrowSize / 2);
-      ctx.lineTo(gizmoSize - arrowLength, arrowSize / 2);
+      ctx.moveTo(xGizmoSize, 0);
+      ctx.lineTo(xGizmoSize - xArrowLength, -xArrowSize / 2);
+      ctx.lineTo(xGizmoSize - xArrowLength, xArrowSize / 2);
       ctx.fillStyle = `rgba(${xColor},1)`;
       ctx.closePath();
       ctx.stroke();
       ctx.fill();
 
-      // Y arrow
-      ctx.beginPath();
-      ctx.moveTo(0, gizmoSize);
-      ctx.lineTo(-arrowSize / 2, gizmoSize - arrowLength);
-      ctx.lineTo(arrowSize / 2, gizmoSize - arrowLength);
-      ctx.fillStyle = `rgba(${yColor},1)`;
-      ctx.closePath();
-      ctx.stroke();
-      ctx.fill();
+      // determine sizing depending on if mouse is over the arrow or not
+      xMultiplier = 1.33;
+      xArrowSize = transform.hoverOver.xAxisNeg
+        ? arrowSize * xMultiplier
+        : arrowSize;
+      xArrowLength = transform.hoverOver.xAxisNeg
+        ? arrowLength * xMultiplier
+        : arrowLength;
+      xGizmoSize = transform.hoverOver.xAxisNeg
+        ? gizmoSize + (xArrowLength - arrowLength)
+        : gizmoSize;
 
-      // X arrow (opposite)
+      // X arrow (negative)
       ctx.beginPath();
-      ctx.moveTo(-gizmoSize, 0);
-      ctx.lineTo(-gizmoSize + arrowLength, -arrowSize / 2);
-      ctx.lineTo(-gizmoSize + arrowLength, arrowSize / 2);
+      ctx.moveTo(-xGizmoSize, 0);
+      ctx.lineTo(-xGizmoSize + xArrowLength, -xArrowSize / 2);
+      ctx.lineTo(-xGizmoSize + xArrowLength, xArrowSize / 2);
       ctx.fillStyle = `rgba(${lineColor},0.5)`;
       ctx.closePath();
       ctx.stroke();
       ctx.fill();
 
-      // Y arrow (opposite)
+      // determine sizing depending on if mouse is over the arrow or not
+      let yMultiplier = 1.33;
+      let yArrowSize = transform.hoverOver.yAxisPos
+        ? arrowSize * yMultiplier
+        : arrowSize;
+      let yArrowLength = transform.hoverOver.yAxisPos
+        ? arrowLength * yMultiplier
+        : arrowLength;
+      let yGizmoSize = transform.hoverOver.yAxisPos
+        ? gizmoSize + (yArrowLength - arrowLength)
+        : gizmoSize;
+
+      // draw Y arrow
       ctx.beginPath();
-      ctx.moveTo(0, -gizmoSize);
-      ctx.lineTo(-arrowSize / 2, -gizmoSize + arrowLength);
-      ctx.lineTo(arrowSize / 2, -gizmoSize + arrowLength);
+      ctx.moveTo(0, yGizmoSize);
+      ctx.lineTo(-yArrowSize / 2, yGizmoSize - yArrowLength);
+      ctx.lineTo(yArrowSize / 2, yGizmoSize - yArrowLength);
+      ctx.fillStyle = `rgba(${yColor},1)`;
+      ctx.closePath();
+      ctx.stroke();
+      ctx.fill();
+
+      // determine sizing depending on if mouse is over the arrow or not
+      yMultiplier = 1.33;
+      yArrowSize = transform.hoverOver.yAxisNeg
+        ? arrowSize * yMultiplier
+        : arrowSize;
+      yArrowLength = transform.hoverOver.yAxisNeg
+        ? arrowLength * yMultiplier
+        : arrowLength;
+      yGizmoSize = transform.hoverOver.yAxisNeg
+        ? gizmoSize + (yArrowLength - arrowLength)
+        : gizmoSize;
+
+      // Y arrow (negative)
+      ctx.beginPath();
+      ctx.moveTo(0, -yGizmoSize);
+      ctx.lineTo(-yArrowSize / 2, -yGizmoSize + yArrowLength);
+      ctx.lineTo(yArrowSize / 2, -yGizmoSize + yArrowLength);
       ctx.fillStyle = `rgba(${lineColor},0.5)`;
       ctx.closePath();
       ctx.stroke();
