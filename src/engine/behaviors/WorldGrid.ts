@@ -66,7 +66,7 @@ class WorldGridBehavior extends Behavior {
     };
   }
 
-  draw(ctx: CanvasRenderingContext2D, renderPass?: string) {
+  drawWorldSpace(ctx: CanvasRenderingContext2D) {
     const cameraScale = (
       Game.Camera.behaviors.Camera as CameraBehavior
     ).getCameraScale();

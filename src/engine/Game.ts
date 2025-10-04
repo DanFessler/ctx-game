@@ -65,6 +65,7 @@ class Game {
       behaviors: [
         new this.behaviors.Camera(),
         new this.behaviors.EditorCameraController(),
+        new this.behaviors.WorldGridBehavior(),
       ],
     });
     this.editorCamera.behaviors.Transform.isLocked = true;
@@ -209,10 +210,15 @@ class Game {
         }
 
         this.ctx.scale(scale, scale);
-        // console.log("cameraTransform.rotation", cameraTransform);
+
+        // we conditionally draw this because the game camera is in the scene and will get rendered by the
+        // scene draw method, while the editor camera is outside the scene and needs to manually be called
+        if (this.camera === this.editorCamera) {
+          this.editorCamera?.drawWorldSpace();
+        }
 
         this.scene.draw("default");
-        this.scene.draw("editor");
+        if (this.isPlaying) this.scene.draw("editor");
         this.scene.drawWorldSpace();
       }
       this.ctx.restore();
