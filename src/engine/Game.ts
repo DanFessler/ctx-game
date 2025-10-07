@@ -6,6 +6,10 @@ import Camera from "./behaviors/Camera";
 const behaviors = import.meta.glob("./behaviors/*.{ts,tsx}", { eager: true });
 // console.log("base behaviors", behaviors);
 
+type GameStats = {
+  showFPS: boolean;
+};
+
 class Game {
   static instance: Game | undefined;
 
@@ -24,6 +28,10 @@ class Game {
   behaviors: Record<string, new () => Behavior> = {};
   highResolution: boolean = false;
   selectedGameObject: GameObject | undefined;
+  fps = 0;
+  stats: GameStats = {
+    showFPS: true,
+  };
 
   private subscribers = new Set<() => void>();
 
@@ -51,9 +59,7 @@ class Game {
     this.PPU = PPU;
 
     this.ctx = this.canvas.getContext("2d")!;
-    this.ctx.scale(PPU, PPU);
-    this.ctx.lineWidth = 1 / PPU;
-    this.ctx.font = `${12 / PPU}px Arial`;
+
     this.ctx.imageSmoothingEnabled = false;
 
     Input.getInstance().registerCanvas(this.canvas);
@@ -112,11 +118,13 @@ class Game {
   }
 
   play() {
+    Input.consumeScrollDelta();
     this.isPlaying = true;
     this.camera = this.mainCamera;
   }
 
   stop() {
+    Input.consumeScrollDelta();
     this.isPlaying = false;
     this.camera = this.editorCamera;
   }
@@ -124,6 +132,15 @@ class Game {
   tick = () => {
     const currentTime = performance.now();
     const deltaTime = (currentTime - this.lastTime) / 1000; // Convert to seconds
+
+    if (deltaTime > 0) {
+      const fps = 1 / deltaTime;
+      this.fps = lerp(this.fps, fps, 0.01);
+      function lerp(a: number, b: number, t: number) {
+        return a + (b - a) * t;
+      }
+    }
+
     this.lastTime = currentTime;
 
     if (this.isPlaying) {
@@ -161,12 +178,7 @@ class Game {
   draw() {
     this.ctx.fillStyle =
       this.camera?.behaviors.Camera?.backgroundColor || "black";
-    this.ctx.fillRect(
-      0,
-      0,
-      this.canvas.width / this.PPU,
-      this.canvas.height / this.PPU
-    );
+    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
     if (!this.camera) {
       this.ctx.fillStyle = "black";
@@ -177,10 +189,13 @@ class Game {
 
     this.ctx.save();
     {
-      if (this.highResolution) this.ctx.scale(2, 2);
+      const PPU = this.PPU * (this.highResolution ? 2 : 1);
+      this.ctx.scale(PPU, PPU);
+      this.ctx.lineWidth = 1 / PPU;
+      this.ctx.font = `${12 / PPU}px Arial`;
+
       this.ctx.save();
       {
-        const PPU = this.PPU * (this.highResolution ? 2 : 1);
         const camera = Game.Camera as GameObject;
         const cameraBehavior = camera.behaviors.Camera as Camera;
         const cameraTransform = camera.behaviors.Transform as Transform;
@@ -223,9 +238,46 @@ class Game {
       }
       this.ctx.restore();
     }
-    this.scene.drawScreenSpace();
     this.ctx.restore();
-    // this.scene.drawScreenSpace(); // not implemented
+
+    this.scene.drawScreenSpace();
+
+    // draw fps
+    this.drawStats();
+  }
+
+  drawStats() {
+    let yPos = 24;
+    const yDelta = 18;
+    this.ctx.fillStyle = "white";
+    this.ctx.font = `14px Arial`;
+
+    // stat count
+    const statCount = Object.keys(this.stats).reduce((acc, key) => {
+      if (this.stats[key as keyof GameStats]) {
+        acc++;
+      }
+      return acc;
+    }, 0);
+
+    if (statCount === 0) return;
+
+    // draw box
+    this.ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+    this.ctx.beginPath();
+    this.ctx.roundRect(4, 4, 128, yDelta * (statCount + 1) + 12, 4);
+    this.ctx.fill();
+    this.ctx.fillStyle = "white";
+
+    // draw stats
+    if (this.stats.showFPS) {
+      this.ctx.fillText("Game Stats", 12, yPos);
+      yPos += yDelta;
+    }
+    if (this.stats.showFPS) {
+      this.ctx.fillText(`FPS: ${this.fps.toFixed(0)}`, 12, yPos);
+      yPos += yDelta;
+    }
   }
 
   static get Camera(): GameObject {

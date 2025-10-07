@@ -57,7 +57,22 @@ function App() {
         <SceneHierarchy gameObject={game.scene} />
       </Dockable.Tab>
       <Dockable.Panel size={3}>
-        <Dockable.Tab id="scene1" name="Scene">
+        <Dockable.Tab
+          id="scene1"
+          name="Scene"
+          actions={[
+            {
+              items: [
+                {
+                  label: "Show FPS",
+                  onClick: () => {
+                    game.stats.showFPS = !game.stats.showFPS;
+                  },
+                },
+              ],
+            },
+          ]}
+        >
           <SceneCanvas />
         </Dockable.Tab>
         <Dockable.Tab id="assets" name="Assets">
