@@ -20,3 +20,7 @@ CTX was designed to be directly customized and modified for each project. Simply
 ## Documentation
 
 coming soon
+
+## TODO
+
+[Todo list](TODO.md)
