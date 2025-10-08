@@ -32,3 +32,8 @@
   border-top: none;
   box-sizing: border-box;
 }
+
+.canvasContainer canvas {
+  width: 100%;
+  height: 100%;
+}

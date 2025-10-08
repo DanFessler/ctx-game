@@ -30,7 +30,7 @@ class Game {
   selectedGameObject: GameObject | undefined;
   fps = 0;
   stats: GameStats = {
-    showFPS: true,
+    showFPS: false,
   };
 
   private subscribers = new Set<() => void>();
@@ -46,23 +46,25 @@ class Game {
     }
 
     this.scene = new GameObject({ name: "Scene" });
-
     this.highResolution = window.devicePixelRatio > 1;
     this.scale = scale;
+    this.PPU = PPU;
+
     this.canvas = document.createElement("canvas");
     this.canvas.width = width * (this.highResolution ? 2 : 1);
     this.canvas.height = height * (this.highResolution ? 2 : 1);
     this.canvas.style.backgroundColor = "black";
     this.canvas.style.imageRendering = "pixelated";
-    this.canvas.style.width = `${width * this.scale}px`;
-    this.canvas.style.height = `${height * this.scale}px`;
-    this.PPU = PPU;
+
+    // commenting out because it's handled by the css
+    // this.canvas.style.width = `${width * this.scale}px`;
+    // this.canvas.style.height = `${height * this.scale}px`;
 
     this.ctx = this.canvas.getContext("2d")!;
-
     this.ctx.imageSmoothingEnabled = false;
 
-    Input.getInstance().registerCanvas(this.canvas);
+    Input.getInstance().registerCanvas(this.canvas!);
+
     Game.instance = this;
     this.registerBehaviors(behaviors);
 
@@ -76,6 +78,27 @@ class Game {
     });
     this.editorCamera.behaviors.Transform.isLocked = true;
     this.camera = this.editorCamera;
+  }
+
+  // Add a method to resize the existing canvas
+  public resizeCanvas(width: number, height: number) {
+    if (!this.canvas) return;
+
+    // Update canvas internal dimensions
+    this.canvas.width = width * (this.highResolution ? 2 : 1);
+    this.canvas.height = height * (this.highResolution ? 2 : 1);
+
+    // Update canvas display size
+    // commenting out because it's handled by the css
+    // this.canvas.style.width = `${width * this.scale}px`;
+    // this.canvas.style.height = `${height * this.scale}px`;
+
+    // Reconfigure context settings
+    this.ctx.imageSmoothingEnabled = false;
+
+    // resize the camera vfov
+    (this.editorCamera?.behaviors.Camera as Camera).vfov =
+      this.canvas.height / this.PPU;
   }
 
   subscribe = (callback: () => void): (() => void) => {
@@ -167,6 +190,7 @@ class Game {
     if (gameObject.behaviors.Camera) {
       this.mainCamera = gameObject;
     }
+    gameObject.game = this;
     this.scene.addChild(gameObject);
     this.gameObjects.set(gameObject.id, gameObject);
   }

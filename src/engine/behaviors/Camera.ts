@@ -25,6 +25,7 @@ export class Camera extends Behavior {
   }
 
   draw(ctx: CanvasRenderingContext2D) {
+    if (Game.instance!.isPlaying) return;
     const aspectRatio = ctx.canvas.width / ctx.canvas.height;
     if (Game.instance!.selectedGameObject === this.gameObject) {
       const pixel = 1 / Game.instance!.PPU;
