@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import native from "../callNative";
-import { FaFile } from "react-icons/fa";
+import { FaFile, FaFileCode, FaFileImage } from "react-icons/fa";
 import { FaFolder } from "react-icons/fa";
 import styles from "./AssetBrowser.module.css";
 import { FaAngleRight } from "react-icons/fa";
 import Game from "../../engine/Game";
+import { BsFilePlayFill } from "react-icons/bs";
 
 type File = {
   name: string;
@@ -164,15 +165,50 @@ function File({
       }}
     >
       <div className={styles.fileIcon}>
-        {!asset.isDirectory ? (
-          <FaFile style={{ width: "100%", height: "100%" }} />
-        ) : (
-          <FaFolder style={{ width: "100%", height: "100%" }} />
-        )}
+        <FileIcon
+          isDirectory={asset.isDirectory}
+          extension={asset.extension}
+          subExtension={asset.subExtension}
+        />
       </div>
-      <div className={styles.fileName}>{asset.name}</div>
+      <div className={styles.fileName}>{asset.name.split(".")[0]}</div>
     </div>
   );
+}
+
+function FileIcon({
+  isDirectory,
+  extension,
+  subExtension,
+}: {
+  isDirectory: boolean;
+  extension?: string;
+  subExtension?: string;
+}) {
+  function getFileIcon() {
+    if (isDirectory) {
+      return FaFolder;
+    }
+
+    switch (extension) {
+      case "png":
+        return FaFileImage;
+      case "ts":
+        return FaFileCode;
+      case "json":
+        switch (subExtension) {
+          case "scene":
+            return BsFilePlayFill;
+          default:
+            return FaFile;
+        }
+      default:
+        return FaFile;
+    }
+  }
+
+  const Icon = getFileIcon();
+  return <Icon style={{ width: "100%", height: "100%" }} />;
 }
 
 export default AssetBrowser;
