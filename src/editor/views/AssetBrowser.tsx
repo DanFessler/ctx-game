@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import native from "../callNative";
-import { FaFile, FaFileCode, FaFileImage } from "react-icons/fa";
-import { FaFolder } from "react-icons/fa";
 import styles from "./AssetBrowser.module.css";
-import { FaAngleRight } from "react-icons/fa";
 import Game from "../../engine/Game";
+
+// Icons
+import { FaFile, FaFileCode, FaFileImage } from "react-icons/fa";
 import { BsFilePlayFill } from "react-icons/bs";
+import { FaFolder } from "react-icons/fa";
+import { FaAngleRight } from "react-icons/fa";
 
 type File = {
   name: string;
@@ -15,6 +17,7 @@ type File = {
   size: number;
   extension: string | undefined;
   subExtension: string | undefined;
+  thumbnail: string | undefined;
 };
 
 function AssetBrowser() {
@@ -165,26 +168,16 @@ function File({
       }}
     >
       <div className={styles.fileIcon}>
-        <FileIcon
-          isDirectory={asset.isDirectory}
-          extension={asset.extension}
-          subExtension={asset.subExtension}
-        />
+        <FileIcon file={asset} />
       </div>
       <div className={styles.fileName}>{asset.name.split(".")[0]}</div>
     </div>
   );
 }
 
-function FileIcon({
-  isDirectory,
-  extension,
-  subExtension,
-}: {
-  isDirectory: boolean;
-  extension?: string;
-  subExtension?: string;
-}) {
+function FileIcon({ file }: { file: File }) {
+  const { isDirectory, extension, subExtension, thumbnail } = file;
+
   function getFileIcon() {
     if (isDirectory) {
       return FaFolder;
@@ -192,6 +185,15 @@ function FileIcon({
 
     switch (extension) {
       case "png":
+        return FileThumbnailHOC(thumbnail);
+      case "jpg":
+      case "jpeg":
+      case "gif":
+      case "bmp":
+      case "tiff":
+      case "ico":
+      case "webp":
+        // TODO: add other image extensions
         return FaFileImage;
       case "ts":
         return FaFileCode;
@@ -209,6 +211,21 @@ function FileIcon({
 
   const Icon = getFileIcon();
   return <Icon style={{ width: "100%", height: "100%" }} />;
+}
+
+function FileThumbnailHOC(thumbnail: string | undefined) {
+  return function FileThumbnail({ style }: { style: React.CSSProperties }) {
+    return (
+      <img
+        src={`data:image/png;base64,${thumbnail}`}
+        style={{
+          borderRadius: "4px",
+          boxShadow: "0 1px 3px rgba(0, 0, 0, .25)",
+          ...style,
+        }}
+      />
+    );
+  };
 }
 
 export default AssetBrowser;

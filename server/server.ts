@@ -16,12 +16,19 @@ const api = {
       const hasExtension = !item.isDirectory() && item.name.includes(".");
       let extension: string | undefined;
       let subExtension: string | undefined;
+      let thumbnail: string | undefined;
+
       if (hasExtension) {
         const splitName = item.name.split(".");
         extension = splitName[splitName.length - 1];
         subExtension =
           splitName.length > 2 ? splitName[splitName.length - 2] : undefined;
+
+        if (extension === "png") {
+          thumbnail = fs.readFileSync(path + "/" + item.name, "base64");
+        }
       }
+
       return {
         name: item.name,
         path: path + "/" + item.name,
@@ -30,6 +37,7 @@ const api = {
         size: fs.statSync(path + "/" + item.name).size,
         extension: extension,
         subExtension: subExtension,
+        thumbnail: thumbnail,
       };
     });
   },
