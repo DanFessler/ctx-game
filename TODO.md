@@ -1,5 +1,8 @@
 # TODO
 
+- boxCollider
+- box transform tool
+
 ## Easy wins
 
 - Behavior context menu
@@ -42,4 +45,5 @@
 
 ## Bugs
 
+- selection in hierarchy desyncs with scene when loading new scenes
 - sorting animation transitions pop sometimes
