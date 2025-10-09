@@ -119,6 +119,11 @@ export class Input {
     return Input.getInstance().scrollDelta;
   }
 
+  // TODO BUG:
+  // If nothing consumes the delta, then it builds up causing issues when something finally does.
+  // Noticed this when exiting play mode and my editor camera suddenly zooms.
+  // Fixed by consuming it before entering and exiting play mode,
+  // But this might pop up again in other situations
   public static consumeScrollDelta(): number {
     const input = Input.getInstance();
     const delta = input.scrollDelta;
