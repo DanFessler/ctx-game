@@ -12,13 +12,26 @@ const api = {
   readFile: async (path: string) => fs.readFileSync(path, "utf-8"),
   listDir: async (path: string) => {
     const result = fs.readdirSync(path, { withFileTypes: true });
-    return result.map((item) => ({
-      name: item.name,
-      path: path + "/" + item.name,
-      isDirectory: item.isDirectory(),
-      updatedAt: fs.statSync(path + "/" + item.name).mtime.toISOString(),
-      size: fs.statSync(path + "/" + item.name).size,
-    }));
+    return result.map((item) => {
+      const hasExtension = !item.isDirectory() && item.name.includes(".");
+      let extension: string | undefined;
+      let subExtension: string | undefined;
+      if (hasExtension) {
+        const splitName = item.name.split(".");
+        extension = splitName[splitName.length - 1];
+        subExtension =
+          splitName.length > 2 ? splitName[splitName.length - 2] : undefined;
+      }
+      return {
+        name: item.name,
+        path: path + "/" + item.name,
+        isDirectory: item.isDirectory(),
+        updatedAt: fs.statSync(path + "/" + item.name).mtime.toISOString(),
+        size: fs.statSync(path + "/" + item.name).size,
+        extension: extension,
+        subExtension: subExtension,
+      };
+    });
   },
   loadFile: async (path: string) => {
     return fs.readFileSync(path, "utf-8");

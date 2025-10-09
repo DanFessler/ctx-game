@@ -1,7 +1,7 @@
 import Game from "../engine/Game";
 const behaviors = import.meta.glob("./behaviors/*.ts", { eager: true });
-import defaultScene from "./scenes/default.json";
-import testScene from "./scenes/TestScene.json";
+import defaultScene from "./scenes/default.scene.json";
+import testScene from "./scenes/TestScene.scene.json";
 // import native from "../editor/callNative";
 
 let game: Game;

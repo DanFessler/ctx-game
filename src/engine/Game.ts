@@ -84,6 +84,10 @@ class Game {
   public resizeCanvas(width: number, height: number) {
     if (!this.canvas) return;
 
+    // get current vfov as a ratio of canvas height
+    const currentVFOV = (this.editorCamera?.behaviors.Camera as Camera).vfov;
+    const newVFOV = currentVFOV * (height / this.canvas.height);
+
     // Update canvas internal dimensions
     this.canvas.width = width * (this.highResolution ? 2 : 1);
     this.canvas.height = height * (this.highResolution ? 2 : 1);
@@ -97,8 +101,7 @@ class Game {
     this.ctx.imageSmoothingEnabled = false;
 
     // resize the camera vfov
-    (this.editorCamera?.behaviors.Camera as Camera).vfov =
-      this.canvas.height / this.PPU;
+    (this.editorCamera?.behaviors.Camera as Camera).vfov = newVFOV;
   }
 
   subscribe = (callback: () => void): (() => void) => {
@@ -123,8 +126,11 @@ class Game {
   }
 
   loadScene(scene: SerializedGameObject) {
+    this.stop();
     this.scene = GameObject.deserialize(scene);
     this.scene.behaviors.Transform.isLocked = true;
+    this.selectedGameObject = undefined;
+    this.scene.start();
     console.log("loaded scene", this.scene);
   }
 

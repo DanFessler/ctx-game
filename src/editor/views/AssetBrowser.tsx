@@ -4,6 +4,7 @@ import { FaFile } from "react-icons/fa";
 import { FaFolder } from "react-icons/fa";
 import styles from "./AssetBrowser.module.css";
 import { FaAngleRight } from "react-icons/fa";
+import Game from "../../engine/Game";
 
 type File = {
   name: string;
@@ -11,6 +12,8 @@ type File = {
   isDirectory: boolean;
   updatedAt: string;
   size: number;
+  extension: string | undefined;
+  subExtension: string | undefined;
 };
 
 function AssetBrowser() {
@@ -128,10 +131,28 @@ function File({
   return (
     <div
       onMouseDown={(e) => handleFileSelect(asset, e)}
+      onClick={() => {
+        // console.log({
+        //   extension: asset.extension,
+        //   subExtension: asset.subExtension,
+        // });
+      }}
       onDoubleClick={() => {
-        if (asset.isDirectory) setPath([...path, asset.name]);
-        else {
-          native.openFile(asset.path);
+        if (asset.isDirectory) {
+          setPath([...path, asset.name]);
+          return;
+        }
+
+        switch (asset.extension) {
+          case "json":
+            native.readFile(asset.path).then((data) => {
+              const parsed = JSON.parse(data);
+              console.log({ parsed });
+              Game.instance!.loadScene(parsed);
+            });
+            break;
+          default:
+            native.openFile(asset.path);
         }
       }}
       className={styles.fileContainer}
