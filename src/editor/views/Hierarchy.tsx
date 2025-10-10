@@ -3,7 +3,7 @@ import { FaSearch } from "react-icons/fa";
 import HierarchyList from "../components/HierarchyList";
 import GameObject from "../../engine/GameObject";
 import game from "../../game";
-import useGameObjectSelector from "../hooks/useGameObjectSelector";
+import useSubscribableObject from "../hooks/useSubscribableObject";
 import Game from "../../engine/Game";
 import {
   // closestCorners,
@@ -18,18 +18,21 @@ import {
 import { useState } from "react";
 import Transform from "../../engine/behaviors/Transform";
 
-type SceneHierarchyProps = {
-  gameObject: GameObject;
-};
-
-function SceneHierarchy({ gameObject }: SceneHierarchyProps) {
+function SceneHierarchy() {
   const [activeChildren, setActiveChildren] = useState<React.ReactNode | null>(
     null
   );
-  const selected = useGameObjectSelector<Game, GameObject | undefined>(
+  const selected = useSubscribableObject<Game, GameObject | undefined>(
     game,
-    (go) => go.selectedGameObject
+    (game) => game.selectedGameObject
   );
+
+  const sceneObject = useSubscribableObject<Game, GameObject>(
+    Game.instance!,
+    (game) => game.scene
+  );
+
+  console.log("rendered hierarchy");
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -103,7 +106,7 @@ function SceneHierarchy({ gameObject }: SceneHierarchyProps) {
         </div>
         <div className={styles.content}>
           <HierarchyList
-            gameObject={gameObject}
+            gameObject={sceneObject}
             setSelectedGameObject={(gameObject) => {
               game.selectedGameObject = gameObject;
               game.updateSubscribers();

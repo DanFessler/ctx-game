@@ -2,6 +2,7 @@ import Game from "./Game";
 import Behavior from "./Behavior";
 import { nanoid } from "nanoid";
 import Transform from "./behaviors/Transform";
+import Subscribable from "./Subscribable";
 
 type GameObjectProps = {
   behaviors?: Behavior[];
@@ -21,7 +22,7 @@ export type SerializedBehavior = {
   properties: Record<string, unknown>;
 };
 
-export class GameObject {
+export class GameObject extends Subscribable {
   // game: Game | undefined;
   behaviors: Record<string, Behavior> = {};
   children: GameObject[] = [];
@@ -31,16 +32,9 @@ export class GameObject {
   id: string;
   isSelected = false;
 
-  private subscribers = new Set<() => void>();
-
-  subscribe = (callback: () => void): (() => void) => {
-    this.subscribers.add(callback);
-    return () => {
-      this.subscribers.delete(callback);
-    };
-  };
-
   constructor({ behaviors, children, name }: GameObjectProps) {
+    super();
+
     this.name = name || this.constructor.name;
     this.id = nanoid();
 
@@ -150,10 +144,6 @@ export class GameObject {
       child.updateEditor(deltaTime);
     });
     this.updateSubscribers();
-  }
-
-  updateSubscribers() {
-    this.subscribers.forEach((callback) => callback());
   }
 
   draw(renderPass?: string) {

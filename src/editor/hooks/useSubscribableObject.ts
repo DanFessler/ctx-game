@@ -6,30 +6,30 @@ interface Subscribeable {
   subscribe: (callback: () => void) => () => void;
 }
 
-function useGameObjectSelector<ObjectType extends Subscribeable, T>(
-  gameObject: ObjectType,
-  selector: (go: ObjectType) => T,
+function useSubscribableObject<ObjectType extends Subscribeable, T>(
+  object: ObjectType,
+  selector: (object: ObjectType) => T,
   equalityFn: (a: T, b: T) => boolean = Object.is
 ): T {
-  const [selected, setSelected] = useState(() => selector(gameObject));
+  const [selected, setSelected] = useState(() => selector(object));
   const selectedRef = useRef(selected);
 
   useEffect(() => {
-    if (!gameObject) return;
+    if (!object) return;
 
     const checkForUpdates = () => {
-      const next = selector(gameObject);
+      const next = selector(object);
       if (!equalityFn(selectedRef.current, next)) {
         selectedRef.current = next;
         setSelected(next);
       }
     };
 
-    const unsubscribe = gameObject.subscribe(checkForUpdates);
+    const unsubscribe = object.subscribe(checkForUpdates);
     return unsubscribe;
-  }, [gameObject, selector, equalityFn]);
+  }, [object, selector, equalityFn]);
 
   return selectedRef.current;
 }
 
-export default useGameObjectSelector;
+export default useSubscribableObject;

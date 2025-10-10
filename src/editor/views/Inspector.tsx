@@ -25,11 +25,11 @@ import SortableItem from "../components/SortableItem";
 import styles from "./Inspector.module.css";
 import useGameObject from "../hooks/useGameObject";
 import Game from "../../engine/Game";
-import useGameObjectSelector from "../hooks/useGameObjectSelector";
+import useSubscribableObject from "../hooks/useSubscribableObject";
 import game from "../../game";
 
 function Inspector() {
-  const gameObject = useGameObjectSelector<Game, GameObject | undefined>(
+  const gameObject = useSubscribableObject<Game, GameObject | undefined>(
     game,
     (go) => go.selectedGameObject
   );

@@ -151,7 +151,6 @@ function File({
           case "json":
             native.readFile(asset.path).then((data) => {
               const parsed = JSON.parse(data);
-              console.log({ parsed });
               Game.instance!.loadScene(parsed);
             });
             break;

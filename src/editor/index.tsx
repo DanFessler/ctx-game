@@ -54,7 +54,7 @@ function App() {
           },
         ]}
       >
-        <SceneHierarchy gameObject={game.scene} />
+        <SceneHierarchy />
       </Dockable.Tab>
       <Dockable.Panel size={3}>
         <Dockable.Tab

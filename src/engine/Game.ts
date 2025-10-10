@@ -3,6 +3,7 @@ import Transform from "./behaviors/Transform";
 import Input from "./Input";
 import Behavior from "./Behavior";
 import Camera from "./behaviors/Camera";
+import Subscribable from "./Subscribable";
 const behaviors = import.meta.glob("./behaviors/*.{ts,tsx}", { eager: true });
 // console.log("base behaviors", behaviors);
 
@@ -10,7 +11,7 @@ type GameStats = {
   showFPS: boolean;
 };
 
-class Game {
+class Game extends Subscribable {
   static instance: Game | undefined;
 
   canvas: HTMLCanvasElement;
@@ -33,14 +34,14 @@ class Game {
     showFPS: false,
   };
 
-  private subscribers = new Set<() => void>();
-
   constructor(
     width: number,
     height: number,
     PPU: number = 64,
     scale: number = 1
   ) {
+    super();
+
     if (Game.instance) {
       throw new Error("Game already exists");
     }
@@ -104,17 +105,6 @@ class Game {
     (this.editorCamera?.behaviors.Camera as Camera).vfov = newVFOV;
   }
 
-  subscribe = (callback: () => void): (() => void) => {
-    this.subscribers.add(callback);
-    return () => {
-      this.subscribers.delete(callback);
-    };
-  };
-
-  updateSubscribers() {
-    this.subscribers.forEach((callback) => callback());
-  }
-
   init() {
     if (!this.mainCamera) {
       const camera = new GameObject({
@@ -132,6 +122,7 @@ class Game {
     this.selectedGameObject = undefined;
     this.scene.start();
     console.log("loaded scene", this.scene);
+    this.updateSubscribers();
   }
 
   serialize() {

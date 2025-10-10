@@ -2,7 +2,7 @@ import { useState } from "react";
 import GameObject from "../../engine/GameObject";
 import styles from "./HierarchyList.module.css";
 import { PiBoundingBoxFill } from "react-icons/pi";
-import useGameObjectSelector from "../hooks/useGameObjectSelector";
+import useSubscribableObject from "../hooks/useSubscribableObject";
 import { useDraggable, useDroppable } from "@dnd-kit/core";
 import { Dockable } from "@danfessler/react-dockable";
 
@@ -19,7 +19,7 @@ function HierarchyList({
   isDragging?: boolean;
   canDrop?: boolean;
 }) {
-  useGameObjectSelector<GameObject, GameObject[]>(
+  useSubscribableObject<GameObject, GameObject[]>(
     gameObject,
     (go) => [...go.children],
     (a, b) => {
@@ -92,7 +92,7 @@ function HierarchyItem({
 }) {
   const [isOpen, setIsOpen] = useState(true);
   const hasChildren = gameObject.children.length > 0;
-  const name = useGameObjectSelector<GameObject, string>(
+  const name = useSubscribableObject<GameObject, string>(
     gameObject,
     (go) => go.name
   );
