@@ -33,6 +33,7 @@ class Game extends Subscribable {
   stats: GameStats = {
     showFPS: false,
   };
+  serializedScene: string | undefined;
 
   constructor(
     width: number,
@@ -79,6 +80,7 @@ class Game extends Subscribable {
     });
     this.editorCamera.behaviors.Transform.isLocked = true;
     this.camera = this.editorCamera;
+    this.init();
   }
 
   // Add a method to resize the existing canvas
@@ -113,15 +115,14 @@ class Game extends Subscribable {
       });
       this.addGameObject(camera);
     }
+    this.start();
   }
 
   loadScene(scene: SerializedGameObject) {
-    this.stop();
     this.scene = GameObject.deserialize(scene);
     this.scene.behaviors.Transform.isLocked = true;
     this.selectedGameObject = undefined;
     this.scene.start();
-    console.log("loaded scene", this.scene);
     this.updateSubscribers();
   }
 
@@ -130,8 +131,6 @@ class Game extends Subscribable {
   }
 
   start() {
-    // this.isPlaying = true;
-    this.init();
     this.scene.start();
     this.lastTime = performance.now();
     this.tick();
@@ -139,14 +138,22 @@ class Game extends Subscribable {
 
   play() {
     Input.consumeScrollDelta();
-    this.isPlaying = true;
+    this.serializedScene = JSON.stringify(this.serialize());
     this.camera = this.mainCamera;
+    this.isPlaying = true;
   }
 
   stop() {
-    Input.consumeScrollDelta();
-    this.isPlaying = false;
+    if (!this.isPlaying) return;
+
+    if (this.serializedScene) {
+      this.loadScene(JSON.parse(this.serializedScene));
+      this.serializedScene = undefined;
+    }
+
     this.camera = this.editorCamera;
+    this.isPlaying = false;
+    Input.consumeScrollDelta();
   }
 
   tick = () => {

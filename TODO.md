@@ -1,7 +1,6 @@
 # TODO
 
-- boxCollider
-- box transform tool
+- Hierarchy search
 
 ## Easy wins
 
@@ -45,5 +44,5 @@
 
 ## Bugs
 
-- selection in hierarchy desyncs with scene when loading new scenes
-- sorting animation transitions pop sometimes
+- save scene doesn't save over opened scene file
+- sorting behavior animation transitions pop sometimes

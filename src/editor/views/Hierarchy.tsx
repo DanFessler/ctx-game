@@ -32,8 +32,6 @@ function SceneHierarchy() {
     (game) => game.scene
   );
 
-  console.log("rendered hierarchy");
-
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
