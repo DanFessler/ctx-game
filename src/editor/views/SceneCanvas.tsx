@@ -4,6 +4,19 @@ import { FaPlay, FaStop } from "react-icons/fa";
 import game from "../../game";
 import styles from "./SceneCanvas.module.css";
 
+export const SceneCanvasActions = [
+  {
+    items: [
+      {
+        label: "Show FPS",
+        onClick: () => {
+          game.stats.showFPS = !game.stats.showFPS;
+        },
+      },
+    ],
+  },
+];
+
 function SceneCanvas() {
   const canvasContainer = useRef<HTMLDivElement>(null);
   const resizeTimeoutRef = useRef<NodeJS.Timeout | null>(null);

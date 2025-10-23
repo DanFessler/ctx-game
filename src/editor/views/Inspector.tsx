@@ -28,6 +28,28 @@ import Game from "../../engine/Game";
 import useSubscribableObject from "../hooks/useSubscribableObject";
 import game from "../../game";
 
+export const InspectorActions = [
+  {
+    items: [
+      {
+        label: "Add Behavior",
+        items: Object.entries(game.behaviors).map(([key]) => ({
+          label: key,
+          onClick: function () {
+            const behaviorClass = game.behaviors![key];
+            console.log(behaviorClass, game.selectedGameObject);
+            if (!behaviorClass || !game.selectedGameObject) return;
+            const behavior = new behaviorClass();
+            behavior.gameObject = game.selectedGameObject;
+            game.selectedGameObject.behaviors[key] = behavior;
+            game.selectedGameObject.updateSubscribers();
+          },
+        })),
+      },
+    ],
+  },
+];
+
 function Inspector() {
   const gameObject = useSubscribableObject<Game, GameObject | undefined>(
     game,

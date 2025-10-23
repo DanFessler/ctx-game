@@ -1,6 +1,7 @@
 # TODO
 
 - Hierarchy search
+- snapping
 
 ## Easy wins
 

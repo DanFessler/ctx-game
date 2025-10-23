@@ -17,6 +17,35 @@ import {
 // import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 import { useState } from "react";
 import Transform from "../../engine/behaviors/Transform";
+import native from "../callNative";
+
+export const SceneHierarchyActions = [
+  {
+    items: [
+      {
+        label: "Save Scene",
+        onClick: () => {
+          const serialized = game.scene.serialize();
+          native.saveFile(
+            "src/game/scenes/default.json",
+            JSON.stringify(serialized, null, 2)
+          );
+        },
+        shortcut: "⌘+S",
+      },
+      {
+        label: "New GameObject",
+        onClick: () => {
+          const newGameObject = new GameObject({
+            name: "New GameObject",
+          });
+          game.scene.addChild(newGameObject);
+        },
+        shortcut: "⌘+S",
+      },
+    ],
+  },
+];
 
 function SceneHierarchy() {
   const [activeChildren, setActiveChildren] = useState<React.ReactNode | null>(
